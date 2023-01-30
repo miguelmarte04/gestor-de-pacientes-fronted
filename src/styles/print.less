@@ -1,0 +1,47 @@
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: #fff !important;
+    color: black !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  @page {
+    margin: 1cm;
+  
+  }
+  html,
+  body {
+    height: initial !important;
+    overflow: initial !important;
+  }
+  div.print-table {
+    height: 2rem;
+    
+  }
+  .print-template {
+    display: block;
+    width: 100%;
+    height: 100vh;
+    page-break-after: always;
+    z-index: 9999;
+    background-color: red;
+  }
+  .print-body {
+    height: max-content;
+    page-break-before: always !important;
+    page-break-after: always !important;
+  }
+  .footer {
+    background: transparent;
+    color: #333;
+    line-height: 50px;
+    padding: 0 20px;
+  }
+
+  .push {
+    height: 50px;
+  }
+}
