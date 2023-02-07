@@ -78,12 +78,7 @@ const Login = (): React.ReactElement => {
                       Inicio de sesión
                     </CustomTitle>
                   </CustomCol>
-                  <Image
-                    preview={false}
-                    width={'17%'}
-                    src="/assets/logo.png"
-                    alt={'Logo'}
-                  />
+                  
                 </CustomRow>
               </CustomFormItem>
               <CustomFormItem
