@@ -63,8 +63,6 @@ const Dashboard = (): React.ReactElement => {
   const { candidates } = useAppSelector((state) => state.recruitment)
   const { departments } = useAppSelector((state) => state.general)
 
-  const { id_departamento } = getSessionInfo()
-
   const buildDataSource = <T, K extends keyof T>(arr: T[], k: K) => {
     const data = new Array<number>()
     const sortedData = sortByDate(arr, k)
@@ -230,16 +228,16 @@ const Dashboard = (): React.ReactElement => {
               <CustomCol xs={24}>
                 <ConditionalComponent
                   condition={
-                    getSessionInfo().id_privilegios?.toString() === '1' ||
-                    getSessionInfo().id_privilegios?.toString() === '3'
+                    getSessionInfo().privilegios === 1 ||
+                    getSessionInfo().privilegios === 3
                   }
                 >
                   <DynamicCard dataSources={dynamicCardDataSources} />
                 </ConditionalComponent>
                 <ConditionalComponent
                   condition={
-                    getSessionInfo().id_privilegios?.toString() === '2' ||
-                    getSessionInfo().id_privilegios?.toString() === '3'
+                    getSessionInfo().privilegios === 2 ||
+                    getSessionInfo().privilegios === 3
                   }
                 >
                   <InfoCard dataSource={infoCardDataSources} />
@@ -247,8 +245,8 @@ const Dashboard = (): React.ReactElement => {
               </CustomCol>
               <ConditionalComponent
                 condition={
-                  getSessionInfo().id_privilegios?.toString() === '1' ||
-                  getSessionInfo().id_privilegios?.toString() === '3'
+                  getSessionInfo().privilegios === 1 ||
+                  getSessionInfo().privilegios === 3
                 }
               >
                 <CustomCol xs={24}>
@@ -262,9 +260,9 @@ const Dashboard = (): React.ReactElement => {
 
               <ConditionalComponent
                 condition={
-                  getSessionInfo().id_privilegios?.toString() === '1' ||
-                  getSessionInfo().id_privilegios?.toString() === '2' ||
-                  getSessionInfo().id_privilegios?.toString() === '3'
+                  getSessionInfo().privilegios === 1 ||
+                  getSessionInfo().privilegios === 2 ||
+                  getSessionInfo().privilegios === 3
                 }
               >
                 <CustomCol xs={24}>

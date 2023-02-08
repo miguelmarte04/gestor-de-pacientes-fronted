@@ -5,7 +5,7 @@ import CustomTable from './CustomTable'
 import CustomCol from './CustomCol'
 import CustomRow from './CustomRow'
 import CustomTitle from './CustomTitle'
-import { getDataInfoEmpresa } from '../utils/session'
+// import { getDataInfoEmpresa } from '../utils/session'
 
 interface PrintTemplateProps {
   columns: ColumnsType<unknown>
@@ -19,11 +19,7 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
       <div ref={ref} className={'print-template'}>
         <CustomCol xs={24}>
           <CustomRow justify={'center'}>
-            <Image
-              width={150}
-              preview={false}
-              src={getDataInfoEmpresa()?.logo}
-            />
+            <Image width={150} preview={false} src={'/assets/logo.png'} />
           </CustomRow>
         </CustomCol>
         <CustomCol xs={24}>

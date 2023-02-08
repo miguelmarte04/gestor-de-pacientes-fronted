@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Image } from 'antd'
 import CustomRow from '../components/CustomRow'
-import { getDataInfoEmpresa } from '../utils/session'
-import { InfoEmpresaType } from '../slicers/general'
+// import { getDataInfoEmpresa } from '../utils/session'
+// import { InfoEmpresaType } from '../slicers/general'
 
 const Home = (): React.ReactElement => {
-  const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
+  // const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
 
-  useEffect(() => {
-    setGetDataEmpresa(getDataInfoEmpresa())
-  }, [])
+  // useEffect(() => {
+  //   setGetDataEmpresa(getDataInfoEmpresa())
+  // }, [])
 
   return (
     <CustomRow justify={'center'} style={{ marginTop: '40px' }}>
       <Image
-        src={getDataEmpresa?.logo}
+        src={'/assets/logo.png'}
         alt="Logo"
         preview={false}
         width={'50%'}

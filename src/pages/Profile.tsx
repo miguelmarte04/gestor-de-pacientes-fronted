@@ -32,7 +32,7 @@ const Profile = (): React.ReactElement => {
     form.setFieldsValue({
       nombres: getSessionInfo().nombres,
       apellidos: getSessionInfo().apellidos,
-      cargo: getSessionInfo().cargo,
+      // cargo: getSessionInfo().cargo,
       usuario: getSessionInfo().usuario,
     })
   }, [])

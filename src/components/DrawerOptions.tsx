@@ -101,276 +101,19 @@ const DrawerOptions = (): React.ReactElement => {
       onOpenChange={onOpenChange}
       style={{ border: 'none', outline: 'none', backgroundColor: '#fff' }}
     >
-      {getSessionInfo().id_privilegios?.toString() === '1' && (
+      {getSessionInfo().privilegios === 1 && (
         <>
-          <CustomSubMenu key="1" icon={<UserOutlined />} title={'EMPLEADOS'}>
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="1-1"
-                onClick={() => handleClick(EMPLOYEES, '1-1')}
-              >
-                Registro del empleado
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="1-2"
-                onClick={() => handleClick(GENERAR_CONTRATO, '1-2')}
-              >
-                Generar Contratos
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="1-7-2"
-                onClick={() => handleClick(CARTA_REGISTRO_EMPLEADOS, '1-7-2')}
-              >
-                Carta Registro de Empleados
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="1-3"
-                onClick={() => handleClick(AUMENTO_SUELDO, '1-3')}
-              >
-                Aumento de sueldo
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="1-4"
-                onClick={() => handleClick(CAMBIAR_DEPARTAMENTO, '1-4')}
-              >
-                Cambiar de departamento
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="1-5"
-                onClick={() => handleClick(EMPLOYEES_HISTORY, '1-5')}
-              >
-                Historial de Cambios
-              </CustomMenuItem>
-              <CustomSubMenu key="1-6" title={'Informe'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="1-6-1"
-                    onClick={() => handleClick(EMPLOYEES_BIRTHDAY, '1-6-1')}
-                  >
-                    Cumpleaños
-                  </CustomMenuItem>
-                  <CustomMenuItem
-                    key="1-6-2"
-                    onClick={() => handleClick(REPORTE_EMPLEADOS, '1-6-2')}
-                  >
-                    Reporte de Empleados
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
-
-          <CustomSubMenu
-            key="2"
+          <CustomMenuItem
+            key="1"
             icon={<TeamOutlined />}
-            title={'RECLUTAMIENTO'}
+            onClick={() => handleClick(EMPLOYEES, '1-1')}
           >
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="2-1"
-                onClick={() => handleClick(VACANCIES_PATH, '2-1')}
-              >
-                Crear / Modificar Vacante
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="2-2"
-                onClick={() => handleClick(CANDIDATES_PATH, '2-2')}
-              >
-                Candidatos
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="2-3"
-                onClick={() => handleClick(CANDIDATES_HISTORY, '2-3')}
-              >
-                Historial de Cambios
-              </CustomMenuItem>
-
-              <CustomSubMenu key="2-4" title={'Informes'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="2-4-1"
-                    onClick={() => handleClick(CANDIDATES_REPORT, '2-4-1')}
-                  >
-                    Candidatos
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
-
-          <CustomSubMenu
-            key="3"
-            icon={<TeamOutlined />}
-            title={'PERMISOS Y LICENCIAS'}
-          >
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="3-1"
-                onClick={() => handleClick(RECORD_PERMIT_OR_LICENSE, '3-1')}
-              >
-                Registrar / Modificar
-              </CustomMenuItem>
-
-              <CustomMenuItem
-                key="3-2"
-                onClick={() =>
-                  handleClick(PERMIT_OR_LICENSE_CHANGE_HISTORY, '3-2')
-                }
-              >
-                Historial de cambios
-              </CustomMenuItem>
-              <CustomSubMenu key="3-3" title={'Informe'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="3-3"
-                    onClick={() => handleClick(INFORME_LICENCIA, '3-3')}
-                  >
-                    Informe Licencias
-                  </CustomMenuItem>
-                  <CustomMenuItem
-                    key="3-4"
-                    onClick={() => handleClick(INFORME_PERMISOS, '3-4')}
-                  >
-                    Informe Permisos
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
-          <CustomSubMenu key="4" icon={<TeamOutlined />} title={'VACACIONES'}>
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="4-1"
-                onClick={() => handleClick(VACATIONS_CONSULTATION, '4-1')}
-              >
-                Consultar / Modificar
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="4-2"
-                onClick={() => handleClick(SOLICITAR_VACACIONES, '4-2')}
-              >
-                Solicitar
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="4-3"
-                onClick={() => handleClick(APROBAR_SOLICITUD_VACACIONES, '4-3')}
-              >
-                Aprobar
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="4-4"
-                onClick={() => handleClick(VACATIONS_CHANGE_HISTORY, '4-4')}
-              >
-                Historial de cambios
-              </CustomMenuItem>
-              <CustomSubMenu key="4-5" title={'Informes'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="4-5-1"
-                    onClick={() => handleClick(INFORME_VACACIONES, '4-5-1')}
-                  >
-                    Informe Vacaciones
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
-          <CustomSubMenu key="5" icon={<TeamOutlined />} title={'FALTAS'}>
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="5-1"
-                onClick={() => handleClick(REGISTER_OR_MODIFY_FAULTS, '5-1')}
-              >
-                Registrar / Modificar
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="5-2"
-                onClick={() => handleClick(CHANGE_HISTORY_FAULTS, '5-2')}
-              >
-                Historial de cambios
-              </CustomMenuItem>
-              <CustomSubMenu key="5-3" title={'Informes'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="5-3-1"
-                    onClick={() => handleClick(INFORME_FALTAS, '5-3-1')}
-                  >
-                    Reporte de Faltas
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
-          <CustomSubMenu key="6" icon={<TeamOutlined />} title={'DESPIDOS'}>
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="6-1"
-                onClick={() => handleClick(REGISTER_OR_MODIFY_LAYOFFS, '6-1')}
-              >
-                Solicitar / Modificar
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="6-2"
-                onClick={() => handleClick(APPROVE_LAYOFFS, '6-2')}
-              >
-                Aprobar
-              </CustomMenuItem>
-              {/* <CustomMenuItem
-                key="6-3"
-                onClick={() => handleClick(CHANGE_HISTORY_LAYOFFS, '6-3')}
-              >
-                Historial de cambios
-              </CustomMenuItem> */}
-              <CustomSubMenu key="6-4" title={'Informes'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="6-4-1"
-                    onClick={() => handleClick(INFORME_DESPIDO, '6-4-1')}
-                  >
-                    Informe de Despidos
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
-          <CustomSubMenu key="7" icon={<TeamOutlined />} title={'RENUNCIAS'}>
-            <CustomMenuItemGroup>
-              <CustomMenuItem
-                key="7-1"
-                onClick={() =>
-                  handleClick(REGISTER_OR_MODIFY_REASIGNATIONS, '7-1')
-                }
-              >
-                Solicitar / Modificar
-              </CustomMenuItem>
-              <CustomMenuItem
-                key="7-2"
-                onClick={() => handleClick(APPROVE_REASIGNATIONS, '7-2')}
-              >
-                Aprobar
-              </CustomMenuItem>
-              {/* <CustomMenuItem
-                key="7-3"
-                onClick={() => handleClick(CHANGE_HISTORY_REASIGNATIONS, '7-3')}
-              >
-                Historial de cambios
-              </CustomMenuItem> */}
-              <CustomSubMenu key="7-4" title={'Informes'}>
-                <CustomMenuItemGroup>
-                  <CustomMenuItem
-                    key="7-4-1"
-                    onClick={() => handleClick(INFORME_RENUNCIAS, '7-4-1')}
-                  >
-                    Informe de Renuncias
-                  </CustomMenuItem>
-                </CustomMenuItemGroup>
-              </CustomSubMenu>
-            </CustomMenuItemGroup>
-          </CustomSubMenu>
+            CONSULTAS
+          </CustomMenuItem>
         </>
       )}
 
-      {getSessionInfo().id_privilegios?.toString() === '2' && (
+      {getSessionInfo().privilegios === 2 && (
         <CustomSubMenu key="8" icon={<TeamOutlined />} title={'NOMINA'}>
           <CustomMenuItemGroup>
             <CustomMenuItem
@@ -420,7 +163,7 @@ const DrawerOptions = (): React.ReactElement => {
         </CustomSubMenu>
       )}
 
-      {getSessionInfo().id_privilegios?.toString() === '1' && (
+      {getSessionInfo().privilegios === 1 && (
         <CustomSubMenu key="9" icon={<HomeOutlined />} title={'DEPARTAMENTOS'}>
           <CustomMenuItemGroup>
             <CustomMenuItem
@@ -438,7 +181,7 @@ const DrawerOptions = (): React.ReactElement => {
           </CustomMenuItemGroup>
         </CustomSubMenu>
       )}
-      {getSessionInfo().id_privilegios?.toString() === '3' && (
+      {getSessionInfo().privilegios === 3 && (
         <CustomSubMenu
           key="10"
           icon={<SettingOutlined />}

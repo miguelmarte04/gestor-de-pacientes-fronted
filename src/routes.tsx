@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import Login from './pages/Login'
 import {
   Navigate,
@@ -57,13 +57,13 @@ import {
   VACATIONS_CHANGE_HISTORY,
 } from './constants/Routes'
 import MenuRoutesWrapper from './components/MenuRoutesWrapper'
-import { getDataInfoEmpresa, isLoggedIn } from './utils/session'
+import {  isLoggedIn } from './utils/session'
 import Employee from './pages/employee'
 import RegisterEmployee from './pages/RegisterEmployee'
 import Profile from './pages/Profile'
-import { styles } from './utils/general'
-import { InfoEmpresaType } from './slicers/general'
-import { useAppSelector } from './hooks'
+// import { styles } from './utils/general'
+// import { InfoEmpresaType } from './slicers/general'
+// import { useAppSelector } from './hooks'
 import ChangeHistory from './pages/ChangeHistory'
 import PermitOrLicense from './pages/PermitOrLicense'
 import Holidays from './pages/Holidays'
@@ -113,20 +113,20 @@ const LoginRequired = (): React.ReactElement =>
   isLoggedIn() ? <Outlet /> : <Navigate to={PATH_LOGIN} />
 
 const Routes = (): React.ReactElement => {
-  const { infoEmpresa: InfoEmpresa } = useAppSelector((state) => state.general)
-  const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
+  // const { infoEmpresa: InfoEmpresa } = useAppSelector((state) => state.general)
+  // const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
 
-  const callback = useCallback(() => {
-    if (getDataInfoEmpresa()?.id && !getDataEmpresa?.id) {
-      setGetDataEmpresa(getDataInfoEmpresa())
-    }
-  }, [InfoEmpresa])
+  // const callback = useCallback(() => {
+  //   if (getDataInfoEmpresa()?.id && !getDataEmpresa?.id) {
+  //     setGetDataEmpresa(getDataInfoEmpresa())
+  //   }
+  // }, [InfoEmpresa])
 
-  useEffect(callback, [callback])
+  // useEffect(callback, [callback])
 
   return (
     <>
-      <style>{styles(getDataInfoEmpresa()?.background_color)}</style>
+      {/* <style>{styles(getDataInfoEmpresa()?.background_color)}</style> */}
       <Router>
         <Switch>
           <Route path={PATH_LOGIN} element={<Login />} />

@@ -20,7 +20,7 @@ import CustomTooltip from './CustomTooltip'
 import CustomDropdown from './CustomDropdown'
 import CustomMenuItem from './CustomMenuItem'
 import {
-  getDataInfoEmpresa,
+  // getDataInfoEmpresa,
   getSessionInfo,
   isLoggedIn,
   removeSession,
@@ -32,7 +32,7 @@ import DrawerOptions from './DrawerOptions'
 import Darkreader from 'react-darkreader'
 import Cookies from 'js-cookie'
 
-import { InfoEmpresaType } from '../slicers/general'
+// import { InfoEmpresaType } from '../slicers/general'
 import { useAppSelector } from '../hooks'
 import CustomCol from './CustomCol'
 import { defaultTheme } from '../themes'
@@ -52,7 +52,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
   const history = useNavigate()
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const [fullScreen, setFullScreen] = useState<boolean>(false)
-  const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
+  // const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
 
   const { infoEmpresa } = useAppSelector((state) => state.general)
 
@@ -60,9 +60,9 @@ const MenuRoutesWrapper = (): React.ReactElement => {
     removeSession()
   }
 
-  useEffect(() => {
-    setGetDataEmpresa(getDataInfoEmpresa())
-  }, [])
+  // useEffect(() => {
+  //   setGetDataEmpresa(getDataInfoEmpresa())
+  // }, [])
 
   useEffect(() => {
     if (infoEmpresa?.id) {
@@ -123,7 +123,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
         <CustomCol xs={24} style={{ minHeight: '120px', maxHeight: '120px' }}>
           <CustomRow justify={'center'}>
             <Image
-              src={getDataEmpresa?.logo}
+              src={'/assets/logo.png'}
               alt="Logo"
               onClick={() => history('/dashboard')}
               preview={false}
@@ -158,10 +158,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
         <CustomRow justify={'center'}>
           <Header
             style={{
-              backgroundColor: `${
-                getDataEmpresa?.background_color ??
-                defaultTheme.secondaryBackgroundColor
-              }`,
+              backgroundColor: `${defaultTheme.secondaryBackgroundColor}`,
               color: defaultTheme.primaryTextColor,
               width: '100%',
               alignItems: 'center',
@@ -195,7 +192,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                   fontSize: '25px',
                 }}
               >
-                {`${getDataInfoEmpresa()?.nombre_empresa ?? ''} `}
+                {'Gestor de Pacientes'}
               </h2>
 
               <CustomSpace size={'large'} style={{ marginRight: '-35px' }}>

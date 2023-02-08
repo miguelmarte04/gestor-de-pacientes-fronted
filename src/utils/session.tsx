@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import moment from 'moment'
-import { InfoEmpresaType } from '../slicers/general'
-import { AnyType } from '../constants/types'
+// import { InfoEmpresaType } from '../slicers/general'
+// import { AnyType } from '../constants/types'
 
 const COOKIE_KEY_USER_NAME = 'hrAppUserName'
 const COOKIE_KEY_SESSION_TOKEN = 'hrAppSessionToken'
@@ -16,28 +16,29 @@ export const isLoggedIn = (): boolean => {
   )
 }
 
-export const getDataInfoEmpresa = (): AnyType => {
-  const data: InfoEmpresaType = JSON.parse(
-    window.sessionStorage.getItem(COOKIE_KEY_BUSINESS_DATA) || '{}'
-  )
-  return data
-}
+// export const getDataInfoEmpresa = (): AnyType => {
+//   const data: InfoEmpresaType = JSON.parse(
+//     window.sessionStorage.getItem(COOKIE_KEY_BUSINESS_DATA) || '{}'
+//   )
+//   return data
+// }
 
 export type UserData = {
   usuario: string
   nombres: string
-  id_empresa: string
+  // id_empresa: string
   apellidos: string
-  cargo: string
-  id_privilegios: string
-  id_departamento: number
+  // cargo: string
+  // id_privilegios: string
+  // id_departamento: number
   id: string
   imagen: string
-  empresa: {
-    background_color: string
-    logo: string
-    nombre_empresa: string
-  }
+  // empresa: {
+  //   background_color: string
+  //   logo: string
+  //   nombre_empresa: string
+  // }
+  privilegios: number
   sessionCookie: {
     token: string
     expiracion: string
@@ -51,12 +52,13 @@ export const createSession = (user: UserData): void => {
     usuario,
     nombres,
     apellidos,
-    cargo,
-    id_privilegios,
-    id_departamento,
-    id_empresa,
+    // cargo,
+    // id_privilegios,
+    // id_departamento,
+    // id_empresa,
     imagen,
-    empresa,
+    privilegios,
+    // empresa,
   } = user
   const { token: sessionToken, expiracion: sessionExpiration } = sessionCookie
   const cookiesExpiration = new Date(sessionExpiration)
@@ -65,18 +67,19 @@ export const createSession = (user: UserData): void => {
     id,
     nombres,
     apellidos,
-    id_empresa,
-    cargo,
-    id_privilegios,
-    id_departamento,
+    privilegios,
+    // id_empresa,
+    // cargo,
+    // id_privilegios,
+    // id_departamento,
   })
 
-  const { background_color, nombre_empresa } = empresa
+  // const { background_color, nombre_empresa } = empresa
 
-  sessionStorage.setItem(COOKIE_KEY_BUSINESS_DATA, JSON.stringify(empresa))
-  sessionStorage.setItem(COOKIE_KEY_USER_DATA, JSON.stringify(imagen))
+  // sessionStorage.setItem(COOKIE_KEY_BUSINESS_DATA, JSON.stringify(empresa))
+  sessionStorage.setItem(COOKIE_KEY_USER_DATA, JSON.stringify(imagen ?? ''))
 
-  const businessInfo = JSON.stringify({ background_color, nombre_empresa })
+  // const businessInfo = JSON.stringify({ background_color, nombre_empresa })
 
   Cookies.set(COOKIE_KEY_USER_NAME, usuario, {
     expires: new Date(
@@ -88,9 +91,9 @@ export const createSession = (user: UserData): void => {
     expires: cookiesExpiration,
   })
 
-  Cookies.set(COOKIE_KEY_BUSINESS_DATA, businessInfo, {
-    expires: cookiesExpiration,
-  })
+  // Cookies.set(COOKIE_KEY_BUSINESS_DATA, businessInfo, {
+  //   expires: cookiesExpiration,
+  // })
 
   Cookies.set(COOKIE_KEY_SESSION_TOKEN, sessionToken, {
     expires: cookiesExpiration,
