@@ -1,18 +1,14 @@
 import {
-  CheckOutlined,
   DeleteOutlined,
+  EditOutlined,
   EyeOutlined,
+  PlusOutlined,
   StopOutlined,
 } from '@ant-design/icons'
 import { Avatar, Form } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import {
-  getLaidOff,
-  getTypeLayoffs,
-  updateLayoff,
-} from '../slicers/employee/employee'
-import { EmployeeType, LayoffsType } from '../slicers/employee/types'
+import { EmployeeType } from '../slicers/employee/types'
 import { defaultTheme } from '../themes'
 import { formatter, searchInArray } from '../utils/general'
 import { CustomModalConfirmation } from '../components/ConfirmModalMethod'
@@ -32,34 +28,29 @@ import CustomRadioGroup from '../components/CustomRadioGroup'
 import CustomRow from '../components/CustomRow'
 import CustomSearch from '../components/CustomSearch'
 import CustomSearchEmployee from '../components/CustomSearchEmployee'
-import CustomSelect from '../components/CustomSelect'
-import CustomTextArea from '../components/CustomTextArea'
 import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
+import { getSessionInfo } from '../utils/session'
 import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
 import CustomSpin from '../components/CustomSpin'
-import CustomInputNumber from '../components/CustomInputNumber'
-const ApproveLayoffs = (): React.ReactElement => {
+import {
+  createDepartments,
+  getDepartments,
+  updateDepartments,
+} from '../slicers/general/general'
+import { DepartmentsType } from '../slicers/general'
+const SimpleTemplate = (): React.ReactElement => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
-  const {
-    dataLaidOff,
-    dataTypeLayoffs,
-    createLayoffRequestStatus,
-    fetchingFromEmployee,
-  } = useAppSelector((state) => state.employee)
+  const { departments, fetchingGeneralData, createDepartmentsRequestStatus } =
+    useAppSelector((state) => state.general)
+
   useEffect(() => {
-    dispatch(getTypeLayoffs({}))
-    dispatch(getLaidOff({}))
+    dispatch(getDepartments({}))
   }, [])
 
-  const getInitials = (name: string, lastName: string) => {
-    return `${name?.charAt(0)?.toUpperCase()}${lastName
-      ?.charAt(0)
-      ?.toUpperCase()}`
-  }
   const [search, setSearch] = useState('')
-  const [edit, setEdit] = useState<LayoffsType>()
+  const [edit, setEdit] = useState<DepartmentsType>()
   const [view, setView] = useState(false)
   const [employeeSelected, setEmployeeSelected] = useState<EmployeeType>()
   const [visible, setVisible] = useState(false)
@@ -75,26 +66,27 @@ const ApproveLayoffs = (): React.ReactElement => {
         }),
       })
   }, [employeeSelected])
-
   useEffect(() => {
-    if (createLayoffRequestStatus === 'success') {
-      dispatch(getLaidOff({}))
+    if (createDepartmentsRequestStatus === 'success') {
+      dispatch(getDepartments({}))
       form.resetFields()
       setVisible(false)
+      setEdit(undefined)
+      setView(false)
     }
-  }, [createLayoffRequestStatus])
+  }, [createDepartmentsRequestStatus])
 
-  const handleDelete = (record: LayoffsType) => {
+  const handleDelete = (record: DepartmentsType) => {
     dispatch(
-      updateLayoff({
+      updateDepartments({
         condition: {
           ...record,
-          estado: 'R',
+          estado: record.estado === 'A' ? 'I' : 'A',
         },
       })
     )
   }
-  const handleEdit = (record: LayoffsType) => {
+  const handleEdit = (record: DepartmentsType) => {
     setVisible(true)
     setEdit(record)
     form.setFieldsValue({
@@ -106,7 +98,7 @@ const ApproveLayoffs = (): React.ReactElement => {
       }),
     })
   }
-  const handleView = (record: LayoffsType) => {
+  const handleView = (record: DepartmentsType) => {
     setView(true)
     setVisible(true)
     form.setFieldsValue({
@@ -119,22 +111,26 @@ const ApproveLayoffs = (): React.ReactElement => {
     })
   }
 
-  const renderItem = (item: LayoffsType) => {
+  const renderItem = (item: DepartmentsType) => {
     return (
       <CustomListItem
         actions={[
-          <>
-            {item.estado === 'A' && (
-              <CustomTooltip key={'aprobar'} title={'Aprobar'}>
-                <CustomButton
-                  onClick={() => handleEdit(item)}
-                  type={'link'}
-                  icon={<CheckOutlined style={{ fontSize: '18px' }} />}
-                  className={'editPhoneButton'}
-                />
-              </CustomTooltip>
-            )}
-          </>,
+          <CustomTooltip
+            key={'edit'}
+            title={
+              item.estado === 'A' || item.estado === 'U'
+                ? 'Editar'
+                : 'Inactivo, no permite edición'
+            }
+          >
+            <CustomButton
+              disabled={item.estado === 'I'}
+              onClick={() => handleEdit(item)}
+              type={'link'}
+              icon={<EditOutlined style={{ fontSize: '18px' }} />}
+              className={'editPhoneButton'}
+            />
+          </CustomTooltip>,
 
           <CustomTooltip key={'view'} title={'Ver'}>
             <CustomButton
@@ -151,105 +147,101 @@ const ApproveLayoffs = (): React.ReactElement => {
               }
             />
           </CustomTooltip>,
-          <>
-            {item.estado === 'A' && (
-              <CustomTooltip
-                key={'delete'}
-                title={
-                  item.estado === 'A' || item.estado === 'U'
-                    ? 'Rechazar'
-                    : 'Habilitar'
-                }
-              >
-                <CustomButton
-                  onClick={() => {
-                    CustomModalConfirmation({
-                      content:
-                        item.estado === 'A'
-                          ? '¿Está seguro que desea eliminar el registro?'
-                          : '¿Está seguro que desea habilitar el registro?',
-                      onOk: () => {
-                        handleDelete(item)
-                      },
-                    })
-                  }}
-                  type={'link'}
-                  icon={
-                    item.estado === 'A' || item.estado === 'U' ? (
-                      <DeleteOutlined
-                        style={{
-                          fontSize: '18px',
-                          color: defaultTheme.dangerColor,
-                        }}
-                      />
-                    ) : (
-                      <StopOutlined
-                        className="disabledColor"
-                        style={{ fontSize: '18px' }}
-                      />
-                    )
-                  }
-                />
-              </CustomTooltip>
-            )}
-          </>,
+
+          <CustomTooltip
+            key={'delete'}
+            title={
+              item.estado === 'A' || item.estado === 'U'
+                ? 'Inhabilitar'
+                : 'Habilitar'
+            }
+          >
+            <CustomButton
+              onClick={() => {
+                CustomModalConfirmation({
+                  content:
+                    item.estado === 'A'
+                      ? '¿Está seguro que desea eliminar el registro?'
+                      : '¿Está seguro que desea habilitar el registro?',
+                  onOk: () => {
+                    handleDelete(item)
+                  },
+                })
+              }}
+              type={'link'}
+              icon={
+                item.estado === 'A' || item.estado === 'U' ? (
+                  <DeleteOutlined
+                    style={{
+                      fontSize: '18px',
+                      color: defaultTheme.dangerColor,
+                    }}
+                  />
+                ) : (
+                  <StopOutlined
+                    className="disabledColor"
+                    style={{ fontSize: '18px' }}
+                  />
+                )
+              }
+            />
+          </CustomTooltip>,
         ]}
       >
         <CustomListItemMeta
           avatar={
             <Avatar
               size={'large'}
-              src={item.imagen_Empleado}
               icon={
-                item.imagen_Empleado ? null : (
-                  <span
-                    style={{
-                      color: defaultTheme.primaryColor,
-                      fontSize: 18,
-                      fontFamily: 'comic sans',
-                    }}
-                  >
-                    {getInitials(item.nombres, item.apellidos)}
-                  </span>
-                )
+                <span
+                  style={{
+                    color: defaultTheme.primaryColor,
+                    fontSize: 18,
+                    fontFamily: 'comic sans',
+                  }}
+                >
+                  {`${item.departamento?.charAt(0)?.toUpperCase()}`}
+                </span>
               }
             />
           }
-          title={`${item.nombres} ${item.apellidos}`}
-          description={`Razón: ${item?.tipo_razon} - Estado: ${
-            item?.estado === 'A'
-              ? 'Pendiente'
-              : item?.estado === 'R'
-              ? 'Rechazado'
-              : 'Aprobado'
-          }`}
+          title={`${item.departamento}`}
+          description={`Encargado: ${item?.nombres} ${
+            item?.apellidos
+          } - ${formatter({
+            value: item?.doc_identidad,
+            type: 'identity_doc',
+          })}`}
         />
       </CustomListItem>
     )
   }
   const handleUpdate = async () => {
     const data = await form.validateFields()
-    dispatch(updateLayoff({ condition: { ...edit, ...data, estado: 'U' } }))
+    dispatch(updateDepartments({ condition: { ...edit, ...data } }))
+  }
+  const handleCreate = async () => {
+    const data = await form.validateFields()
+
+    dispatch(
+      createDepartments({
+        condition: {
+          ...data,
+          id_empleado_encargado: employeeSelected?.id,
+          usuario_insercion: getSessionInfo().usuario,
+        },
+      })
+    )
   }
   return (
     <CustomLayoutBoxShadow>
-      <CustomSpin spinning={fetchingFromEmployee}>
+      <CustomSpin spinning={fetchingGeneralData}>
         <CustomRow justify={'end'}>
           <CustomCol xs={24}>
-            <CustomForm
-              form={form}
-              onChange={() => {
-                const data = form.getFieldsValue()
-                const prestaciones =
-                  Number(data?.preaviso) +
-                  Number(data?.regalia) +
-                  Number(data?.cesantia)
-                form.setFieldValue('total_prestaciones', prestaciones)
-              }}
-            >
+            <CustomForm form={form}>
               <CustomRow>
                 <CustomDivider>
-                  <CustomTitle>Aprobar / Rechazar Despidos</CustomTitle>
+                  <CustomTitle>Departamentos</CustomTitle>
                 </CustomDivider>
 
                 <CustomCol xs={24} md={12} />
@@ -268,6 +260,20 @@ const ApproveLayoffs = (): React.ReactElement => {
                         />
                       </CustomFormItem>
                     </CustomCol>
+
+                    <CustomCol xs={4} md={2} lg={3} xl={2}>
+                      <CustomTooltip title={'Nuevo Departamento'}>
+                        <CustomButton
+                          icon={<PlusOutlined />}
+                          shape={'circle'}
+                          size={'middle'}
+                          type={'primary'}
+                          onClick={() => {
+                            setVisible(true)
+                          }}
+                        />
+                      </CustomTooltip>
+                    </CustomCol>
                   </CustomRow>
                 </CustomCol>
 
@@ -281,9 +287,8 @@ const ApproveLayoffs = (): React.ReactElement => {
                           setStateFilter(e.target.value)
                         }}
                       >
-                        <CustomRadio value={'A'}>Pendientes</CustomRadio>
-                        <CustomRadio value={'U'}>Aprobados</CustomRadio>
-                        <CustomRadio value={'R'}>Rechazados</CustomRadio>
+                        <CustomRadio value={'A'}>Activos</CustomRadio>
+                        <CustomRadio value={'I'}>Inactivos</CustomRadio>
                       </CustomRadioGroup>
                     </CustomFormItem>
                   </CustomRow>
@@ -294,12 +299,16 @@ const ApproveLayoffs = (): React.ReactElement => {
                 dataSource={
                   stateFilter === ''
                     ? searchInArray(
-                        dataLaidOff?.filter((item) => item?.estado !== 'I'),
+                        departments?.filter(
+                          (item) => item.estado === 'A' || item.estado === 'I'
+                        ),
                         ['nombres', 'doc_identidad'],
                         search
                       )
                     : searchInArray(
-                        dataLaidOff?.filter((item) => item?.estado !== 'I'),
+                        departments?.filter(
+                          (item) => item.estado === 'A' || item.estado === 'I'
+                        ),
                         ['nombres', 'doc_identidad'],
                         search
                       )?.filter((item) => item.estado === stateFilter)
@@ -311,10 +320,10 @@ const ApproveLayoffs = (): React.ReactElement => {
                 title={
                   <CustomTitle>
                     {edit?.id
-                      ? 'Aprobar Despido'
+                      ? 'Editar Departamento'
                       : view
-                      ? 'Ver Despido'
-                      : 'Registrar Despido'}
+                      ? 'Departamento'
+                      : 'Registrar Departamento'}
                   </CustomTitle>
                 }
                 width={'50%'}
@@ -328,7 +337,7 @@ const ApproveLayoffs = (): React.ReactElement => {
                   form.resetFields()
                 }}
                 onOk={() => {
-                  handleUpdate()
+                  edit?.id ? handleUpdate() : handleCreate()
                 }}
               >
                 {!(edit?.id || view) && (
@@ -353,7 +362,7 @@ const ApproveLayoffs = (): React.ReactElement => {
 
                 <CustomCol xs={24}>
                   <CustomFormItem
-                    label={'Empleado'}
+                    label={'Empleado Encargado'}
                     rules={[{ required: true }]}
                     labelCol={{ span: 6 }}
                   >
@@ -389,91 +398,12 @@ const ApproveLayoffs = (): React.ReactElement => {
 
                 <CustomCol xs={24}>
                   <CustomFormItem
-                    label={'Razón del despido'}
-                    name={'id_tipo_razon_despido'}
+                    label={'Departamento'}
+                    name={'departamento'}
                     rules={[{ required: true }]}
                     labelCol={{ span: 6 }}
                   >
-                    <CustomSelect
-                      placeholder={'Seleccione una razón'}
-                      disabled
-                      options={dataTypeLayoffs?.map((item) => ({
-                        label: item.tipo_razon,
-                        value: item.id,
-                      }))}
-                    />
-                  </CustomFormItem>
-                </CustomCol>
-                <CustomCol xs={24}>
-                  <CustomFormItem
-                    label={'Cesantía'}
-                    name={'cesantia'}
-                    rules={[{ required: true }]}
-                    labelCol={{ span: 6 }}
-                  >
-                    <CustomInputNumber
-                      placeholder="Cesantía"
-                      style={{ width: '50%' }}
-                      format={{ format: 'money', coin: 'RD' }}
-                      readOnly={view}
-                    />
-                  </CustomFormItem>
-                </CustomCol>
-                <CustomCol xs={24}>
-                  <CustomFormItem
-                    label={'Preaviso'}
-                    name={'preaviso'}
-                    rules={[{ required: true }]}
-                    labelCol={{ span: 6 }}
-                  >
-                    <CustomInputNumber
-                      placeholder="Preaviso"
-                      style={{ width: '50%' }}
-                      format={{ format: 'money', coin: 'RD' }}
-                      readOnly={view}
-                    />
-                  </CustomFormItem>
-                </CustomCol>
-                <CustomCol xs={24}>
-                  <CustomFormItem
-                    label={'Regalia'}
-                    name={'regalia'}
-                    rules={[{ required: true }]}
-                    labelCol={{ span: 6 }}
-                  >
-                    <CustomInputNumber
-                      placeholder="Regalia"
-                      style={{ width: '50%' }}
-                      format={{ format: 'money', coin: 'RD' }}
-                      readOnly={view}
-                    />
-                  </CustomFormItem>
-                </CustomCol>
-                <CustomCol xs={24}>
-                  <CustomFormItem
-                    label={'Total a pagar'}
-                    name={'total_prestaciones'}
-                    rules={[{ required: true }]}
-                    labelCol={{ span: 6 }}
-                  >
-                    <CustomInputNumber
-                      readOnly
-                      placeholder="Total a pagar"
-                      style={{ width: '50%' }}
-                      format={{ format: 'money', coin: 'RD' }}
-                    />
-                  </CustomFormItem>
-                </CustomCol>
-                <CustomCol xs={24}>
-                  <CustomFormItem
-                    label={'Observaciones'}
-                    name={'observaciones'}
-                    labelCol={{ span: 6 }}
-                  >
-                    <CustomTextArea
-                      placeholder="Observaciones"
-                      disabled={view}
-                    />
+                    <CustomInput placeholder="Departamento" />
                   </CustomFormItem>
                 </CustomCol>
               </CustomModal>
@@ -485,4 +415,4 @@ const ApproveLayoffs = (): React.ReactElement => {
   )
 }
 
-export default ApproveLayoffs
+export default SimpleTemplate

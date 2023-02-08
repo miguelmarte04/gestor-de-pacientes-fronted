@@ -8,52 +8,7 @@ import {
 } from '@ant-design/icons'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  APPROVE_LAYOFFS,
-  APPROVE_REASIGNATIONS,
-  APROBAR_NOMINA,
-  APROBAR_SOLICITUD_VACACIONES,
-  AUMENTO_SUELDO,
-  AUTORIZAR_NOMINA,
-  CAMBIAR_DEPARTAMENTO,
-  CANDIDATES_HISTORY,
-  CANDIDATES_PATH,
-  CANDIDATES_REPORT,
-  CARTA_REGISTRO_EMPLEADOS,
-  CHANGE_HISTORY_DEPARTMENTS,
-  CHANGE_HISTORY_FAULTS,
-  CHANGE_HISTORY_LAYOFFS,
-  CHANGE_HISTORY_REASIGNATIONS,
-  CONSULTAR_NOMINA,
-  EMPLOYEES,
-  EMPLOYEES_BIRTHDAY,
-  EMPLOYEES_HISTORY,
-  GENERAR_CONTRATO,
-  HISTORIAL_NOMINA,
-  HISTORY_OF_CONFIGURATION_CHANGES,
-  INFO_EMPRESA,
-  INFORME_DESPIDO,
-  INFORME_FALTAS,
-  INFORME_LICENCIA,
-  INFORME_PERMISOS,
-  INFORME_RENUNCIAS,
-  INFORME_VACACIONES,
-  PATH_LOGIN,
-  PERMIT_OR_LICENSE_CHANGE_HISTORY,
-  RECORD_PERMIT_OR_LICENSE,
-  REGISTER_OR_MODIFY_CONFIGURATION,
-  REGISTER_OR_MODIFY_DEPARTMENTS,
-  REGISTER_OR_MODIFY_FAULTS,
-  REGISTER_OR_MODIFY_LAYOFFS,
-  REGISTER_OR_MODIFY_REASIGNATIONS,
-  REGISTRAR_NOMINA,
-  REVERSAR_NOMINA,
-  SOLICITAR_VACACIONES,
-  TIPOS_NOMINA,
-  VACANCIES_PATH,
-  VACATIONS_CHANGE_HISTORY,
-  VACATIONS_CONSULTATION,
-} from '../constants/Routes'
+import { PATH_CONSULTAS } from '../constants/Routes'
 import CustomMenu from './CustomMenu'
 import CustomMenuItem from './CustomMenuItem'
 import CustomMenuItemGroup from './CustomMenuItemGroup'
@@ -65,7 +20,6 @@ import {
   setResetRegisterEmployee,
 } from '../slicers/employee'
 import { setNextLocation, setStepPositionReset } from '../slicers/general'
-import { REPORTE_EMPLEADOS } from '../constants/Routes'
 import { getSessionInfo } from '../utils/session'
 
 const DrawerOptions = (): React.ReactElement => {
@@ -76,9 +30,6 @@ const DrawerOptions = (): React.ReactElement => {
 
   useResetStore(resetStore)
   const handleClick = (direction: string, key: string) => {
-    // if (!isLoggedIn()) {
-    //   removeSession()
-    // }
     dispatch(setNextLocation(''))
     dispatch(resetEmployeeState())
     dispatch(setStepPositionReset())
@@ -106,14 +57,14 @@ const DrawerOptions = (): React.ReactElement => {
           <CustomMenuItem
             key="1"
             icon={<TeamOutlined />}
-            onClick={() => handleClick(EMPLOYEES, '1-1')}
+            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
           >
             CONSULTAS
           </CustomMenuItem>
         </>
       )}
 
-      {getSessionInfo().privilegios === 2 && (
+      {/* {getSessionInfo().privilegios === 2 && (
         <CustomSubMenu key="8" icon={<TeamOutlined />} title={'NOMINA'}>
           <CustomMenuItemGroup>
             <CustomMenuItem
@@ -161,51 +112,7 @@ const DrawerOptions = (): React.ReactElement => {
             </CustomMenuItem>
           </CustomMenuItemGroup>
         </CustomSubMenu>
-      )}
-
-      {getSessionInfo().privilegios === 1 && (
-        <CustomSubMenu key="9" icon={<HomeOutlined />} title={'DEPARTAMENTOS'}>
-          <CustomMenuItemGroup>
-            <CustomMenuItem
-              key="9-1"
-              onClick={() => handleClick(REGISTER_OR_MODIFY_DEPARTMENTS, '9-1')}
-            >
-              Registrar / Modificar
-            </CustomMenuItem>
-            <CustomMenuItem
-              key="9-2"
-              onClick={() => handleClick(CHANGE_HISTORY_DEPARTMENTS, '9-2')}
-            >
-              Historial de cambios
-            </CustomMenuItem>
-          </CustomMenuItemGroup>
-        </CustomSubMenu>
-      )}
-      {getSessionInfo().privilegios === 3 && (
-        <CustomSubMenu
-          key="10"
-          icon={<SettingOutlined />}
-          title={'CONFIGURACIONES'}
-        >
-          <CustomMenuItemGroup>
-            <CustomMenuItem
-              key="10-1"
-              onClick={() =>
-                handleClick(REGISTER_OR_MODIFY_CONFIGURATION, '10-1')
-              }
-            >
-              Registrar / Modificar
-            </CustomMenuItem>
-
-            <CustomMenuItem
-              key="10-2"
-              onClick={() => handleClick('asignar_permisos', '10-2')}
-            >
-              Asignar permiso
-            </CustomMenuItem>
-          </CustomMenuItemGroup>
-        </CustomSubMenu>
-      )}
+      )} */}
     </CustomMenu>
   )
 }
