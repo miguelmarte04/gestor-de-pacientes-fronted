@@ -32,7 +32,10 @@ const Routes = (): React.ReactElement => {
           <Route path={'/'} element={<MenuRoutesWrapper />}>
             <Route path={PATH_MAIN} element={<Dashboard />} />
             <Route path={PATH_PROFILE} element={<Profile />} />
-            <Route path={PATH_CONSULTAS} element={<SimpleTemplate />} />
+            <Route
+              path={PATH_CONSULTAS}
+              element={<SimpleTemplate State={'C'} />}
+            />
             <Route path={'*'} element={<NotFound />} />
           </Route>
         </Route>

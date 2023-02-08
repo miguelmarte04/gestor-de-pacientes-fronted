@@ -39,7 +39,13 @@ import {
   updateDepartments,
 } from '../slicers/general/general'
 import { DepartmentsType } from '../slicers/general'
-const SimpleTemplate = (): React.ReactElement => {
+interface TemplateProps {
+  State: string
+}
+
+const SimpleTemplate: React.FC<TemplateProps> = ({
+  State,
+}): React.ReactElement => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
   const { departments, fetchingGeneralData, createDepartmentsRequestStatus } =
@@ -55,6 +61,13 @@ const SimpleTemplate = (): React.ReactElement => {
   const [employeeSelected, setEmployeeSelected] = useState<EmployeeType>()
   const [visible, setVisible] = useState(false)
   const [stateFilter, setStateFilter] = useState<string>('A')
+
+  const title = {
+    C: {
+      title: 'Consultas',
+    },
+  }
+
   useEffect(() => {
     employeeSelected &&
       form.setFieldsValue({
@@ -233,6 +246,7 @@ const SimpleTemplate = (): React.ReactElement => {
       })
     )
   }
+
   return (
     <CustomLayoutBoxShadow>
       <CustomSpin spinning={fetchingGeneralData}>
@@ -241,7 +255,7 @@ const SimpleTemplate = (): React.ReactElement => {
             <CustomForm form={form}>
               <CustomRow>
                 <CustomDivider>
-                  <CustomTitle>Departamentos</CustomTitle>
+                  <CustomTitle>{title[`${State}`]?.title}</CustomTitle>
                 </CustomDivider>
 
                 <CustomCol xs={24} md={12} />
