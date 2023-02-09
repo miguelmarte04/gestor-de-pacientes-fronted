@@ -91,7 +91,7 @@ const Profile = (): React.ReactElement => {
               <CustomInput placeholder="Usuario" readOnly />
             </CustomFormItem>
           </CustomCol>
-          <CustomCol {...defaultBreakpoints}>
+          {/* <CustomCol {...defaultBreakpoints}>
             <CustomFormItem
               label={'Cargo'}
               name={'cargo'}
@@ -99,6 +99,16 @@ const Profile = (): React.ReactElement => {
               {...formItemLayout}
             >
               <CustomInput placeholder="Cargo" readOnly />
+            </CustomFormItem>
+          </CustomCol> */}
+          <CustomCol {...defaultBreakpoints}>
+            <CustomFormItem
+              label={'Cedula'}
+              name={'cedula'}
+              rules={[{ required: true }]}
+              {...formItemLayout}
+            >
+              <CustomInput placeholder="cedula" readOnly />
             </CustomFormItem>
           </CustomCol>
         </CustomRow>

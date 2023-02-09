@@ -46,7 +46,7 @@ export type CountriesType = {
   estado: string
 }
 
-export type DepartmentsType = {
+export type ConsultasType = {
   id: number
   departamento: string
   estado: string

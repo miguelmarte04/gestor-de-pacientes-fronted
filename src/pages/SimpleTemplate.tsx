@@ -34,11 +34,11 @@ import { getSessionInfo } from '../utils/session'
 import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
 import CustomSpin from '../components/CustomSpin'
 import {
-  createDepartments,
-  getDepartments,
-  updateDepartments,
+  createConsultas,
+  getConsultas,
+  updateConsultas,
 } from '../slicers/general/general'
-import { DepartmentsType } from '../slicers/general'
+import { ConsultasType } from '../slicers/general'
 interface TemplateProps {
   State: string
 }
@@ -48,15 +48,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 }): React.ReactElement => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
-  const { departments, fetchingGeneralData, createDepartmentsRequestStatus } =
+  const { Consultas, fetchingGeneralData, createConsultasRequestStatus } =
     useAppSelector((state) => state.general)
 
   useEffect(() => {
-    dispatch(getDepartments({}))
+    State === 'C' && dispatch(getConsultas({}))
   }, [])
 
   const [search, setSearch] = useState('')
-  const [edit, setEdit] = useState<DepartmentsType>()
+  const [edit, setEdit] = useState<ConsultasType>()
   const [view, setView] = useState(false)
   const [employeeSelected, setEmployeeSelected] = useState<EmployeeType>()
   const [visible, setVisible] = useState(false)
@@ -65,6 +65,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const title = {
     C: {
       title: 'Consultas',
+      titleModal: 'Registrar Consulta',
+      titleModalEdit: 'Editar Consulta',
     },
   }
 
@@ -80,18 +82,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       })
   }, [employeeSelected])
   useEffect(() => {
-    if (createDepartmentsRequestStatus === 'success') {
-      dispatch(getDepartments({}))
+    if (createConsultasRequestStatus === 'success') {
+      dispatch(getConsultas({}))
       form.resetFields()
       setVisible(false)
       setEdit(undefined)
       setView(false)
     }
-  }, [createDepartmentsRequestStatus])
+  }, [createConsultasRequestStatus])
 
-  const handleDelete = (record: DepartmentsType) => {
+  const handleDelete = (record: ConsultasType) => {
     dispatch(
-      updateDepartments({
+      updateConsultas({
         condition: {
           ...record,
           estado: record.estado === 'A' ? 'I' : 'A',
@@ -99,7 +101,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       })
     )
   }
-  const handleEdit = (record: DepartmentsType) => {
+  const handleEdit = (record: ConsultasType) => {
     setVisible(true)
     setEdit(record)
     form.setFieldsValue({
@@ -111,7 +113,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       }),
     })
   }
-  const handleView = (record: DepartmentsType) => {
+  const handleView = (record: ConsultasType) => {
     setView(true)
     setVisible(true)
     form.setFieldsValue({
@@ -124,7 +126,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     })
   }
 
-  const renderItem = (item: DepartmentsType) => {
+  const renderItem = (item: ConsultasType) => {
     return (
       <CustomListItem
         actions={[
@@ -231,20 +233,20 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   }
   const handleUpdate = async () => {
     const data = await form.validateFields()
-    dispatch(updateDepartments({ condition: { ...edit, ...data } }))
+    dispatch(updateConsultas({ condition: { ...edit, ...data } }))
   }
   const handleCreate = async () => {
     const data = await form.validateFields()
-
-    dispatch(
-      createDepartments({
-        condition: {
-          ...data,
-          id_empleado_encargado: employeeSelected?.id,
-          usuario_insercion: getSessionInfo().usuario,
-        },
-      })
-    )
+    State === 'C' &&
+      dispatch(
+        createConsultas({
+          condition: {
+            ...data,
+            id_empleado_encargado: employeeSelected?.id,
+            usuario_insercion: getSessionInfo().usuario,
+          },
+        })
+      )
   }
 
   return (
@@ -313,14 +315,14 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 dataSource={
                   stateFilter === ''
                     ? searchInArray(
-                        departments?.filter(
+                        Consultas?.filter(
                           (item) => item.estado === 'A' || item.estado === 'I'
                         ),
                         ['nombres', 'doc_identidad'],
                         search
                       )
                     : searchInArray(
-                        departments?.filter(
+                        Consultas?.filter(
                           (item) => item.estado === 'A' || item.estado === 'I'
                         ),
                         ['nombres', 'doc_identidad'],
@@ -334,10 +336,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 title={
                   <CustomTitle>
                     {edit?.id
-                      ? 'Editar Departamento'
-                      : view
-                      ? 'Departamento'
-                      : 'Registrar Departamento'}
+                      ? title[`${State}`]?.titleModalEdit
+                      : title[`${State}`]?.titleModal}
                   </CustomTitle>
                 }
                 width={'50%'}

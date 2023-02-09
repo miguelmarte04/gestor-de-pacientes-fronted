@@ -44,7 +44,6 @@ const iconButtonStyle: CSSProperties = {
   color: '#fff',
   cursor: 'pointer',
   maxHeight: '40px',
-  maxWidth: '40px',
   padding: '3px',
 }
 
@@ -206,7 +205,10 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                       type={'link'}
                       style={iconButtonStyle}
                     >
-                      <Avatar size={'large'} src={getSessionInfo().imagen} />
+                      {/* <Avatar size={'large'} src={getSessionInfo().imagen} /> */}
+                      {`${getSessionInfo().nombres} ${
+                        getSessionInfo().apellidos
+                      }`}
                     </CustomButton>
                   </CustomDropdown>
                 </CustomCol>

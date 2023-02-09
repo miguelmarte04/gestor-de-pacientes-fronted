@@ -34,11 +34,11 @@ import {
   WEB_SERVICE_API_GET_CHANGE_HISTORY_EMPLOYEE,
   WEB_SERVICE_API_GET_CHANGE_HISTORY_NOMINAS,
   WEB_SERVICE_API_GET_CONFIGURATIONS,
+  WEB_SERVICE_API_GET_CONSULTAS,
   WEB_SERVICE_API_GET_CONTACT_EMERGENCY,
   WEB_SERVICE_API_GET_COUNTRIES,
   WEB_SERVICE_API_GET_DATA_EMPLOYEE,
   WEB_SERVICE_API_GET_DELAY,
-  WEB_SERVICE_API_GET_DEPARTMENTS,
   WEB_SERVICE_API_GET_DESCUENTOS_EMPLEADO,
   WEB_SERVICE_API_GET_DESCUENTOS_FIJOS,
   WEB_SERVICE_API_GET_DET_NOMINAS,
@@ -90,8 +90,8 @@ import {
   WEB_SERVICE_API_TIPOS_NOMINAS,
   WEB_SERVICE_API_UPDATE_CAMBIO_DEPARTAMENTO,
   WEB_SERVICE_API_UPDATE_CANDIDATES,
+  WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS,
   WEB_SERVICE_API_UPDATE_CREATE_CONTACT_EMERGENCY,
-  WEB_SERVICE_API_UPDATE_CREATE_DEPARTMENTS,
   WEB_SERVICE_API_UPDATE_EMPLOYMENT_DATA,
   WEB_SERVICE_API_UPDATE_PASS,
   WEB_SERVICE_API_UPDATE_STATE_EMPLOYEE,
@@ -192,14 +192,14 @@ const getTypesPermissions = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_TYPES_PERMISSIONS}`, payload)
 }
 
-const getDepartments = (payload: GeneralType): Promise<AxiosResponse> => {
-  return postRequest(`${WEB_SERVICE_API_GET_DEPARTMENTS}`, payload)
+const getConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_CONSULTAS}`, payload)
 }
-const createDepartments = (payload: GeneralType): Promise<AxiosResponse> => {
-  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DEPARTMENTS}`, payload)
+const createConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS}`, payload)
 }
-const updateDepartments = (payload: GeneralType): Promise<AxiosResponse> => {
-  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DEPARTMENTS}`, payload)
+const updateConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS}`, payload)
 }
 
 const getPaymentType = (payload: GeneralType): Promise<AxiosResponse> => {
@@ -269,9 +269,9 @@ export const userApiHelper = {
   registarTiposNomina,
   getAcademicLevel,
   actualizarTiposNomina,
-  getDepartments,
-  createDepartments,
-  updateDepartments,
+  getConsultas,
+  createConsultas,
+  updateConsultas,
   getCargos,
   getWorkingDay,
   getPayroll,

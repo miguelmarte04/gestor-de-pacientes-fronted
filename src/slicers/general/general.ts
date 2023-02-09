@@ -1,9 +1,9 @@
 import {
   AcademicLevelType,
   CargosType,
+  ConsultasType,
   CountriesType,
   CustomUploadFileType,
-  DepartmentsType,
   InfoEmpresaType,
   PayrollType,
   PersonDataType,
@@ -37,10 +37,10 @@ export interface GeneralState {
   civilState: CivilStateType[]
   countries: CountriesType[]
   deleteNullValuesBeforeRequest: boolean
-  departments: DepartmentsType[]
+  Consultas: ConsultasType[]
   emailsTypes: EmailType[]
   fetchingGeneralData: boolean
-  createDepartmentsRequestStatus: RequestStatusType
+  createConsultasRequestStatus: RequestStatusType
   fileList: CustomUploadFileType[]
   infoEmpresa: InfoEmpresaType
   isEditing: boolean
@@ -64,13 +64,13 @@ export interface GeneralState {
 const initialState: GeneralState = {
   academicLevel: [],
   bloodType: [],
-  createDepartmentsRequestStatus: '',
+  createConsultasRequestStatus: '',
   cargos: [],
   fileList: new Array<CustomUploadFileType>(),
   civilState: [],
   countries: [],
   deleteNullValuesBeforeRequest: true,
-  departments: [],
+  Consultas: [],
   emailsTypes: [],
   fetchingGeneralData: false,
   infoEmpresa: {} as InfoEmpresaType,
@@ -171,20 +171,20 @@ export const getRelationShip = createAsyncThunk(
   }
 )
 
-export const getDepartments = createAsyncThunk(
-  'general/getDepartments',
+export const getConsultas = createAsyncThunk(
+  'general/getConsultas',
   async (payload: GeneralType) => {
-    const response = await userApiHelper.getDepartments(payload)
+    const response = await userApiHelper.getConsultas(payload)
 
     const { data } = response.data
 
     return data
   }
 )
-export const createDepartments = createAsyncThunk(
-  'employee/createDepartments',
+export const createConsultas = createAsyncThunk(
+  'employee/createConsultas',
   async (payload: GeneralType) => {
-    const response = await userApiHelper.createDepartments(
+    const response = await userApiHelper.createConsultas(
       removeField(payload.condition, [
         'dias',
         'SEARCH_EMPLOYEE',
@@ -199,10 +199,10 @@ export const createDepartments = createAsyncThunk(
     return data
   }
 )
-export const updateDepartments = createAsyncThunk(
-  'employee/updateDepartments',
+export const updateConsultas = createAsyncThunk(
+  'employee/updateConsultas',
   async (payload: GeneralType) => {
-    const response = await userApiHelper.updateDepartments(
+    const response = await userApiHelper.updateConsultas(
       removeField(payload.condition, [
         'dias',
         'SEARCH_EMPLOYEE',
@@ -480,57 +480,57 @@ export const generalSlice = createSlice({
       .addCase(getRelationShip.rejected, (state) => {
         state.fetchingGeneralData = false
       })
-      .addCase(getDepartments.pending, (state) => {
+      .addCase(getConsultas.pending, (state) => {
         state.fetchingGeneralData = true
       })
-      .addCase(getDepartments.fulfilled, (state, action) => {
-        state.departments = action.payload
+      .addCase(getConsultas.fulfilled, (state, action) => {
+        state.Consultas = action.payload
         state.fetchingGeneralData = false
       })
-      .addCase(getDepartments.rejected, (state) => {
+      .addCase(getConsultas.rejected, (state) => {
         state.fetchingGeneralData = false
       })
-      .addCase(createDepartments.pending, (state) => {
+      .addCase(createConsultas.pending, (state) => {
         state.fetchingGeneralData = true
-        state.createDepartmentsRequestStatus = 'pending'
+        state.createConsultasRequestStatus = 'pending'
       })
-      .addCase(createDepartments.fulfilled, (state) => {
+      .addCase(createConsultas.fulfilled, (state) => {
         state.fetchingGeneralData = false
-        state.createDepartmentsRequestStatus = 'success'
+        state.createConsultasRequestStatus = 'success'
         showNotification({
           title: 'Exitoso',
-          description: 'Departamento Insertado correctamente',
+          description: 'Consulta Insertado correctamente',
           type: 'success',
         })
       })
-      .addCase(createDepartments.rejected, (state) => {
-        state.createDepartmentsRequestStatus = 'error'
+      .addCase(createConsultas.rejected, (state) => {
+        state.createConsultasRequestStatus = 'error'
         state.fetchingGeneralData = false
         showNotification({
           title: 'Error',
-          description: 'No se pudo Insertar el Departamento',
+          description: 'No se pudo Insertar el Consulta',
           type: 'error',
         })
       })
-      .addCase(updateDepartments.pending, (state) => {
+      .addCase(updateConsultas.pending, (state) => {
         state.fetchingGeneralData = true
-        state.createDepartmentsRequestStatus = 'pending'
+        state.createConsultasRequestStatus = 'pending'
       })
-      .addCase(updateDepartments.fulfilled, (state) => {
+      .addCase(updateConsultas.fulfilled, (state) => {
         state.fetchingGeneralData = false
-        state.createDepartmentsRequestStatus = 'success'
+        state.createConsultasRequestStatus = 'success'
         showNotification({
           title: 'Exitoso',
-          description: 'Departamento actualizado correctamente',
+          description: 'Consulta actualizado correctamente',
           type: 'success',
         })
       })
-      .addCase(updateDepartments.rejected, (state) => {
-        state.createDepartmentsRequestStatus = 'error'
+      .addCase(updateConsultas.rejected, (state) => {
+        state.createConsultasRequestStatus = 'error'
         state.fetchingGeneralData = false
         showNotification({
           title: 'Error',
-          description: 'No se pudo actualizar el Departamento',
+          description: 'No se pudo actualizar el Consulta',
           type: 'error',
         })
       })

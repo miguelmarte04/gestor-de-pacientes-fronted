@@ -41,7 +41,7 @@ import {
   getNominas,
   getPermissions,
 } from '../slicers/employee/employee'
-import { getDepartments } from '../slicers/general'
+import { getConsultas } from '../slicers/general'
 import { getCandidates } from '../slicers/recruitment/recruitment'
 import { sortByDate } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
@@ -64,7 +64,7 @@ const Dashboard = (): React.ReactElement => {
     detNomina,
   } = useAppSelector((state) => state.employee)
   const { candidates } = useAppSelector((state) => state.recruitment)
-  const { departments } = useAppSelector((state) => state.general)
+  const { Consultas } = useAppSelector((state) => state.general)
 
   const buildDataSource = <T, K extends keyof T>(arr: T[], k: K) => {
     const data = new Array<number>()
@@ -146,7 +146,7 @@ const Dashboard = (): React.ReactElement => {
   useEffect(() => {
     const condition = {}
     dispatch(getCandidates(condition))
-    dispatch(getDepartments(condition))
+    dispatch(getConsultas(condition))
     dispatch(getNominas(condition))
     dispatch(getPermissions(condition))
     dispatch(getLaidOff(condition))
@@ -183,13 +183,13 @@ const Dashboard = (): React.ReactElement => {
     },
     {
       title: 'Especialidades',
-      description: CardDescription('Total', `${departments?.length ?? 0}`),
+      description: CardDescription('Total', `${Consultas?.length ?? 0}`),
       icon: <TagOutlined />,
       color: '#95de64',
     },
     {
       title: 'Consultas',
-      description: CardDescription('Total', `${employeesBirthday ?? 0}`),
+      description: CardDescription('Total', `${Consultas?.length ?? 0}`),
       icon: <ProfileOutlined />,
       color: '#87e8de',
     },
