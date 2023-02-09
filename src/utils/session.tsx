@@ -77,7 +77,7 @@ export const createSession = (user: UserData): void => {
   // const { background_color, nombre_empresa } = empresa
 
   // sessionStorage.setItem(COOKIE_KEY_BUSINESS_DATA, JSON.stringify(empresa))
-  sessionStorage.setItem(COOKIE_KEY_USER_DATA, JSON.stringify(imagen ?? ''))
+  sessionStorage.setItem(COOKIE_KEY_USER_DATA, JSON.stringify(imagen))
 
   // const businessInfo = JSON.stringify({ background_color, nombre_empresa })
 

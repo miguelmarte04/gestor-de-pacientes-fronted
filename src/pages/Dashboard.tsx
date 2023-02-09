@@ -6,7 +6,10 @@ import {
   // DollarCircleOutlined,
   GifOutlined,
   IssuesCloseOutlined,
+  ProfileOutlined,
   RedoOutlined,
+  TagOutlined,
+  TeamOutlined,
   UsergroupAddOutlined,
   UserOutlined,
 } from '@ant-design/icons'
@@ -167,27 +170,27 @@ const Dashboard = (): React.ReactElement => {
 
   const dynamicCardDataSources: DynamicCardType[] = [
     {
-      title: 'Empleados',
-      description: CardDescription('Total', `${employee?.length}`),
-      icon: <UserOutlined />,
+      title: 'Pacientes',
+      description: CardDescription('Total', `${employee?.length ?? 0}`),
+      icon: <TeamOutlined />,
       color: '#ffe58f',
     },
     {
-      title: 'Candidatos',
-      description: CardDescription('Total', `${candidates?.length}`),
-      icon: <UsergroupAddOutlined />,
+      title: 'Doctores',
+      description: CardDescription('Total', `${candidates?.length ?? 0}`),
+      icon: <UserOutlined />,
       color: '#f4ffb8',
     },
     {
-      title: 'Departamentos',
-      description: CardDescription('Total', `${departments?.length}`),
-      icon: <ApartmentOutlined />,
+      title: 'Especialidades',
+      description: CardDescription('Total', `${departments?.length ?? 0}`),
+      icon: <TagOutlined />,
       color: '#95de64',
     },
     {
-      title: 'Cumpleaños',
-      description: CardDescription('Total', `${employeesBirthday}`),
-      icon: <GifOutlined />,
+      title: 'Consultas',
+      description: CardDescription('Total', `${employeesBirthday ?? 0}`),
+      icon: <ProfileOutlined />,
       color: '#87e8de',
     },
   ]
@@ -243,7 +246,7 @@ const Dashboard = (): React.ReactElement => {
                   <InfoCard dataSource={infoCardDataSources} />
                 </ConditionalComponent>
               </CustomCol>
-              <ConditionalComponent
+              {/* <ConditionalComponent
                 condition={
                   getSessionInfo().privilegios === 1 ||
                   getSessionInfo().privilegios === 3
@@ -256,9 +259,9 @@ const Dashboard = (): React.ReactElement => {
                     data={barChartDataSourcePermissions}
                   />
                 </CustomCol>
-              </ConditionalComponent>
+              </ConditionalComponent> */}
 
-              <ConditionalComponent
+              {/* <ConditionalComponent
                 condition={
                   getSessionInfo().privilegios === 1 ||
                   getSessionInfo().privilegios === 2 ||
@@ -274,7 +277,7 @@ const Dashboard = (): React.ReactElement => {
                     hired={buildDataSource(dataResignation, 'fecha_insercion')}
                   />
                 </CustomCol>
-              </ConditionalComponent>
+              </ConditionalComponent> */}
             </CustomRow>
           </CustomRow>
         </CustomCol>

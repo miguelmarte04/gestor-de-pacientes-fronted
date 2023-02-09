@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  CalendarOutlined,
   HomeOutlined,
   LineChartOutlined,
+  ProfileOutlined,
   SettingOutlined,
+  TagOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons'
@@ -56,10 +59,38 @@ const DrawerOptions = (): React.ReactElement => {
         <>
           <CustomMenuItem
             key="1"
-            icon={<TeamOutlined />}
+            icon={<ProfileOutlined />}
             onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
           >
             CONSULTAS
+          </CustomMenuItem>
+          <CustomMenuItem
+            key="2"
+            icon={<TeamOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+          >
+            PACIENTES
+          </CustomMenuItem>
+          <CustomMenuItem
+            key="3"
+            icon={<TeamOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+          >
+            DOCTORES
+          </CustomMenuItem>
+          <CustomMenuItem
+            key="4"
+            icon={<TagOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+          >
+            ESPECIALIDADES
+          </CustomMenuItem>
+          <CustomMenuItem
+            key="5"
+            icon={<CalendarOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+          >
+            HORARIOS
           </CustomMenuItem>
         </>
       )}
