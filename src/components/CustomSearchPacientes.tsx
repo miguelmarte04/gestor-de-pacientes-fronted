@@ -19,7 +19,7 @@ import CustomTooltip from './CustomTooltip'
 import CustomDropdown from './CustomDropdown'
 import CustomSearch from './CustomSearch'
 import { format } from '../constants/general'
-import { EmployeeType, getEmployee } from '../slicers/employee'
+import { EmployeeType, getPacientes } from '../slicers/employee'
 import { getOnlyUnique, truncate } from '../utils/general'
 import { CustomFormItemContext } from './CustomFormItem'
 import { useAppDispatch, useAppSelector } from '../hooks'
@@ -61,7 +61,7 @@ type CustomProps = Omit<CustomInputProps, 'onSelect' | 'onBlur'> & {
   onClear?: () => void
 }
 
-const CustomSearchEmployee: React.FC<CustomProps> = ({
+const CustomSearchPacientes: React.FC<CustomProps> = ({
   trigger = ['click'],
   isEditing = false,
   disabled = false,
@@ -145,7 +145,7 @@ const CustomSearchEmployee: React.FC<CustomProps> = ({
   const handleSearchInitialValue = useCallback(() => {
     showInitialValue &&
       dispatch(
-        getEmployee({
+        getPacientes({
           condition: {
             search: initialValue,
             type: 'search',
@@ -173,7 +173,7 @@ const CustomSearchEmployee: React.FC<CustomProps> = ({
   const handleSearchEmployee = useCallback(() => {
     if (debounce) {
       dispatch(
-        getEmployee({
+        getPacientes({
           condition: {
             search: debounce.replace(/-/gi, ''),
             type: 'search',
@@ -329,4 +329,4 @@ const CustomSearchEmployee: React.FC<CustomProps> = ({
   )
 }
 
-export default CustomSearchEmployee
+export default CustomSearchPacientes

@@ -1,11 +1,10 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
   PlusOutlined,
   StopOutlined,
 } from '@ant-design/icons'
-import { Avatar, Form } from 'antd'
+import { Form } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { EmployeeType } from '../slicers/employee/types'
@@ -19,15 +18,12 @@ import CustomForm from '../components/CustomForm'
 import CustomFormItem from '../components/CustomFormItem'
 import CustomInput from '../components/CustomInput'
 import CustomInputGroup from '../components/CustomInputGroup'
-import CustomList from '../components/CustomList'
-import CustomListItem from '../components/CustomListItem'
-import CustomListItemMeta from '../components/CustomListItemMeta'
 import CustomModal from '../components/CustomModal'
 import CustomRadio from '../components/CustomRadio'
 import CustomRadioGroup from '../components/CustomRadioGroup'
 import CustomRow from '../components/CustomRow'
 import CustomSearch from '../components/CustomSearch'
-import CustomSearchEmployee from '../components/CustomSearchEmployee'
+import CustomSearchEmployee from '../components/CustomSearchPacientes'
 import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
 import { getSessionInfo } from '../utils/session'
@@ -39,6 +35,11 @@ import {
   updateConsultas,
 } from '../slicers/general/general'
 import { ConsultasType } from '../slicers/general'
+import CustomTable from '../components/CustomTable'
+import { ColumnType } from 'antd/lib/table'
+import { AnyType } from '../constants/types'
+import CustomSpace from '../components/CustomSpace'
+import moment from 'moment'
 interface TemplateProps {
   State: string
 }
@@ -106,131 +107,128 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     setEdit(record)
     form.setFieldsValue({
       ...record,
-      nombres: `${record?.nombres} ${record?.apellidos}`,
-      doc_identidad: formatter({
-        value: record?.doc_identidad,
-        type: 'identity_doc',
-      }),
-    })
-  }
-  const handleView = (record: ConsultasType) => {
-    setView(true)
-    setVisible(true)
-    form.setFieldsValue({
-      ...record,
-      nombres: `${record?.nombres} ${record?.apellidos}`,
-      doc_identidad: formatter({
-        value: record?.doc_identidad,
-        type: 'identity_doc',
-      }),
+      // nombres: `${record?.nombres} ${record?.apellidos}`,
+      // doc_identidad: formatter({
+      //   value: record?.doc_identidad,
+      //   type: 'identity_doc',
+      // }),
     })
   }
 
-  const renderItem = (item: ConsultasType) => {
-    return (
-      <CustomListItem
-        actions={[
-          <CustomTooltip
-            key={'edit'}
-            title={
-              item.estado === 'A' || item.estado === 'U'
-                ? 'Editar'
-                : 'Inactivo, no permite edición'
-            }
-          >
-            <CustomButton
-              disabled={item.estado === 'I'}
-              onClick={() => handleEdit(item)}
-              type={'link'}
-              icon={<EditOutlined style={{ fontSize: '18px' }} />}
-              className={'editPhoneButton'}
-            />
-          </CustomTooltip>,
+  const columns: ColumnType<ConsultasType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'paciente',
+      title: 'Paciente',
+      dataIndex: 'paciente',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+    },
+    {
+      key: 'doctor',
+      title: 'Doctor',
+      dataIndex: 'doctor',
+      render: (_, record) => {
+        return `${record.nombre_doctor} ${record.apellido_doctor}`
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
 
-          <CustomTooltip key={'view'} title={'Ver'}>
-            <CustomButton
-              onClick={() => {
-                handleView(item)
-              }}
-              type={'link'}
-              icon={
-                <EyeOutlined
-                  style={{
-                    fontSize: '18px',
-                  }}
-                />
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' || item.estado === 'U'
+                  ? 'Editar'
+                  : 'Inactivo, no permite edición'
               }
-            />
-          </CustomTooltip>,
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
 
-          <CustomTooltip
-            key={'delete'}
-            title={
-              item.estado === 'A' || item.estado === 'U'
-                ? 'Inhabilitar'
-                : 'Habilitar'
-            }
-          >
-            <CustomButton
-              onClick={() => {
-                CustomModalConfirmation({
-                  content:
-                    item.estado === 'A'
-                      ? '¿Está seguro que desea eliminar el registro?'
-                      : '¿Está seguro que desea habilitar el registro?',
-                  onOk: () => {
-                    handleDelete(item)
-                  },
-                })
-              }}
-              type={'link'}
-              icon={
-                item.estado === 'A' || item.estado === 'U' ? (
-                  <DeleteOutlined
-                    style={{
-                      fontSize: '18px',
-                      color: defaultTheme.dangerColor,
-                    }}
-                  />
-                ) : (
-                  <StopOutlined
-                    className="disabledColor"
-                    style={{ fontSize: '18px' }}
-                  />
-                )
+            <CustomTooltip
+              key={'delete'}
+              title={
+                item.estado === 'A' || item.estado === 'U'
+                  ? 'Inhabilitar'
+                  : 'Habilitar'
               }
-            />
-          </CustomTooltip>,
-        ]}
-      >
-        <CustomListItemMeta
-          avatar={
-            <Avatar
-              size={'large'}
-              icon={
-                <span
-                  style={{
-                    color: defaultTheme.primaryColor,
-                    fontSize: 18,
-                    fontFamily: 'comic sans',
-                  }}
-                >
-                  {`${item.departamento?.charAt(0)?.toUpperCase()}`}
-                </span>
-              }
-            />
-          }
-          title={`${item.departamento}`}
-          description={`Encargado: ${item?.nombres} ${
-            item?.apellidos
-          } - ${formatter({
-            value: item?.doc_identidad,
-            type: 'identity_doc',
-          })}`}
-        />
-      </CustomListItem>
-    )
-  }
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' || item.estado === 'U' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <StopOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
   const handleUpdate = async () => {
     const data = await form.validateFields()
     dispatch(updateConsultas({ condition: { ...edit, ...data } }))
@@ -310,28 +308,28 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   </CustomRow>
                 </CustomCol>
               </CustomRow>
-
-              <CustomList
+              <CustomTable
+                columns={columns}
                 dataSource={
                   stateFilter === ''
                     ? searchInArray(
                         Consultas?.filter(
                           (item) => item.estado === 'A' || item.estado === 'I'
                         ),
-                        ['nombres', 'doc_identidad'],
+                        ['nombre_paciente', 'apellido_paciente', 'asunto'],
                         search
                       )
                     : searchInArray(
                         Consultas?.filter(
                           (item) => item.estado === 'A' || item.estado === 'I'
                         ),
-                        ['nombres', 'doc_identidad'],
+                        ['nombre_paciente', 'apellido_paciente', 'asunto'],
                         search
                       )?.filter((item) => item.estado === stateFilter)
                 }
                 pagination={{ pageSize: 5 }}
-                renderItem={renderItem}
               />
+
               <CustomModal
                 title={
                   <CustomTitle>

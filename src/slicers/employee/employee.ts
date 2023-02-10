@@ -184,10 +184,10 @@ export const createEmployee = createAsyncThunk(
   }
 )
 
-export const getEmployee = createAsyncThunk(
-  'employee/getEmployee',
+export const getPacientes = createAsyncThunk(
+  'Pacientes/getPacientes',
   async (payload: GeneralType) => {
-    const response = await EmployeeApiHelpers.getEmployee(payload)
+    const response = await EmployeeApiHelpers.getPacientes(payload)
     const { data } = response.data
 
     return data
@@ -1607,16 +1607,16 @@ export const employeeSlicer = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getEmployee.pending, (state) => {
+      .addCase(getPacientes.pending, (state) => {
         state.fetchingFromEmployee = true
         state.employeeRequestStatus = 'pending'
       })
-      .addCase(getEmployee.fulfilled, (state, action) => {
+      .addCase(getPacientes.fulfilled, (state, action) => {
         state.employeeRequestStatus = 'success'
         state.fetchingFromEmployee = false
         state.employee = action.payload
       })
-      .addCase(getEmployee.rejected, (state) => {
+      .addCase(getPacientes.rejected, (state) => {
         state.employeeRequestStatus = 'error'
         state.fetchingFromEmployee = false
         state.employee = initialState.employee

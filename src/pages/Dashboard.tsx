@@ -34,7 +34,7 @@ import InfoCard, { InfoCardType } from '../components/InfoCard'
 import PieChart from '../components/PieChart'
 // import { CONSULTAR_NOMINA } from '../constants/Routes'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { getEmployee } from '../slicers/employee'
+import { getPacientes } from '../slicers/employee'
 import {
   getDetNominas,
   getLaidOff,
@@ -152,7 +152,7 @@ const Dashboard = (): React.ReactElement => {
     dispatch(getLaidOff(condition))
     dispatch(getDetNominas(condition))
     dispatch(
-      getEmployee({
+      getPacientes({
         condition: {
           search: '',
           type: 'search_register',

@@ -47,13 +47,18 @@ export type CountriesType = {
 }
 
 export type ConsultasType = {
-  id: number
-  departamento: string
+  apellido_doctor: string
+  apellido_paciente: string
+  asunto: string
   estado: string
-  nombres: string
-  apellidos: string
-  tipo_nomina?: string
-  doc_identidad: string
+  fecha_insercion: string
+  fin: string
+  id: number
+  id_doctor: number
+  id_paciente: number
+  inicio: string
+  nombre_doctor: string
+  nombre_paciente: string
 }
 
 export type PaymentType = {

@@ -8,7 +8,7 @@ export const PATH_CONSULTAS = '/consultas'
 // external routes API
 export const WEB_SERVICE_API = process.env.REACT_APP_WEB_SERVICE_API
 export const WEB_SERVICE_API_LOGIN = `${WEB_SERVICE_API}/login`
-export const WEB_SERVICE_API_GET_EMPLOYEE = `${WEB_SERVICE_API}/empleados`
+export const WEB_SERVICE_API_GET_PACIENTES = `${WEB_SERVICE_API}/empleados`
 export const WEB_SERVICE_API_CREATE_UPDATE_EMPLOYEE = `${WEB_SERVICE_API}/empleados/empleado`
 export const WEB_SERVICE_API_BLOOD_TYPES = `${WEB_SERVICE_API}/tipos_sangre`
 export const WEB_SERVICE_API_CIVIL_STATUS = `${WEB_SERVICE_API}/estado_civil`

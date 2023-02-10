@@ -24,7 +24,7 @@ export {
   getDocTypes,
   getDocuments,
   getEmail,
-  getEmployee,
+  getPacientes,
   getEmployeeHistoryChange,
   getEmployeeSummary,
   getHolidays,

@@ -49,7 +49,6 @@ import {
   WEB_SERVICE_API_GET_DOCUMENTS,
   WEB_SERVICE_API_GET_EMAIL,
   WEB_SERVICE_API_GET_EMAILS_TYPES,
-  WEB_SERVICE_API_GET_EMPLOYEE,
   WEB_SERVICE_API_GET_HOLIDAYS,
   WEB_SERVICE_API_GET_INFO_EMPRESA,
   WEB_SERVICE_API_GET_INGRESOS_EMPLEADO,
@@ -57,6 +56,7 @@ import {
   WEB_SERVICE_API_GET_LAYOFFS,
   WEB_SERVICE_API_GET_LICENCES,
   WEB_SERVICE_API_GET_NOMINAS,
+  WEB_SERVICE_API_GET_PACIENTES,
   WEB_SERVICE_API_GET_PARAMETROS,
   WEB_SERVICE_API_GET_PAYMENT_TYPE,
   WEB_SERVICE_API_GET_PAYROLL,
@@ -322,8 +322,8 @@ const updateCambioDepartamento = (
   return putRequest(`${WEB_SERVICE_API_UPDATE_CAMBIO_DEPARTAMENTO}`, parameters)
 }
 
-const getEmployee = (payload: GeneralType): Promise<AxiosResponse> => {
-  return postRequest(`${WEB_SERVICE_API_GET_EMPLOYEE}`, payload)
+const getPacientes = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_PACIENTES}`, payload)
 }
 
 const createAcademic = (parameters: GeneralType): Promise<AxiosResponse> => {
@@ -751,7 +751,7 @@ export const EmployeeApiHelpers = {
   getDocTypes,
   getDocuments,
   getEmail,
-  getEmployee,
+  getPacientes,
   getEmployeeHistoryChange,
   getEmployeeSummary,
   getHistoryChange,

@@ -14,7 +14,7 @@ import CustomTitle from './CustomTitle'
 import { useReactToPrint } from 'react-to-print'
 import moment from 'moment'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { EmployeeType, getEmployee } from '../slicers/employee'
+import { EmployeeType, getPacientes } from '../slicers/employee'
 
 const PrintReportTss = (): React.ReactElement => {
   const dispatch = useAppDispatch()
@@ -121,7 +121,7 @@ const PrintReportTss = (): React.ReactElement => {
   }
   useEffect(() => {
     dispatch(
-      getEmployee({
+      getPacientes({
         condition: {
           search: ' ',
         },
