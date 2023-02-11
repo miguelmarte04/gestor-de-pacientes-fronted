@@ -54,6 +54,7 @@ export type EmployeeType = {
   apellidos: string
   apodo: string
   cargo: string
+  cedula: string
   nivel_academico: string
   doc_identidad: string
   estado: string

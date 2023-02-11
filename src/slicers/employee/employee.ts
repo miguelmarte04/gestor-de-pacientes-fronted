@@ -1619,7 +1619,7 @@ export const employeeSlicer = createSlice({
       .addCase(getPacientes.rejected, (state) => {
         state.employeeRequestStatus = 'error'
         state.fetchingFromEmployee = false
-        state.employee = initialState.employee
+        state.employee = [] as EmployeeType[]
       })
       .addCase(getNominas.pending, (state) => {
         state.fetchingFromEmployee = true

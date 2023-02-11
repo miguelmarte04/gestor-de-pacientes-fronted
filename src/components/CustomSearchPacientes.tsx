@@ -110,9 +110,11 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
   useEffect(() => {
     if (employee?.length > 0) {
       const data = getOnlyUnique(employee ?? [])
-      setDataSource(data || [])
+      setDataSource(data)
+    } else {
+      setDataSource([])
     }
-  }, [employee, fetchingFromEmployee])
+  }, [employee])
 
   useEffect(() => {
     employeeSelected &&
@@ -124,7 +126,7 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
           value: cleanOnFinish
             ? ''
             : employeeSelected?.nombres
-            ? `${employeeSelected?.nombres} ${employeeSelected?.apellidos}`
+            ? `${employeeSelected?.nombres} ${employeeSelected?.apellidos} | ${employeeSelected?.cedula}`
             : undefined,
         },
       ])
@@ -219,28 +221,30 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
       {dataSource !== undefined && dataSource?.length > 0 ? (
         truncate(dataSource, pageSize)?.map((item: EmployeeType) => (
           <CustomMenuItem key={item.id} style={{ padding: '4px' }}>
-            <CustomTooltip title={`${item.nombres} ${item.apellidos}`}>
+            <CustomTooltip
+              title={`${item.nombres} ${item.apellidos} | ${item?.cedula}`}
+            >
               <CustomRow justify={'space-around'}>
                 <CustomCol
-                  xs={7}
+                  xs={9}
                   style={{
                     borderRight: '1px solid #d9d9d9',
                   }}
                 >
                   {format({
-                    value: item.doc_identidad,
+                    value: item.cedula,
                     type: 'cedula',
                   })}
                 </CustomCol>
                 <CustomCol
-                  xs={16}
+                  xs={14}
                   style={{
                     whiteSpace: 'nowrap',
                     textOverflow: 'ellipsis',
                     overflow: 'hidden',
                   }}
                 >
-                  {`${item.nombres} ${item.apellidos}`}
+                  {`${item.nombres} ${item.apellidos} `}
                 </CustomCol>
               </CustomRow>
             </CustomTooltip>

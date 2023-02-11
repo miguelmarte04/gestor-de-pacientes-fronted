@@ -23,7 +23,7 @@ import CustomRadio from '../components/CustomRadio'
 import CustomRadioGroup from '../components/CustomRadioGroup'
 import CustomRow from '../components/CustomRow'
 import CustomSearch from '../components/CustomSearch'
-import CustomSearchEmployee from '../components/CustomSearchPacientes'
+import CustomSearchPacientes from '../components/CustomSearchPacientes'
 import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
 import { getSessionInfo } from '../utils/session'
@@ -40,6 +40,9 @@ import { ColumnType } from 'antd/lib/table'
 import { AnyType } from '../constants/types'
 import CustomSpace from '../components/CustomSpace'
 import moment from 'moment'
+import CustomSelect from '../components/CustomSelect'
+import CustomTextArea from '../components/CustomTextArea'
+import CustomRangePicker from '../components/CustomRangePicker'
 interface TemplateProps {
   State: string
 }
@@ -76,8 +79,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       form.setFieldsValue({
         ...employeeSelected,
         nombres: `${employeeSelected?.nombres} ${employeeSelected?.apellidos}`,
-        doc_identidad: formatter({
-          value: employeeSelected?.doc_identidad,
+        documento_identidad: formatter({
+          value: employeeSelected?.cedula,
           type: 'identity_doc',
         }),
       })
@@ -135,6 +138,17 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'doctor',
       render: (_, record) => {
         return `${record.nombre_doctor} ${record.apellido_doctor}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_doctor} ${item.apellido_doctor}`,
+              value: item.nombre_doctor,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nombre_doctor === value
       },
     },
     {
@@ -356,7 +370,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   <CustomCol xs={24}>
                     <CustomRow justify="end">
                       <CustomFormItem name={'SEARCH_EMPLOYEE'} noStyle>
-                        <CustomSearchEmployee
+                        <CustomSearchPacientes
                           width={'40%'}
                           showInitialValue
                           style={{ marginBottom: '2%' }}
@@ -374,7 +388,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
                 <CustomCol xs={24}>
                   <CustomFormItem
-                    label={'Empleado Encargado'}
+                    label={'Paciente'}
                     rules={[{ required: true }]}
                     labelCol={{ span: 6 }}
                   >
@@ -382,7 +396,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       <CustomFormItem
                         label={'Documento Identidad'}
                         noStyle
-                        name={'doc_identidad'}
+                        name={'documento_identidad'}
                         rules={[{ required: true }]}
                       >
                         <CustomInput
@@ -410,12 +424,32 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
                 <CustomCol xs={24}>
                   <CustomFormItem
-                    label={'Departamento'}
-                    name={'departamento'}
+                    label={'Doctor'}
+                    name={'id_doctor'}
                     rules={[{ required: true }]}
                     labelCol={{ span: 6 }}
                   >
-                    <CustomInput placeholder="Departamento" />
+                    <CustomSelect placeholder={'Seleccione un doctor'} />
+                  </CustomFormItem>
+                </CustomCol>
+                <CustomCol xs={24}>
+                  <CustomFormItem
+                    label={'Asunto'}
+                    name={'asunto'}
+                    rules={[{ required: true }]}
+                    labelCol={{ span: 6 }}
+                  >
+                    <CustomTextArea placeholder="Asunto" />
+                  </CustomFormItem>
+                </CustomCol>
+                <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
+                  <CustomFormItem
+                    label={'Fecha'}
+                    name={'fecha'}
+                    rules={[{ required: true }]}
+                    labelCol={{ span: 6 }}
+                  >
+                    <CustomRangePicker />
                   </CustomFormItem>
                 </CustomCol>
               </CustomModal>
