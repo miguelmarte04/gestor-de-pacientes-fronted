@@ -50,6 +50,7 @@ export type ConsultasType = {
   apellido_doctor: string
   apellido_paciente: string
   asunto: string
+  cedula: string
   estado: string
   fecha_insercion: string
   fin: string
@@ -86,10 +87,21 @@ export type PayrollType = {
   estado: string
 }
 
-export type WorkingDayType = {
-  id: number
-  jornada_trabajo: string
+export type DoctoresType = {
+  apellido: string
+  cedula: string
+  clave: string
+  correo: string
   estado: string
+  fecha_insercion: string
+  fecha_nacimiento: string
+  id: number
+  id_especialidad: number
+  id_nacionalidad: number
+  imagen: string
+  nombre: string
+  sexo: string
+  telefono: string
 }
 export type TiposNominasType = {
   id: number

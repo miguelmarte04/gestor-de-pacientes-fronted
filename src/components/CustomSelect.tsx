@@ -1,48 +1,52 @@
-import React from 'react'
 import { Select, SelectProps } from 'antd'
-import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons'
-import CustomTooltip from './CustomTooltip'
-import DisableContent from './DisableContent'
-import CustomSpace from './CustomSpace'
-type CustomSelectProps = SelectProps<string | number> & {
-  tooltip?: string
-  alwaysAvailable?: boolean
-  width?: string
+import { AnyType } from '../constants/types'
+import { deleteSpecialCharacters } from '../utils/general'
+
+interface CustomSelectProps extends SelectProps {
+  width?: string | number
+  deleteSpecialCharacter?: boolean
 }
+
 const CustomSelect: React.FC<CustomSelectProps> = ({
-  tooltip = undefined,
-  dropdownMatchSelectWidth = false,
-  allowClear = false,
+  options = [],
   size = 'small',
-  disabled = false,
+  deleteSpecialCharacter = true,
+  showSearch = true,
   width = '100%',
   ...props
 }): React.ReactElement => {
-  const suffixIcon = tooltip ? (
-    <CustomSpace style={{ marginLeft: '-20px' }}>
-      <CustomTooltip title={tooltip}>
-        <QuestionCircleOutlined />
-      </CustomTooltip>
-      <DownOutlined />
-    </CustomSpace>
-  ) : undefined
-
+  const handleFilterOption = (input: string, option: AnyType) => {
+    return deleteSpecialCharacters(option?.label?.toString() as string)
+      ?.toLowerCase()
+      ?.includes(deleteSpecialCharacters(input)?.toLowerCase())
+  }
+  const handleOnChange = (value: string | number) => {
+    props.value = deleteSpecialCharacter
+      ? deleteSpecialCharacters(value?.toString())
+      : value
+  }
   return (
-    <DisableContent disabled={disabled} style={{ width: width }}>
-      <Select
-        allowClear={allowClear}
-        style={{ width: '100%' }}
-        showSearch
-        optionFilterProp={'children'}
-        disabled={disabled}
-        suffixIcon={suffixIcon}
-        dropdownMatchSelectWidth={dropdownMatchSelectWidth}
-        size={size}
-        {...props}
-      >
-        {props.children}
-      </Select>
-    </DisableContent>
+    <Select
+      style={Object.assign({}, props.style, { width })}
+      size={size}
+      showSearch={showSearch}
+      optionLabelProp="label"
+      onChange={handleOnChange}
+      filterOption={handleFilterOption}
+      options={
+        options
+          ?.map((item) => ({
+            ...item,
+            label:
+              Number(item?.label?.toString()?.length) >= 35
+                ? item.label?.toString()?.substring(0, 35) + '...'
+                : item.label,
+          }))
+          .unique('label') as never
+      }
+      {...props}
+    />
   )
 }
+
 export default CustomSelect

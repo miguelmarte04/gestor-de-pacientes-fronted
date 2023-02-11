@@ -46,6 +46,7 @@ import {
   WEB_SERVICE_API_GET_DISCOUNTS,
   WEB_SERVICE_API_GET_DISCOUNTS_DESCRIPTION,
   WEB_SERVICE_API_GET_DOC_TYPES,
+  WEB_SERVICE_API_GET_DOCTORES,
   WEB_SERVICE_API_GET_DOCUMENTS,
   WEB_SERVICE_API_GET_EMAIL,
   WEB_SERVICE_API_GET_EMAILS_TYPES,
@@ -79,7 +80,6 @@ import {
   WEB_SERVICE_API_GET_USER_SUMMARY,
   WEB_SERVICE_API_GET_VACANCY,
   WEB_SERVICE_API_GET_VALIDATE_ID,
-  WEB_SERVICE_API_GET_WORKING_DAY,
   WEB_SERVICE_API_LOGIN,
   WEB_SERVICE_API_PERSON_DATA,
   WEB_SERVICE_API_REGISTER_UPDATE_DESCUENTOS_EMPLEADO,
@@ -222,8 +222,8 @@ const getCargos = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_CARGOS}`, payload)
 }
 
-const getWorkingDay = (payload: GeneralType): Promise<AxiosResponse> => {
-  return postRequest(`${WEB_SERVICE_API_GET_WORKING_DAY}`, payload)
+const getDoctores = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_DOCTORES}`, payload)
 }
 
 const getPayroll = (payload: GeneralType): Promise<AxiosResponse> => {
@@ -273,7 +273,7 @@ export const userApiHelper = {
   createConsultas,
   updateConsultas,
   getCargos,
-  getWorkingDay,
+  getDoctores,
   getPayroll,
   getRelationShip,
   getPhoneTypes,

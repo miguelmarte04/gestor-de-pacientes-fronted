@@ -8,6 +8,7 @@ import generalReducer, {
   getCivilState,
   getConsultas,
   getCountries,
+  getDoctores,
   getEmailsTypes,
   getInfoEmpresa,
   getParametros,
@@ -19,7 +20,6 @@ import generalReducer, {
   getRelationShip,
   getTypeAbsences,
   getTypesPermissions,
-  getWorkingDay,
   resetAction,
 } from './general'
 
@@ -30,6 +30,7 @@ import {
   CivilStateType,
   ConsultasType,
   CountriesType,
+  DoctoresType,
   ElationShipType,
   InfoEmpresaType,
   PaymentType,
@@ -38,7 +39,6 @@ import {
   ProvincesType,
   RelationshipType,
   TypesPermissions,
-  WorkingDayType,
 } from './types'
 
 export const {
@@ -69,7 +69,7 @@ export {
   getRelationShip,
   getTypeAbsences,
   getTypesPermissions,
-  getWorkingDay,
+  getDoctores,
   resetAction,
   generalSelector,
 }
@@ -85,7 +85,7 @@ export type {
   PaymentType,
   CargosType,
   PayrollType,
-  WorkingDayType,
+  DoctoresType,
   ElationShipType,
   ProvincesType,
   InfoEmpresaType,

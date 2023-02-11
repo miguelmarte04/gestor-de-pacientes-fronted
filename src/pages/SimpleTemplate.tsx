@@ -16,8 +16,6 @@ import CustomCol from '../components/CustomCol'
 import CustomDivider from '../components/CustomDivider'
 import CustomForm from '../components/CustomForm'
 import CustomFormItem from '../components/CustomFormItem'
-import CustomInput from '../components/CustomInput'
-import CustomInputGroup from '../components/CustomInputGroup'
 import CustomModal from '../components/CustomModal'
 import CustomRadio from '../components/CustomRadio'
 import CustomRadioGroup from '../components/CustomRadioGroup'
@@ -26,12 +24,12 @@ import CustomSearch from '../components/CustomSearch'
 import CustomSearchPacientes from '../components/CustomSearchPacientes'
 import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
-import { getSessionInfo } from '../utils/session'
 import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
 import CustomSpin from '../components/CustomSpin'
 import {
   createConsultas,
   getConsultas,
+  getDoctores,
   updateConsultas,
 } from '../slicers/general/general'
 import { ConsultasType } from '../slicers/general'
@@ -43,6 +41,7 @@ import moment from 'moment'
 import CustomSelect from '../components/CustomSelect'
 import CustomTextArea from '../components/CustomTextArea'
 import CustomRangePicker from '../components/CustomRangePicker'
+import CustomInput from '../components/CustomInput'
 interface TemplateProps {
   State: string
 }
@@ -52,17 +51,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 }): React.ReactElement => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
-  const { Consultas, fetchingGeneralData, createConsultasRequestStatus } =
-    useAppSelector((state) => state.general)
+  const {
+    Consultas,
+    fetchingGeneralData,
+    createConsultasRequestStatus,
+    doctores,
+  } = useAppSelector((state) => state.general)
 
   useEffect(() => {
-    State === 'C' && dispatch(getConsultas({}))
+    if (State === 'C') {
+      dispatch(getConsultas({}))
+      dispatch(getDoctores({}))
+    }
   }, [])
 
   const [search, setSearch] = useState('')
   const [edit, setEdit] = useState<ConsultasType>()
   const [view, setView] = useState(false)
-  const [employeeSelected, setEmployeeSelected] = useState<EmployeeType>()
+  const [pacienteSelected, setpacienteSelected] = useState<EmployeeType>()
   const [visible, setVisible] = useState(false)
   const [stateFilter, setStateFilter] = useState<string>('A')
 
@@ -71,20 +77,21 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Consultas',
       titleModal: 'Registrar Consulta',
       titleModalEdit: 'Editar Consulta',
+      placeHolderSearch: 'Buscar por nombre paciente / doctor',
     },
   }
 
   useEffect(() => {
-    employeeSelected &&
+    pacienteSelected &&
       form.setFieldsValue({
-        ...employeeSelected,
-        nombres: `${employeeSelected?.nombres} ${employeeSelected?.apellidos}`,
+        ...pacienteSelected,
+        nombres: `${pacienteSelected?.nombres} ${pacienteSelected?.apellidos}`,
         documento_identidad: formatter({
-          value: employeeSelected?.cedula,
+          value: pacienteSelected?.cedula,
           type: 'identity_doc',
         }),
       })
-  }, [employeeSelected])
+  }, [pacienteSelected])
   useEffect(() => {
     if (createConsultasRequestStatus === 'success') {
       dispatch(getConsultas({}))
@@ -110,11 +117,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     setEdit(record)
     form.setFieldsValue({
       ...record,
-      // nombres: `${record?.nombres} ${record?.apellidos}`,
-      // doc_identidad: formatter({
-      //   value: record?.doc_identidad,
-      //   type: 'identity_doc',
-      // }),
+      nombres: `${record?.nombre_paciente} ${record?.apellido_paciente}`,
+      documento_identidad: formatter({
+        value: record?.cedula,
+        type: 'identity_doc',
+      }),
+      fecha: [moment(record.inicio), moment(record.fin)],
     })
   }
 
@@ -249,13 +257,16 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   }
   const handleCreate = async () => {
     const data = await form.validateFields()
+    // eslint-disable-next-line no-console
+    console.log(data)
     State === 'C' &&
       dispatch(
         createConsultas({
           condition: {
             ...data,
-            id_empleado_encargado: employeeSelected?.id,
-            usuario_insercion: getSessionInfo().usuario,
+            id_paciente: pacienteSelected.id,
+            inicio: moment(data.fecha[0]).format('YYYY-MM-DD'),
+            fin: moment(data.fecha[1]).format('YYYY-MM-DD'),
           },
         })
       )
@@ -279,9 +290,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       <CustomFormItem noStyle name={'SEARCH'}>
                         <CustomSearch
                           className={'search'}
-                          placeholder={
-                            'Buscar por nombre o documento de identidad'
-                          }
+                          placeholder={title[`${State}`]?.placeHolderSearch}
                           onChange={(e) => {
                             setSearch(e.target.value)
                           }}
@@ -330,14 +339,14 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         Consultas?.filter(
                           (item) => item.estado === 'A' || item.estado === 'I'
                         ),
-                        ['nombre_paciente', 'apellido_paciente', 'asunto'],
+                        ['nombre_paciente', 'nombre_doctor', 'cedula'],
                         search
                       )
                     : searchInArray(
                         Consultas?.filter(
                           (item) => item.estado === 'A' || item.estado === 'I'
                         ),
-                        ['nombre_paciente', 'apellido_paciente', 'asunto'],
+                        ['nombre_paciente', 'nombre_doctor', 'cedula'],
                         search
                       )?.filter((item) => item.estado === stateFilter)
                 }
@@ -366,59 +375,33 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   edit?.id ? handleUpdate() : handleCreate()
                 }}
               >
-                {!(edit?.id || view) && (
-                  <CustomCol xs={24}>
-                    <CustomRow justify="end">
-                      <CustomFormItem name={'SEARCH_EMPLOYEE'} noStyle>
-                        <CustomSearchPacientes
-                          width={'40%'}
-                          showInitialValue
-                          style={{ marginBottom: '2%' }}
-                          placeholder={
-                            'Buscar por: documento de identidad o nombres'
-                          }
-                          onSelect={(_, employee) => {
-                            setEmployeeSelected(employee)
-                          }}
-                        />
-                      </CustomFormItem>
-                    </CustomRow>
-                  </CustomCol>
-                )}
-
                 <CustomCol xs={24}>
                   <CustomFormItem
                     label={'Paciente'}
                     rules={[{ required: true }]}
                     labelCol={{ span: 6 }}
                   >
-                    <CustomInputGroup compact>
-                      <CustomFormItem
-                        label={'Documento Identidad'}
-                        noStyle
-                        name={'documento_identidad'}
-                        rules={[{ required: true }]}
-                      >
-                        <CustomInput
-                          placeholder="Documento Identidad"
-                          style={{ width: '30%' }}
-                          disabled
+                    <CustomFormItem
+                      label={'Nombre'}
+                      noStyle
+                      name={'nombres'}
+                      rules={[{ required: true }]}
+                    >
+                      {edit?.nombre_paciente ? (
+                        <CustomInput disabled placeholder="paciente" />
+                      ) : (
+                        <CustomSearchPacientes
+                          showInitialValue
+                          style={{ marginBottom: '2%' }}
+                          placeholder={
+                            'Buscar por: documento de identidad o nombres'
+                          }
+                          onSelect={(_, employee) => {
+                            setpacienteSelected(employee)
+                          }}
                         />
-                      </CustomFormItem>
-
-                      <CustomFormItem
-                        label={'Nombre'}
-                        noStyle
-                        name={'nombres'}
-                        rules={[{ required: true }]}
-                      >
-                        <CustomInput
-                          placeholder="Nombre"
-                          style={{ width: '70%' }}
-                          disabled
-                        />
-                      </CustomFormItem>
-                    </CustomInputGroup>
+                      )}
+                    </CustomFormItem>
                   </CustomFormItem>
                 </CustomCol>
 
@@ -429,7 +412,13 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     rules={[{ required: true }]}
                     labelCol={{ span: 6 }}
                   >
-                    <CustomSelect placeholder={'Seleccione un doctor'} />
+                    <CustomSelect
+                      placeholder={'Seleccione un doctor'}
+                      options={doctores?.map((item) => ({
+                        label: item.nombre,
+                        value: item.id,
+                      }))}
+                    />
                   </CustomFormItem>
                 </CustomCol>
                 <CustomCol xs={24}>

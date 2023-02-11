@@ -4,11 +4,11 @@ import {
   ConsultasType,
   CountriesType,
   CustomUploadFileType,
+  DoctoresType,
   InfoEmpresaType,
   PayrollType,
   PersonDataType,
   ProvincesType,
-  WorkingDayType,
 } from './types'
 import { AnyType, GeneralType, RequestStatusType } from '../../constants/types'
 import { AbsencesType } from '../employee'
@@ -57,7 +57,7 @@ export interface GeneralState {
   stepPosition: number
   typeAbsences: AbsencesType[]
   typesPermissions: TypesPermissions[]
-  workingDay: WorkingDayType[]
+  doctores: DoctoresType[]
   registarTiposNominaResponse: AnyType
 }
 
@@ -88,7 +88,7 @@ const initialState: GeneralState = {
   stepPosition: 0,
   typeAbsences: [],
   typesPermissions: [],
-  workingDay: [],
+  doctores: [],
   registarTiposNominaResponse: '',
 }
 
@@ -138,10 +138,10 @@ export const getEmailsTypes = createAsyncThunk(
   }
 )
 
-export const getWorkingDay = createAsyncThunk(
-  'general/getWorkingDay',
+export const getDoctores = createAsyncThunk(
+  'general/getDoctores',
   async (payload: GeneralType) => {
-    const response = await userApiHelper.getWorkingDay(payload)
+    const response = await userApiHelper.getDoctores(payload)
 
     const { data } = response.data
 
@@ -212,6 +212,10 @@ export const updateConsultas = createAsyncThunk(
         'key',
         'index',
         'nombres',
+        'nombre_paciente',
+        'apellido_paciente',
+        'nombre_doctor',
+        'apellido_doctor',
         'fecha',
         'documento',
       ])
@@ -450,14 +454,14 @@ export const generalSlice = createSlice({
       .addCase(getEmailsTypes.rejected, (state) => {
         state.fetchingGeneralData = false
       })
-      .addCase(getWorkingDay.pending, (state) => {
+      .addCase(getDoctores.pending, (state) => {
         state.fetchingGeneralData = true
       })
-      .addCase(getWorkingDay.fulfilled, (state, action) => {
-        state.workingDay = action.payload
+      .addCase(getDoctores.fulfilled, (state, action) => {
+        state.doctores = action.payload
         state.fetchingGeneralData = false
       })
-      .addCase(getWorkingDay.rejected, (state) => {
+      .addCase(getDoctores.rejected, (state) => {
         state.fetchingGeneralData = false
       })
       .addCase(getPayroll.pending, (state) => {
