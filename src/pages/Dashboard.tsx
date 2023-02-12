@@ -99,17 +99,19 @@ const Dashboard = (): React.ReactElement => {
 
   useEffect(() => {
     const condition = {}
-    dispatch(getConsultas(condition))
-    dispatch(getDoctores(condition))
-    dispatch(getEspecialidades(condition))
-    dispatch(
-      getPacientes({
-        condition: {
-          search: '',
-          type: 'search_register',
-        },
-      })
-    )
+    if (getSessionInfo().privilegios === 1) {
+      dispatch(getConsultas(condition))
+      dispatch(getDoctores(condition))
+      dispatch(getEspecialidades(condition))
+      dispatch(
+        getPacientes({
+          condition: {
+            search: '',
+            type: 'search_register',
+          },
+        })
+      )
+    }
   }, [])
 
   const CardDescription = (desc: string, label: string) => (
@@ -181,18 +183,12 @@ const Dashboard = (): React.ReactElement => {
             <CustomRow justify={'space-between'}>
               <CustomCol xs={24}>
                 <ConditionalComponent
-                  condition={
-                    getSessionInfo().privilegios === 1 ||
-                    getSessionInfo().privilegios === 3
-                  }
+                  condition={getSessionInfo().privilegios === 1}
                 >
                   <DynamicCard dataSources={dynamicCardDataSources} />
                 </ConditionalComponent>
                 <ConditionalComponent
-                  condition={
-                    getSessionInfo().privilegios === 2 ||
-                    getSessionInfo().privilegios === 3
-                  }
+                  condition={getSessionInfo().privilegios === 1}
                 >
                   {/* <InfoCard dataSource={infoCardDataSources} /> */}
                 </ConditionalComponent>

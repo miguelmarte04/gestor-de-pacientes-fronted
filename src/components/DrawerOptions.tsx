@@ -13,10 +13,13 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   PATH_CONSULTAS,
+  PATH_CONSULTAS_DOCTORES,
+  PATH_CONSULTAS_PACIENTES,
   PATH_DOCTORES,
   PATH_ESPECIALIDADES,
   PATH_HORARIOS,
   PATH_PACIENTES,
+  PATH_PACIENTES_DOCTORES,
 } from '../constants/Routes'
 import CustomMenu from './CustomMenu'
 import CustomMenuItem from './CustomMenuItem'
@@ -92,56 +95,34 @@ const DrawerOptions = (): React.ReactElement => {
           </CustomMenuItem>
         </>
       )}
+      {getSessionInfo().privilegios === 2 && (
+        <CustomMenuItem
+          key="1"
+          icon={<ProfileOutlined />}
+          onClick={() => handleClick(PATH_CONSULTAS_PACIENTES, '1')}
+        >
+          MIS CONSULTAS
+        </CustomMenuItem>
+      )}
+      {getSessionInfo().privilegios === 3 && (
+        <>
+          <CustomMenuItem
+            key="1"
+            icon={<ProfileOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS_DOCTORES, '1')}
+          >
+            MIS CONSULTAS
+          </CustomMenuItem>
 
-      {/* {getSessionInfo().privilegios === 2 && (
-        <CustomSubMenu key="8" icon={<TeamOutlined />} title={'NOMINA'}>
-          <CustomMenuItemGroup>
-            <CustomMenuItem
-              key="8-0"
-              onClick={() => handleClick(CONSULTAR_NOMINA, '8-0')}
-            >
-              Consultar
-            </CustomMenuItem>
-            <CustomMenuItem
-              key="8-1"
-              onClick={() => handleClick(REGISTRAR_NOMINA, '8-1')}
-            >
-              Registrar / Modificar
-            </CustomMenuItem>
-
-            <CustomMenuItem
-              key="8-2"
-              onClick={() => handleClick(APROBAR_NOMINA, '8-2')}
-            >
-              Aprobar
-            </CustomMenuItem>
-            <CustomMenuItem
-              key="8-3"
-              onClick={() => handleClick(AUTORIZAR_NOMINA, '8-3')}
-            >
-              Autorizar
-            </CustomMenuItem>
-            <CustomMenuItem
-              key="8-4"
-              onClick={() => handleClick(REVERSAR_NOMINA, '8-4')}
-            >
-              Nominas Reversadas
-            </CustomMenuItem>
-            <CustomMenuItem
-              key="8-5"
-              onClick={() => handleClick(TIPOS_NOMINA, '8-5')}
-            >
-              Tipos de Nominas
-            </CustomMenuItem>
-            <CustomMenuItem
-              key="8-6"
-              onClick={() => handleClick(HISTORIAL_NOMINA, '8-6')}
-            >
-              Historial de cambios
-            </CustomMenuItem>
-          </CustomMenuItemGroup>
-        </CustomSubMenu>
-      )} */}
+          {/* <CustomMenuItem
+            key="2"
+            icon={<TeamOutlined />}
+            onClick={() => handleClick(PATH_PACIENTES_DOCTORES, '2')}
+          >
+            MIS PACIENTES
+          </CustomMenuItem> */}
+        </>
+      )}
     </CustomMenu>
   )
 }

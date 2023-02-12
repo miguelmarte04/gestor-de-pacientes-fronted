@@ -71,6 +71,7 @@ import CustomDatePicker from '../components/CustomDatePicker'
 import CustomUpload from '../components/CustomUpload'
 import CustomMaskedInput from '../components/CustomMaskedInput'
 import { maskedInput } from '../constants/general'
+import { getSessionInfo } from '../utils/session'
 interface TemplateProps {
   State: string
 }
@@ -113,6 +114,22 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     } else if (State === 'H') {
       dispatch(getHorarios({}))
       dispatch(getDoctores({}))
+    } else if (State === 'CP' && getSessionInfo().id) {
+      dispatch(
+        getConsultas({
+          condition: {
+            id_paciente: getSessionInfo().id,
+          },
+        })
+      )
+    } else if (State === 'CD' && getSessionInfo().id) {
+      dispatch(
+        getConsultas({
+          condition: {
+            id_doctor: getSessionInfo().id,
+          },
+        })
+      )
     }
   }, [State])
 
@@ -318,6 +335,94 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             </CustomTooltip>
           </CustomSpace>
         )
+      },
+    },
+  ]
+  const columnsConsultasPacientes: ColumnType<ConsultasType>[] = [
+    {
+      key: 'doctor',
+      title: 'Doctor',
+      dataIndex: 'doctor',
+      render: (_, record) => {
+        return `${record.nombre_doctor} ${record.apellido_doctor}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_doctor} ${item.apellido_doctor}`,
+              value: item.nombre_doctor,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nombre_doctor === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
+  ]
+  const columnsConsultasDoctor: ColumnType<ConsultasType>[] = [
+    {
+      key: 'paciente',
+      title: 'Paciente',
+      dataIndex: 'paciente',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
+              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
       },
     },
   ]
@@ -850,6 +955,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
               search
             )?.filter((item) => item.estado === stateFilter),
     },
+
     D: {
       title: 'Doctores',
       titleModal: 'Registrar Doctor',
@@ -919,6 +1025,52 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
               search
             )?.filter((item) => item.estado === stateFilter),
     },
+    CP: {
+      title: 'Mis Consultas',
+      titleModal: 'Registrar Consulta',
+      titleModalEdit: 'Editar Consulta',
+      placeHolderSearch: 'Buscar por nombre paciente / doctor',
+      columns: columnsConsultasPacientes,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              Consultas?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_doctor'],
+              search
+            )
+          : searchInArray(
+              Consultas?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_doctor'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
+    CD: {
+      title: 'Mis Consultas',
+      titleModal: 'Registrar Consulta',
+      titleModalEdit: 'Editar Consulta',
+      placeHolderSearch: 'Buscar por nombre paciente',
+      columns: columnsConsultasDoctor,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              Consultas?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_paciente'],
+              search
+            )
+          : searchInArray(
+              Consultas?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_paciente'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
   }
 
   useEffect(() => {
@@ -941,6 +1093,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       createHorariosRequestStatus === 'success'
     ) {
       State === 'C' && dispatch(getConsultas({}))
+
       State === 'P' && dispatch(getPacientes({}))
       State === 'D' && dispatch(getDoctores({}))
       State === 'E' && dispatch(getEspecialidades({}))

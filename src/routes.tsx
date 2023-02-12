@@ -9,12 +9,15 @@ import {
 } from 'react-router-dom'
 import {
   PATH_CONSULTAS,
+  PATH_CONSULTAS_DOCTORES,
+  PATH_CONSULTAS_PACIENTES,
   PATH_DOCTORES,
   PATH_ESPECIALIDADES,
   PATH_HORARIOS,
   PATH_LOGIN,
   PATH_MAIN,
   PATH_PACIENTES,
+  PATH_PACIENTES_DOCTORES,
   PATH_PROFILE,
 } from './constants/Routes'
 import MenuRoutesWrapper from './components/MenuRoutesWrapper'
@@ -41,8 +44,20 @@ const Routes = (): React.ReactElement => {
               element={<SimpleTemplate State={'C'} />}
             />
             <Route
+              path={PATH_CONSULTAS_PACIENTES}
+              element={<SimpleTemplate State={'CP'} />}
+            />
+            <Route
+              path={PATH_CONSULTAS_DOCTORES}
+              element={<SimpleTemplate State={'CD'} />}
+            />
+            <Route
               path={PATH_PACIENTES}
               element={<SimpleTemplate State={'P'} />}
+            />
+            <Route
+              path={PATH_PACIENTES_DOCTORES}
+              element={<SimpleTemplate State={'PD'} />}
             />
             <Route
               path={PATH_DOCTORES}

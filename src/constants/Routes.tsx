@@ -4,10 +4,13 @@ export const PATH_MAIN = '/dashboard'
 export const PATH_ERROR = '/404'
 export const PATH_PROFILE = '/account'
 export const PATH_CONSULTAS = '/consultas'
+export const PATH_CONSULTAS_PACIENTES = '/consultas_pacientes'
+export const PATH_CONSULTAS_DOCTORES = '/consultas_doctores'
 export const PATH_HORARIOS = '/horarios'
 export const PATH_DOCTORES = '/doctores'
 export const PATH_ESPECIALIDADES = '/especialidades'
 export const PATH_PACIENTES = '/pacientes'
+export const PATH_PACIENTES_DOCTORES = '/pacientes_doctores'
 
 // external routes API
 export const WEB_SERVICE_API = process.env.REACT_APP_WEB_SERVICE_API
