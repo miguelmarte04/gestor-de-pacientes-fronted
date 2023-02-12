@@ -1,16 +1,28 @@
-import { FunctionComponent, ReactElement } from 'react'
-import { Table } from 'antd'
-import { TableProps } from 'antd/lib/table'
+import { Table, TableProps } from 'antd'
 import { AnyType } from '../constants/types'
+import CustomCard from './CustomCard'
 
-const CustomTable: FunctionComponent<TableProps<AnyType>> = ({
-  bordered = true,
-  size = 'small',
+interface CustomTableProps extends TableProps<AnyType> {
+  cardStyle?: React.CSSProperties
+  extra?: React.ReactNode
+}
+
+const CustomTable: React.FC<CustomTableProps> = ({
+  bordered = false,
+  cardStyle,
+  extra,
+  pagination,
+  size = 'middle',
   ...props
-}): ReactElement => (
-  <Table bordered={bordered} size={size} {...props}>
-    {props.children}
-  </Table>
-)
+}): React.ReactElement => {
+  return (
+    <CustomCard style={{ ...cardStyle }}>
+      {extra}
+      <Table pagination={pagination} bordered={bordered} size={size} {...props}>
+        {props.children}
+      </Table>
+    </CustomCard>
+  )
+}
 
 export default CustomTable

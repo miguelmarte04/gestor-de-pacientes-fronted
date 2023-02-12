@@ -534,3 +534,15 @@ export const generatePassword = (name: string, lastName: string): string => {
     ?.toLowerCase()}${Math.random().toString(36).substr(2, 6)}`
   return password
 }
+
+export const removeFilters = (columns: AnyType[]): AnyType[] => {
+  const newColumns = [...columns]
+  return newColumns?.map((item) => {
+    return {
+      ...item,
+      filters: undefined,
+      align: 'center',
+      className: 'print-column',
+    }
+  })
+}

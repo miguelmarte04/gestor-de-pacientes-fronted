@@ -1,39 +1,58 @@
+import { Typography } from 'antd'
+import moment from 'moment'
 import React from 'react'
-import { ColumnsType } from 'antd/lib/table'
-import { Image } from 'antd'
-import CustomTable from './CustomTable'
+import { getSessionInfo } from '../utils/session'
 import CustomCol from './CustomCol'
 import CustomRow from './CustomRow'
-import CustomTitle from './CustomTitle'
-// import { getDataInfoEmpresa } from '../utils/session'
+import { Image } from 'antd'
+import styled from 'styled-components'
 
-interface PrintTemplateProps {
-  columns: ColumnsType<unknown>
-  dataSource: unknown[]
-  title: string
+const { Text } = Typography
+const Separated = styled.div`
+  margin: 10px 0;
+  height: 2px;
+  borde2: 1px solid ${(props) => props.theme.borderColor};
+  width: 100%;
+`
+interface PrintTemplateProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
 }
 
 const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
-  ({ dataSource, columns, title }, ref) => {
+  ({ children, ...rest }, ref) => {
     return (
-      <div ref={ref} className={'print-template'}>
+      <div ref={ref} {...rest}>
         <CustomCol xs={24}>
           <CustomRow justify={'center'}>
-            <Image width={150} preview={false} src={'/assets/logo.png'} />
+            <Image
+              preview={false}
+              src={'/assets/logo.png'}
+              alt={'Logo'}
+              style={{
+                width: '120px',
+                height: '120px',
+              }}
+            />
           </CustomRow>
         </CustomCol>
         <CustomCol xs={24}>
           <CustomRow justify={'center'}>
-            <CustomTitle>{title}</CustomTitle>
+            <Text strong>{'Gestor de Pacientes'}</Text>
           </CustomRow>
         </CustomCol>
-        <div className={'push'}></div>
-        <CustomTable
-          columns={columns}
-          className={'print-table'}
-          dataSource={dataSource}
-          pagination={false}
-        />
+
+        <CustomRow justify={'end'}>
+          <Text type={'secondary'}>{moment().format('DD MMMM YYYY')}</Text>
+          <Separated />
+          <CustomCol xs={24}>{children}</CustomCol>
+          <Separated />
+          <Text type={'secondary'}>
+            Usuario:{' '}
+            <strong>{`${getSessionInfo().nombres} ${
+              getSessionInfo().apellidos
+            }`}</strong>
+          </Text>
+        </CustomRow>
       </div>
     )
   }
