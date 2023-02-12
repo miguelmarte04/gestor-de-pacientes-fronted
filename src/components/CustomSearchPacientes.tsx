@@ -208,7 +208,7 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
             errors: undefined,
             value:
               setValue === 'doc'
-                ? employeeSource?.doc_identidad
+                ? employeeSource?.cedula
                 : setValue === 'name'
                 ? employeeSource?.nombres
                 : employeeSource?.id,

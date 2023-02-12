@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   DeleteOutlined,
   EditOutlined,
@@ -7,8 +8,13 @@ import {
 import { Form } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { defaultTheme } from '../themes'
-import { formatter, searchInArray } from '../utils/general'
+import { defaultBreakpoints, defaultTheme } from '../themes'
+import {
+  formatter,
+  generatePassword,
+  replaceAll,
+  searchInArray,
+} from '../utils/general'
 import { CustomModalConfirmation } from '../components/ConfirmModalMethod'
 import CustomButton from '../components/CustomButton'
 import CustomCol from '../components/CustomCol'
@@ -27,9 +33,17 @@ import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
 import CustomSpin from '../components/CustomSpin'
 import {
   createConsultas,
+  createDoctor,
+  createPacientes,
   getConsultas,
   getDoctores,
+  getEspecialidades,
+  getNacionalidades,
+  getPacientes,
+  getSeguros,
   updateConsultas,
+  updateDoctor,
+  updatePacientes,
 } from '../slicers/general/general'
 import { ConsultasType } from '../slicers/general'
 import CustomTable from '../components/CustomTable'
@@ -41,7 +55,12 @@ import CustomSelect from '../components/CustomSelect'
 import CustomTextArea from '../components/CustomTextArea'
 import CustomRangePicker from '../components/CustomRangePicker'
 import CustomInput from '../components/CustomInput'
-import { PacientesType } from '../slicers/general/types'
+import { DoctoresType, PacientesType } from '../slicers/general/types'
+import ConditionalComponent from '../components/ConditionalComponent'
+import CustomDatePicker from '../components/CustomDatePicker'
+import CustomUpload from '../components/CustomUpload'
+import CustomMaskedInput from '../components/CustomMaskedInput'
+import { maskedInput } from '../constants/general'
 interface TemplateProps {
   State: string
 }
@@ -55,24 +74,38 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     Consultas,
     fetchingGeneralData,
     createConsultasRequestStatus,
+    createPacientesRequestStatus,
+    createDoctorRequestStatus,
     doctores,
+    pacientes,
+    nacionalidades,
+    seguros,
+    especialidades,
   } = useAppSelector((state) => state.general)
 
   useEffect(() => {
     if (State === 'C') {
       dispatch(getConsultas({}))
       dispatch(getDoctores({}))
+    } else if (State === 'P') {
+      dispatch(getPacientes({}))
+      dispatch(getNacionalidades({}))
+      dispatch(getSeguros({}))
+    } else if (State === 'D') {
+      dispatch(getDoctores({}))
+      dispatch(getNacionalidades({}))
+      dispatch(getEspecialidades({}))
     }
-  }, [])
+  }, [State])
 
   const [search, setSearch] = useState('')
-  const [edit, setEdit] = useState<ConsultasType>()
+  const [edit, setEdit] = useState<AnyType>()
   const [view, setView] = useState(false)
   const [pacienteSelected, setpacienteSelected] = useState<PacientesType>()
   const [visible, setVisible] = useState(false)
   const [stateFilter, setStateFilter] = useState<string>('A')
 
-  const handleDelete = (record: ConsultasType) => {
+  const handleDelete = (record: ConsultasType | PacientesType) => {
     if (State === 'C') {
       dispatch(
         updateConsultas({
@@ -82,9 +115,27 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    } else if (State === 'P') {
+      dispatch(
+        updatePacientes({
+          condition: {
+            ...record,
+            estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
+    } else if (State === 'D') {
+      dispatch(
+        updateDoctor({
+          condition: {
+            ...record,
+            estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
     }
   }
-  const handleEdit = (record: ConsultasType) => {
+  const handleEdit = (record: AnyType) => {
     setVisible(true)
     setEdit(record)
     if (State === 'C') {
@@ -96,6 +147,17 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           type: 'identity_doc',
         }),
         fecha: [moment(record.inicio), moment(record.fin)],
+      })
+    } else if (State === 'P') {
+      form.setFieldsValue({
+        ...record,
+        fecha_nacimiento: moment(record.fecha_nacimiento),
+        imagen: record.imagen ? record.imagen : [],
+      })
+    } else if (State === 'D') {
+      form.setFieldsValue({
+        ...record,
+        fecha_nacimiento: moment(record.fecha_nacimiento),
       })
     }
   }
@@ -219,6 +281,322 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       },
     },
   ]
+  const columnsPacientes: ColumnType<PacientesType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'nombres',
+      title: 'Nombre',
+      dataIndex: 'nombres',
+      render: (_, record) => {
+        return `${record.nombres} ${record.apellidos}`
+      },
+    },
+    {
+      key: 'cedula',
+      title: 'Cédula',
+      width: '12%',
+      dataIndex: 'cedula',
+      render: (_, record) => {
+        return formatter({ value: record.cedula, type: 'identity_doc' })
+      },
+    },
+    {
+      key: 'fecha_nacimiento',
+      title: 'Fecha de nacimiento',
+      width: '10%',
+      dataIndex: 'fecha_nacimiento',
+      render: (_, record) => {
+        return moment(record.fecha_nacimiento).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'sexo',
+      title: 'Sexo',
+      width: '10%',
+      dataIndex: 'sexo',
+      render: (item) => {
+        return item === 'M' ? 'Masculino' : 'Femenino'
+      },
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.sexo === 'M' ? 'Masculino' : 'Femenino',
+                value: item.sexo,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.sexo === value
+      },
+    },
+    {
+      key: 'seguro',
+      title: 'Seguro',
+      dataIndex: 'seguro',
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.seguro,
+                value: item.seguro,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.seguro === value
+      },
+    },
+    {
+      key: 'email',
+      title: 'Email',
+      dataIndex: 'email',
+    },
+    {
+      key: 'nacionalidad',
+      title: 'Nacionalidad',
+      dataIndex: 'nacionalidad',
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.nacionalidad,
+                value: item.nacionalidad,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nacionalidad === value
+      },
+    },
+
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <StopOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
+  const columnsDoctores: ColumnType<DoctoresType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'nombres',
+      title: 'Nombre',
+      dataIndex: 'nombres',
+      render: (_, record) => {
+        return `${record.nombre} ${record.apellido}`
+      },
+    },
+    {
+      key: 'cedula',
+      title: 'Cédula',
+      width: '12%',
+      dataIndex: 'cedula',
+      render: (_, record) => {
+        return formatter({ value: record.cedula, type: 'identity_doc' })
+      },
+    },
+    {
+      key: 'fecha_nacimiento',
+      title: 'Fecha de nacimiento',
+      width: '10%',
+      dataIndex: 'fecha_nacimiento',
+      render: (_, record) => {
+        return moment(record.fecha_nacimiento).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'sexo',
+      title: 'Sexo',
+      width: '10%',
+      dataIndex: 'sexo',
+      render: (item) => {
+        return item === 'M' ? 'Masculino' : 'Femenino'
+      },
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.sexo === 'M' ? 'Masculino' : 'Femenino',
+                value: item.sexo,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.sexo === value
+      },
+    },
+    {
+      key: 'especialidad',
+      title: 'Especialidad',
+      dataIndex: 'especialidad',
+      filters:
+        Number(pacientes?.length) > 0
+          ? doctores
+              ?.map((item) => ({
+                text: item.especialidad,
+                value: item.especialidad,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.especialidad === value
+      },
+    },
+    {
+      key: 'correo',
+      title: 'Email',
+      dataIndex: 'correo',
+    },
+    {
+      key: 'nacionalidad',
+      title: 'Nacionalidad',
+      dataIndex: 'nacionalidad',
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.nacionalidad,
+                value: item.nacionalidad,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nacionalidad === value
+      },
+    },
+
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <StopOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
 
   const title = {
     C: {
@@ -249,23 +627,46 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       titleModal: 'Registrar Paciente',
       titleModalEdit: 'Editar Paciente',
       placeHolderSearch: 'Buscar por nombre paciente o cedula',
-      // dataSource:
-      // stateFilter === ''
-      //   ? searchInArray(
-      //       Consultas?.filter(
-      //         (item) => item.estado === 'A' || item.estado === 'I'
-      //       ),
-      //       ['nombres', 'apellidos', 'cedula'],
-      //       search
-      //     )
-      //   : searchInArray(
-      //       Consultas?.filter(
-      //         (item) => item.estado === 'A' || item.estado === 'I'
-      //       ),
-      //       ['nombres', 'apellidos', 'cedula'],
-      //       search
-      //     )?.filter((item) => item.estado === stateFilter),
-      dataSource: [],
+      columns: columnsPacientes,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              pacientes?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombres', 'apellidos', 'cedula'],
+              search
+            )
+          : searchInArray(
+              pacientes?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombres', 'apellidos', 'cedula'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
+    D: {
+      title: 'Doctores',
+      titleModal: 'Registrar Doctor',
+      titleModalEdit: 'Editar Doctor',
+      placeHolderSearch: 'Buscar por nombre Nombre o cedula',
+      columns: columnsDoctores,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              doctores?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre', 'apellido', 'cedula'],
+              search
+            )
+          : searchInArray(
+              doctores?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre', 'apellido', 'cedula'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
     },
   }
 
@@ -281,19 +682,33 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       })
   }, [pacienteSelected])
   useEffect(() => {
-    if (createConsultasRequestStatus === 'success') {
-      dispatch(getConsultas({}))
+    if (
+      createConsultasRequestStatus === 'success' ||
+      createPacientesRequestStatus === 'success' ||
+      createDoctorRequestStatus === 'success'
+    ) {
+      State === 'C' && dispatch(getConsultas({}))
+      State === 'P' && dispatch(getPacientes({}))
+      State === 'D' && dispatch(getDoctores({}))
       form.resetFields()
       setVisible(false)
       setEdit(undefined)
       setView(false)
     }
-  }, [createConsultasRequestStatus])
+  }, [
+    createConsultasRequestStatus,
+    createPacientesRequestStatus,
+    createDoctorRequestStatus,
+  ])
 
   const handleUpdate = async () => {
     const data = await form.validateFields()
     if (State === 'C') {
       dispatch(updateConsultas({ condition: { ...edit, ...data } }))
+    } else if (State === 'P') {
+      dispatch(updatePacientes({ condition: { ...edit, ...data } }))
+    } else if (State === 'D') {
+      dispatch(updateDoctor({ condition: { ...edit, ...data } }))
     }
   }
   const handleCreate = async () => {
@@ -307,6 +722,32 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             id_paciente: pacienteSelected.id,
             inicio: moment(data.fecha[0]).format('YYYY-MM-DD'),
             fin: moment(data.fecha[1]).format('YYYY-MM-DD'),
+          },
+        })
+      )
+    } else if (State === 'P') {
+      dispatch(
+        createPacientes({
+          condition: {
+            ...data,
+            telefono: replaceAll(data.telefono, ' ', ''),
+            cedula: replaceAll(data.cedula, '-', ''),
+            id_seguro: data.seguro,
+            id_nacionalidad: data.nacionalidad,
+            clave: generatePassword(data.nombres, data.apellidos),
+          },
+        })
+      )
+    } else if (State === 'D') {
+      dispatch(
+        createDoctor({
+          condition: {
+            ...data,
+            telefono: replaceAll(data.telefono, ' ', ''),
+            cedula: replaceAll(data.cedula, '-', ''),
+            id_especialidad: data.especialidad,
+            id_nacionalidad: data.nacionalidad,
+            clave: generatePassword(data.nombres, data.apellidos),
           },
         })
       )
@@ -386,89 +827,361 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       : title[`${State}`]?.titleModal}
                   </CustomTitle>
                 }
-                width={'50%'}
+                width={'55%'}
                 visible={visible}
                 cancelText={view ? 'Salir' : 'Cancelar'}
                 okButtonProps={{ hidden: view }}
                 onCancel={() => {
-                  setVisible(false)
-                  setEdit(undefined)
-                  setView(false)
-                  form.resetFields()
+                  CustomModalConfirmation({
+                    content:
+                      '¿Está seguro que desea salir sin guardar los cambios?',
+                    onOk: () => {
+                      setVisible(false)
+                      setEdit(undefined)
+                      setView(false)
+                      form.resetFields()
+                    },
+                  })
                 }}
                 onOk={() => {
                   edit?.id ? handleUpdate() : handleCreate()
                 }}
               >
-                {State === 'C' ? (
-                  <>
-                    <CustomCol xs={24}>
+                {/* consultas  */}
+                <ConditionalComponent condition={State === 'C'}>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Paciente'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
                       <CustomFormItem
-                        label={'Paciente'}
+                        label={'Nombre'}
+                        noStyle
+                        name={'nombres'}
+                        rules={[{ required: true }]}
+                      >
+                        {edit?.nombre_paciente ? (
+                          <CustomInput disabled placeholder="paciente" />
+                        ) : (
+                          <CustomSearchPacientes
+                            showInitialValue
+                            style={{ marginBottom: '2%' }}
+                            placeholder={
+                              'Buscar por: documento de identidad o nombres'
+                            }
+                            onSelect={(_, employee) => {
+                              setpacienteSelected(employee)
+                            }}
+                          />
+                        )}
+                      </CustomFormItem>
+                    </CustomFormItem>
+                  </CustomCol>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Doctor'}
+                      name={'id_doctor'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
+                      <CustomSelect
+                        placeholder={'Seleccione un doctor'}
+                        options={doctores?.map((item) => ({
+                          label: item.nombre,
+                          value: item.id,
+                        }))}
+                      />
+                    </CustomFormItem>
+                  </CustomCol>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Asunto'}
+                      name={'asunto'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
+                      <CustomTextArea placeholder="Asunto" />
+                    </CustomFormItem>
+                  </CustomCol>
+                  <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
+                    <CustomFormItem
+                      label={'Fecha'}
+                      name={'fecha'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
+                      <CustomRangePicker />
+                    </CustomFormItem>
+                  </CustomCol>
+                </ConditionalComponent>
+                {/* Pacientes  */}
+                <ConditionalComponent condition={State === 'P'}>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Nombre'}
+                        name={'nombres'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 6 }}
                       >
-                        <CustomFormItem
-                          label={'Nombre'}
-                          noStyle
-                          name={'nombres'}
-                          rules={[{ required: true }]}
-                        >
-                          {edit?.nombre_paciente ? (
-                            <CustomInput disabled placeholder="paciente" />
-                          ) : (
-                            <CustomSearchPacientes
-                              showInitialValue
-                              style={{ marginBottom: '2%' }}
-                              placeholder={
-                                'Buscar por: documento de identidad o nombres'
-                              }
-                              onSelect={(_, employee) => {
-                                setpacienteSelected(employee)
-                              }}
-                            />
-                          )}
-                        </CustomFormItem>
+                        <CustomInput placeholder="Nombre" />
                       </CustomFormItem>
                     </CustomCol>
-                    <CustomCol xs={24}>
+                    <CustomCol {...defaultBreakpoints}>
                       <CustomFormItem
-                        label={'Doctor'}
-                        name={'id_doctor'}
+                        label={'Apellido'}
+                        name={'apellidos'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 6 }}
                       >
+                        <CustomInput placeholder="Apellido" />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints} pull={1}>
+                      <CustomFormItem
+                        label={'Nacionalidad'}
+                        name={'nacionalidad'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 8 }}
+                      >
                         <CustomSelect
-                          placeholder={'Seleccione un doctor'}
-                          options={doctores?.map((item) => ({
+                          placeholder={'Seleccione una nacionalidad'}
+                          width={'112%'}
+                          options={nacionalidades?.map((item) => ({
                             label: item.nombre,
                             value: item.id,
                           }))}
                         />
                       </CustomFormItem>
                     </CustomCol>
-                    <CustomCol xs={24}>
+                    <CustomCol {...defaultBreakpoints}>
                       <CustomFormItem
-                        label={'Asunto'}
-                        name={'asunto'}
+                        label={'Cédula'}
+                        name={'cedula'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 6 }}
                       >
-                        <CustomTextArea placeholder="Asunto" />
+                        <CustomMaskedInput
+                          mask={maskedInput.doc_identidad}
+                          placeholder="Cedula"
+                        />
                       </CustomFormItem>
                     </CustomCol>
-                    <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints} pull={2}>
                       <CustomFormItem
-                        label={'Fecha'}
-                        name={'fecha'}
+                        label={'Fecha de Nac.'}
+                        name={'fecha_nacimiento'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 10 }}
+                      >
+                        <CustomDatePicker style={{ width: '128%' }} />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Sexo'}
+                        name={'sexo'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 6 }}
                       >
-                        <CustomRangePicker />
+                        <CustomSelect
+                          placeholder={'Seleccione el Sexo'}
+                          options={[
+                            { label: 'Masculino', value: 'M' },
+                            { label: 'Femenino', value: 'F' },
+                          ]}
+                        />
                       </CustomFormItem>
                     </CustomCol>
-                  </>
-                ) : null}
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Seguro'}
+                        name={'seguro'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Seleccione el Seguro'}
+                          options={seguros?.map((item) => ({
+                            label: item.nombre,
+                            value: item.id,
+                          }))}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Teléfono'}
+                        name={'telefono'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomMaskedInput
+                          mask={maskedInput.telefono}
+                          placeholder="Telefono"
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Email'}
+                        name={'email'}
+                        rules={[{ required: true, type: 'email' }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomInput
+                          placeholder={'Correo Electrónico'}
+                          type={'email'}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    {/* <CustomCol {...defaultBreakpoints}>
+                      <CustomUpload
+                        form={form}
+                        previewTitle={'Imagen'}
+                        label={'Foto'}
+                        name={'imagen'}
+                        labelCol={{ span: 6 }}
+                      />
+                    </CustomCol> */}
+                  </CustomRow>
+                </ConditionalComponent>
+                {/* Doctor  */}
+                <ConditionalComponent condition={State === 'D'}>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Nombre'}
+                        name={'nombre'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomInput placeholder="Nombre" />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Apellido'}
+                        name={'apellido'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomInput placeholder="Apellido" />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints} pull={1}>
+                      <CustomFormItem
+                        label={'Nacionalidad'}
+                        name={'nacionalidad'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 8 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Seleccione una nacionalidad'}
+                          width={'112%'}
+                          options={nacionalidades?.map((item) => ({
+                            label: item.nombre,
+                            value: item.id,
+                          }))}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Cédula'}
+                        name={'cedula'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomMaskedInput
+                          mask={maskedInput.doc_identidad}
+                          placeholder="Cedula"
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints} pull={2}>
+                      <CustomFormItem
+                        label={'Fecha de Nac.'}
+                        name={'fecha_nacimiento'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 10 }}
+                      >
+                        <CustomDatePicker style={{ width: '128%' }} />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Sexo'}
+                        name={'sexo'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Seleccione el Sexo'}
+                          options={[
+                            { label: 'Masculino', value: 'M' },
+                            { label: 'Femenino', value: 'F' },
+                          ]}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Especialidad'}
+                        name={'especialidad'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Seleccionar Especialidad'}
+                          options={especialidades?.map((item) => ({
+                            label: item.nombre,
+                            value: item.id,
+                          }))}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Teléfono'}
+                        name={'telefono'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomMaskedInput
+                          mask={maskedInput.telefono}
+                          placeholder="Telefono"
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Email'}
+                        name={'correo'}
+                        rules={[{ required: true, type: 'email' }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomInput
+                          placeholder={'Correo Electrónico'}
+                          type={'email'}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                </ConditionalComponent>
               </CustomModal>
             </CustomForm>
           </CustomCol>

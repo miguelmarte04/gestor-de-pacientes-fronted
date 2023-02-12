@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 import {
   PATH_CONSULTAS,
+  PATH_DOCTORES,
   PATH_LOGIN,
   PATH_MAIN,
   PATH_PACIENTES,
@@ -40,6 +41,10 @@ const Routes = (): React.ReactElement => {
             <Route
               path={PATH_PACIENTES}
               element={<SimpleTemplate State={'P'} />}
+            />
+            <Route
+              path={PATH_DOCTORES}
+              element={<SimpleTemplate State={'D'} />}
             />
             <Route path={'*'} element={<NotFound />} />
           </Route>

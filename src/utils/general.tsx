@@ -526,3 +526,11 @@ export function filterByDate<T, K extends keyof T>(
     'id' as K
   )
 }
+
+// funcion para generar contraseña aleatoria de 8 caracteres apartir del nombre y apellido
+export const generatePassword = (name: string, lastName: string): string => {
+  const password = `${name?.charAt(0)?.toLowerCase()}${lastName
+    ?.charAt(0)
+    ?.toLowerCase()}${Math.random().toString(36).substr(2, 6)}`
+  return password
+}

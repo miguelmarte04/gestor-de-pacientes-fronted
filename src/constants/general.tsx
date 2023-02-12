@@ -91,7 +91,6 @@ export const maskedInput = {
     /\d/,
     /\d/,
   ],
-  email: [/^[0-9]^/],
   id_cuenta: [
     /\d/,
     /\d/,

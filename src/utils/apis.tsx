@@ -3,9 +3,14 @@ import { getSessionToken } from './session'
 import {
   WEB_SERVICE_API_GET_CONSULTAS,
   WEB_SERVICE_API_GET_DOCTORES,
+  WEB_SERVICE_API_GET_ESPECILIDADES,
+  WEB_SERVICE_API_GET_NACIONALIDADES,
   WEB_SERVICE_API_GET_PACIENTES,
+  WEB_SERVICE_API_GET_SEGUROS,
   WEB_SERVICE_API_LOGIN,
   WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS,
+  WEB_SERVICE_API_UPDATE_CREATE_DOCTORES,
+  WEB_SERVICE_API_UPDATE_CREATE_PACIENTES,
 } from '../constants/Routes'
 import { GeneralType } from '../constants/types'
 import { removeNullFields } from './general'
@@ -88,9 +93,37 @@ const getDoctores = (payload: GeneralType): Promise<AxiosResponse> => {
 const getPacientes = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_PACIENTES}`, payload)
 }
+const getNacionalidades = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_NACIONALIDADES}`, payload)
+}
+const getEspecialidades = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_ESPECILIDADES}`, payload)
+}
+const getSeguros = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_SEGUROS}`, payload)
+}
+const createPacientes = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_PACIENTES}`, payload)
+}
+const updatePacientes = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_PACIENTES}`, payload)
+}
+const createDoctor = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DOCTORES}`, payload)
+}
+const updateDoctor = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DOCTORES}`, payload)
+}
 
 export const userApiHelper = {
   getPacientes,
+  getEspecialidades,
+  getNacionalidades,
+  getSeguros,
+  createPacientes,
+  updatePacientes,
+  createDoctor,
+  updateDoctor,
   authenticateUser,
   getConsultas,
   createConsultas,

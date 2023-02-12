@@ -11,7 +11,11 @@ import {
 } from '@ant-design/icons'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PATH_CONSULTAS, PATH_PACIENTES } from '../constants/Routes'
+import {
+  PATH_CONSULTAS,
+  PATH_DOCTORES,
+  PATH_PACIENTES,
+} from '../constants/Routes'
 import CustomMenu from './CustomMenu'
 import CustomMenuItem from './CustomMenuItem'
 import CustomMenuItemGroup from './CustomMenuItemGroup'
@@ -66,7 +70,7 @@ const DrawerOptions = (): React.ReactElement => {
           <CustomMenuItem
             key="3"
             icon={<TeamOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '3')}
+            onClick={() => handleClick(PATH_DOCTORES, '3')}
           >
             DOCTORES
           </CustomMenuItem>
