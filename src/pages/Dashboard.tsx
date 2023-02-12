@@ -34,15 +34,8 @@ import InfoCard, { InfoCardType } from '../components/InfoCard'
 import PieChart from '../components/PieChart'
 // import { CONSULTAR_NOMINA } from '../constants/Routes'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { getPacientes } from '../slicers/employee'
-import {
-  getDetNominas,
-  getLaidOff,
-  getNominas,
-  getPermissions,
-} from '../slicers/employee/employee'
 import { getConsultas } from '../slicers/general'
-import { getCandidates } from '../slicers/recruitment/recruitment'
+import { getPacientes } from '../slicers/general/general'
 import { sortByDate } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
 
@@ -54,16 +47,6 @@ const StyledLayout = styled(CustomLayout)`
 
 const Dashboard = (): React.ReactElement => {
   const dispatch = useAppDispatch()
-  // const navigate = useNavigate()
-  const {
-    employee,
-    nomina,
-    dataPermissions,
-    dataLaidOff,
-    dataResignation,
-    detNomina,
-  } = useAppSelector((state) => state.employee)
-  const { candidates } = useAppSelector((state) => state.recruitment)
   const { Consultas } = useAppSelector((state) => state.general)
 
   const buildDataSource = <T, K extends keyof T>(arr: T[], k: K) => {
@@ -93,41 +76,6 @@ const Dashboard = (): React.ReactElement => {
     return data
   }
 
-  const barChartDataSourcePermissions = useMemo(() => {
-    // cantidad de permisos por mes
-    const data = new Array<number>()
-    const arr = dataPermissions?.[0]?.id ? [...dataPermissions] : []
-
-    // ordenar la data por mes de nacimiento
-    const sortedData = arr?.sort?.((a, b) => {
-      const monthA = new Date(a?.fecha_insercion).getMonth()
-      const monthB = new Date(b?.fecha_insercion).getMonth()
-
-      return monthA - monthB
-    })
-
-    // obtener la cantidad de empleados por mes y si un mes no tiene empleados, agregar 0
-    for (let i = 0; i < 12; i++) {
-      const month = sortedData?.filter(
-        (permission) => new Date(permission?.fecha_insercion).getMonth() === i
-      )
-
-      data.push(month?.length)
-    }
-
-    return data
-  }, [dataPermissions])
-
-  const employeesBirthday = useMemo(() => {
-    const currentMonth = new Date().getMonth()
-    const arr = employee?.[0]?.id ? [...employee] : []
-
-    return arr?.filter(
-      (employee) =>
-        new Date(employee.fecha_nacimiento).getMonth() === currentMonth
-    )?.length
-  }, [employee])
-
   const labels = [
     'enero',
     'febrero',
@@ -145,12 +93,7 @@ const Dashboard = (): React.ReactElement => {
 
   useEffect(() => {
     const condition = {}
-    dispatch(getCandidates(condition))
     dispatch(getConsultas(condition))
-    dispatch(getNominas(condition))
-    dispatch(getPermissions(condition))
-    dispatch(getLaidOff(condition))
-    dispatch(getDetNominas(condition))
     dispatch(
       getPacientes({
         condition: {
@@ -171,19 +114,19 @@ const Dashboard = (): React.ReactElement => {
   const dynamicCardDataSources: DynamicCardType[] = [
     {
       title: 'Pacientes',
-      description: CardDescription('Total', `${employee?.length ?? 0}`),
+      description: CardDescription('Total', '0'),
       icon: <TeamOutlined />,
       color: '#ffe58f',
     },
     {
       title: 'Doctores',
-      description: CardDescription('Total', `${candidates?.length ?? 0}`),
+      description: CardDescription('Total', '0'),
       icon: <UserOutlined />,
       color: '#f4ffb8',
     },
     {
       title: 'Especialidades',
-      description: CardDescription('Total', `${Consultas?.length ?? 0}`),
+      description: CardDescription('Total', '0'),
       icon: <TagOutlined />,
       color: '#95de64',
     },
@@ -195,32 +138,32 @@ const Dashboard = (): React.ReactElement => {
     },
   ]
 
-  const infoCardDataSources: InfoCardType[] = [
-    {
-      content: 'Nóminas Registradas',
-      value: `${nomina?.length}`,
-      icon: <BarChartOutlined />,
-      color: '#91d5ff',
-    },
-    {
-      content: 'Nominas Aprobadas',
-      value: `${nomina?.filter((item) => item.estado_nomina === 'A')?.length}`,
-      icon: <CheckCircleOutlined />,
-      color: '#b7eb8f',
-    },
-    {
-      content: 'Nominas Autorizadas',
-      value: `${nomina?.filter((item) => item.estado_nomina === 'U')?.length}`,
-      icon: <IssuesCloseOutlined />,
-      color: '#adc6ff',
-    },
-    {
-      content: 'Nominas Reversadas',
-      value: `${nomina?.filter((item) => item.estado_nomina === 'D')?.length}`,
-      icon: <RedoOutlined />,
-      color: '#efdbff',
-    },
-  ]
+  // const infoCardDataSources: InfoCardType[] = [
+  //   {
+  //     content: 'Nóminas Registradas',
+  //     value: `${nomina?.length}`,
+  //     icon: <BarChartOutlined />,
+  //     color: '#91d5ff',
+  //   },
+  //   {
+  //     content: 'Nominas Aprobadas',
+  //     value: `${nomina?.filter((item) => item.estado_nomina === 'A')?.length}`,
+  //     icon: <CheckCircleOutlined />,
+  //     color: '#b7eb8f',
+  //   },
+  //   {
+  //     content: 'Nominas Autorizadas',
+  //     value: `${nomina?.filter((item) => item.estado_nomina === 'U')?.length}`,
+  //     icon: <IssuesCloseOutlined />,
+  //     color: '#adc6ff',
+  //   },
+  //   {
+  //     content: 'Nominas Reversadas',
+  //     value: `${nomina?.filter((item) => item.estado_nomina === 'D')?.length}`,
+  //     icon: <RedoOutlined />,
+  //     color: '#efdbff',
+  //   },
+  // ]
 
   return (
     <CustomSpin>
@@ -243,7 +186,7 @@ const Dashboard = (): React.ReactElement => {
                     getSessionInfo().privilegios === 3
                   }
                 >
-                  <InfoCard dataSource={infoCardDataSources} />
+                  {/* <InfoCard dataSource={infoCardDataSources} /> */}
                 </ConditionalComponent>
               </CustomCol>
               {/* <ConditionalComponent

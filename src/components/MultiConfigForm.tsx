@@ -1,11 +1,8 @@
 import { Form } from 'antd'
 import React, { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../hooks'
-import { ConfigPayload } from '../slicers/employee'
-import {
-  createConfigurations,
-  updateConfigurations,
-} from '../slicers/employee/employee'
+import { AnyType } from '../constants/types'
+import { useAppSelector } from '../hooks'
+
 import { formItemLayout } from '../themes'
 import { showNotification } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
@@ -20,7 +17,7 @@ import CustomTitle from './CustomTitle'
 
 interface MultiConfigFormProps {
   visible: boolean
-  data: ConfigPayload | undefined
+  data: AnyType | undefined
   onCancel(): void
   title: string
   key: string
@@ -35,18 +32,18 @@ const MultiConfigForm: React.FC<MultiConfigFormProps> = ({
   data: record,
   isEditing,
 }): React.ReactElement => {
-  const dispatch = useAppDispatch()
+  // const dispatch = useAppDispatch()
   const [form] = Form.useForm()
   const [showModal, setShowModal] = useState<boolean>()
-  const { fetchingFromEmployee } = useAppSelector((state) => state.employee)
+  const { fetchingFromPacientes } = useAppSelector((state) => state.general)
 
   useEffect(() => {
     setShowModal(visible)
   }, [visible])
 
   useEffect(() => {
-    !fetchingFromEmployee && onCancel()
-  }, [fetchingFromEmployee])
+    !fetchingFromPacientes && onCancel()
+  }, [fetchingFromPacientes])
 
   useEffect(() => {
     form.setFieldsValue(record)
@@ -59,19 +56,19 @@ const MultiConfigForm: React.FC<MultiConfigFormProps> = ({
 
   const handleOnFinish = async () => {
     try {
-      const data = (await form.validateFields()) as ConfigPayload
+      const data = (await form.validateFields()) as AnyType
 
       // eslint-disable-next-line no-console
       console.log({ key })
 
       data.usuario_insercion = getSessionInfo().usuario
       data.tipo = key ?? sessionStorage.getItem('key')
-      if (!isEditing) {
-        dispatch(createConfigurations(data))
-      } else {
-        const newData = { ...record, ...data }
-        dispatch(updateConfigurations(newData))
-      }
+      // if (!isEditing) {
+      //   dispatch(createConfigurations(data))
+      // } else {
+      //   const newData = { ...record, ...data }
+      //   dispatch(updateConfigurations(newData))
+      // }
     } catch (error) {
       showNotification({
         type: 'error',

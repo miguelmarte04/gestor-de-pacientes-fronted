@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Affix, Avatar, Image, Layout } from 'antd'
 import {
   FullscreenExitOutlined,
@@ -33,7 +33,6 @@ import Darkreader from 'react-darkreader'
 import Cookies from 'js-cookie'
 
 // import { InfoEmpresaType } from '../slicers/general'
-import { useAppSelector } from '../hooks'
 import CustomCol from './CustomCol'
 import { defaultTheme } from '../themes'
 import CustomSpace from './CustomSpace'
@@ -53,8 +52,6 @@ const MenuRoutesWrapper = (): React.ReactElement => {
   const [fullScreen, setFullScreen] = useState<boolean>(false)
   // const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
 
-  const { infoEmpresa } = useAppSelector((state) => state.general)
-
   if (!isLoggedIn()) {
     removeSession()
   }
@@ -62,12 +59,6 @@ const MenuRoutesWrapper = (): React.ReactElement => {
   // useEffect(() => {
   //   setGetDataEmpresa(getDataInfoEmpresa())
   // }, [])
-
-  useEffect(() => {
-    if (infoEmpresa?.id) {
-      window.sessionStorage.setItem('INFO_EMPRESA', JSON.stringify(infoEmpresa))
-    }
-  }, [infoEmpresa])
 
   const PerfilMenu = (
     <CustomMenu key={1}>

@@ -11,18 +11,13 @@ import {
 } from '@ant-design/icons'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PATH_CONSULTAS } from '../constants/Routes'
+import { PATH_CONSULTAS, PATH_PACIENTES } from '../constants/Routes'
 import CustomMenu from './CustomMenu'
 import CustomMenuItem from './CustomMenuItem'
 import CustomMenuItemGroup from './CustomMenuItemGroup'
 import CustomSubMenu from './CustomSubMenu'
 import { AnyType } from '../constants/types'
 import { useAppDispatch, useResetStore } from '../hooks'
-import {
-  resetEmployeeState,
-  setResetRegisterEmployee,
-} from '../slicers/employee'
-import { setNextLocation, setStepPositionReset } from '../slicers/general'
 import { getSessionInfo } from '../utils/session'
 
 const DrawerOptions = (): React.ReactElement => {
@@ -33,9 +28,6 @@ const DrawerOptions = (): React.ReactElement => {
 
   useResetStore(resetStore)
   const handleClick = (direction: string, key: string) => {
-    dispatch(setNextLocation(''))
-    dispatch(resetEmployeeState())
-    dispatch(setStepPositionReset())
     history(direction)
     setResetStore(true)
     window.sessionStorage.setItem('ID_ACTIVIDAD', key)
@@ -60,35 +52,35 @@ const DrawerOptions = (): React.ReactElement => {
           <CustomMenuItem
             key="1"
             icon={<ProfileOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+            onClick={() => handleClick(PATH_CONSULTAS, '1')}
           >
             CONSULTAS
           </CustomMenuItem>
           <CustomMenuItem
             key="2"
             icon={<TeamOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+            onClick={() => handleClick(PATH_PACIENTES, '2')}
           >
             PACIENTES
           </CustomMenuItem>
           <CustomMenuItem
             key="3"
             icon={<TeamOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+            onClick={() => handleClick(PATH_CONSULTAS, '3')}
           >
             DOCTORES
           </CustomMenuItem>
           <CustomMenuItem
             key="4"
             icon={<TagOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+            onClick={() => handleClick(PATH_CONSULTAS, '4')}
           >
             ESPECIALIDADES
           </CustomMenuItem>
           <CustomMenuItem
             key="5"
             icon={<CalendarOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
+            onClick={() => handleClick(PATH_CONSULTAS, '5')}
           >
             HORARIOS
           </CustomMenuItem>

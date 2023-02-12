@@ -11,6 +11,7 @@ import {
   PATH_CONSULTAS,
   PATH_LOGIN,
   PATH_MAIN,
+  PATH_PACIENTES,
   PATH_PROFILE,
 } from './constants/Routes'
 import MenuRoutesWrapper from './components/MenuRoutesWrapper'
@@ -35,6 +36,10 @@ const Routes = (): React.ReactElement => {
             <Route
               path={PATH_CONSULTAS}
               element={<SimpleTemplate State={'C'} />}
+            />
+            <Route
+              path={PATH_PACIENTES}
+              element={<SimpleTemplate State={'P'} />}
             />
             <Route path={'*'} element={<NotFound />} />
           </Route>

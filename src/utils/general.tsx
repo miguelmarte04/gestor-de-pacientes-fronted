@@ -5,7 +5,7 @@ import {
   FormatterParameters,
   NotificationType,
 } from '../constants/types'
-import { EmployeeType } from '../slicers/employee'
+import { PacientesType } from '../slicers/general/types'
 
 type NotificationParametersType = {
   title: string
@@ -124,7 +124,7 @@ export const getDays = (start: AnyType, end: AnyType): number => {
   return days + 1
 }
 
-export const getOnlyUnique = (record: EmployeeType[]): EmployeeType[] => {
+export const getOnlyUnique = (record: PacientesType[]): PacientesType[] => {
   //eliminar los null de la lista
   const filtered = record?.filter((el) => {
     return el?.id != null

@@ -1,25 +1,8 @@
 import generalReducer, {
   generalSelector,
-  generalSlice,
   GeneralState,
-  getAcademicLevel,
-  getBloodType,
-  getCargos,
-  getCivilState,
   getConsultas,
-  getCountries,
   getDoctores,
-  getEmailsTypes,
-  getInfoEmpresa,
-  getParametros,
-  getPaymentType,
-  getPayroll,
-  getPersonData,
-  getPhoneTypes,
-  getProvinces,
-  getRelationShip,
-  getTypeAbsences,
-  getTypesPermissions,
   resetAction,
 } from './general'
 
@@ -41,38 +24,7 @@ import {
   TypesPermissions,
 } from './types'
 
-export const {
-  setDeleteNullValuesBeforeRequest,
-  setModalVisibilityStateForEmployeeSummary,
-  setModalStateFormVacancy,
-  setEditingMode,
-  setNextLocation,
-  setStepPosition,
-  setStepPositionReset,
-} = generalSlice.actions
-
-export {
-  getAcademicLevel,
-  getBloodType,
-  getCargos,
-  getCivilState,
-  getCountries,
-  getConsultas,
-  getEmailsTypes,
-  getInfoEmpresa,
-  getParametros,
-  getPaymentType,
-  getPayroll,
-  getPersonData,
-  getPhoneTypes,
-  getProvinces,
-  getRelationShip,
-  getTypeAbsences,
-  getTypesPermissions,
-  getDoctores,
-  resetAction,
-  generalSelector,
-}
+export { getConsultas, getDoctores, resetAction, generalSelector }
 
 export type {
   PersonDataType,

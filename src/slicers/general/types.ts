@@ -1,5 +1,39 @@
 import { UploadFile } from 'antd'
 
+export type PacientesType = {
+  apellidos: string
+  apodo: string
+  cargo: string
+  cedula: string
+  nivel_academico: string
+  doc_identidad: string
+  estado: string
+  fecha_contratacion: string
+  fecha_insercion: string
+  fecha_nacimiento: string
+  honorifico: string
+  estado_civil: string
+  id: number
+  departamento?: number
+  id_cargo: number
+  id_departamento: number
+  id_estado_civil: number
+  id_jornada_trabajo: number
+  id_pais: number
+  id_privilegios: number
+  id_tipo_pago: number
+  id_tipo_sangre: number
+  imagen: string
+  lugar_nacimiento: string
+  nombres: string
+  sexo: string
+  sueldo: number
+  tipo_doc_identidad: string
+  ultimo_inicio_sesion: string
+  usuario: string
+  usuario_insercion: string
+  pass?: string
+}
 export type PersonDataType = {
   person_id: number
   identification: string

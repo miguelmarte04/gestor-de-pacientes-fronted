@@ -19,14 +19,15 @@ import CustomTooltip from './CustomTooltip'
 import CustomDropdown from './CustomDropdown'
 import CustomSearch from './CustomSearch'
 import { format } from '../constants/general'
-import { EmployeeType, getPacientes } from '../slicers/employee'
 import { getOnlyUnique, truncate } from '../utils/general'
 import { CustomFormItemContext } from './CustomFormItem'
 import { useAppDispatch, useAppSelector } from '../hooks'
+import { PacientesType } from '../slicers/general/types'
+import { getPacientes } from '../slicers/general/general'
 
 type ContextValue = {
-  employeeSelected?: EmployeeType
-  setEmployeeSelected?: (employee: React.SetStateAction<EmployeeType>) => void
+  pacienteSelected?: PacientesType
+  setPacienteSelected?: (paciente: React.SetStateAction<PacientesType>) => void
   inputValue?: string
   setInputValue?: (value: React.SetStateAction<string>) => void
 }
@@ -39,7 +40,7 @@ export type MenuInfo = {
 
 export type MenuClickEventHandler = (
   item: MenuInfo,
-  employee?: EmployeeType & { key?: React.Key }
+  paciente?: PacientesType & { key?: React.Key }
 ) => void
 
 type CustomProps = Omit<CustomInputProps, 'onSelect' | 'onBlur'> & {
@@ -81,20 +82,20 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
   const dispatch = useAppDispatch()
   const ctx = useContext(CustomFormContext)
   const name = useContext(CustomFormItemContext)?.name || 'SEARCH'
-  const [employeeSelected, setEmployeeSelected] = useState<EmployeeType>(
-    {} as EmployeeType
+  const [pacienteSelected, setPacienteSelected] = useState<PacientesType>(
+    {} as PacientesType
   )
   const [inputValue, setInputValue] = useState<string>('')
   const [dataSource, setDataSource] =
-    useState<(EmployeeType & { key?: string })[]>()
+    useState<(PacientesType & { key?: string })[]>()
   const [dropdownVisible, setDropdownVisible] = useState(false)
   const [searchValue, setSearchValue] = useState<string>()
   const [delay, setDelay] = useState<number>(0)
   const debounce = useSearch(searchValue, delay)
   const inputId = `${ctx?.name}_${name || ''}`
 
-  const { employee, fetchingFromEmployee } = useAppSelector(
-    (state) => state.employee
+  const { pacientes, fetchingFromPacientes } = useAppSelector(
+    (state) => state.general
   )
 
   const handleOnSelect = (item: MenuInfo) => {
@@ -102,38 +103,38 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
       (curItem) => `${curItem.id}` === `${item.key}`
     )
     if (curDataSource) {
-      setEmployeeSelected(curDataSource)
+      setPacienteSelected(curDataSource)
       if (typeof onSelect === 'function') onSelect(item, curDataSource)
     }
   }
 
   useEffect(() => {
-    if (employee?.length > 0) {
-      const data = getOnlyUnique(employee ?? [])
+    if (pacientes?.length > 0) {
+      const data = getOnlyUnique(pacientes ?? [])
       setDataSource(data)
     } else {
       setDataSource([])
     }
-  }, [employee])
+  }, [pacientes])
 
   useEffect(() => {
-    employeeSelected &&
-      setInputValue(cleanOnFinish ? '' : employeeSelected?.nombres)
-    employeeSelected &&
+    pacienteSelected &&
+      setInputValue(cleanOnFinish ? '' : pacienteSelected?.nombres)
+    pacienteSelected &&
       ctx?.form?.setFields([
         {
           name: name,
           value: cleanOnFinish
             ? ''
-            : employeeSelected?.nombres
-            ? `${employeeSelected?.nombres} ${employeeSelected?.apellidos} | ${employeeSelected?.cedula}`
+            : pacienteSelected?.nombres
+            ? `${pacienteSelected?.nombres} ${pacienteSelected?.apellidos} | ${pacienteSelected?.cedula}`
             : undefined,
         },
       ])
-  }, [employeeSelected])
+  }, [pacienteSelected])
 
   const handleInitialValue = useCallback(() => {
-    const person = employee?.find((item) => item.id === initialValue)
+    const person = pacientes?.find((item) => item.id === initialValue)
 
     person &&
       ctx?.form?.setFields([
@@ -142,7 +143,7 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
           value: person?.nombres,
         },
       ])
-  }, [initialValue, employee])
+  }, [initialValue, pacientes])
 
   const handleSearchInitialValue = useCallback(() => {
     showInitialValue &&
@@ -219,7 +220,7 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
   const menu = (
     <CustomMenu onClick={handleOnClick}>
       {dataSource !== undefined && dataSource?.length > 0 ? (
-        truncate(dataSource, pageSize)?.map((item: EmployeeType) => (
+        truncate(dataSource, pageSize)?.map((item: PacientesType) => (
           <CustomMenuItem key={item.id} style={{ padding: '4px' }}>
             <CustomTooltip
               title={`${item.nombres} ${item.apellidos} | ${item?.cedula}`}
@@ -252,14 +253,14 @@ const CustomSearchPacientes: React.FC<CustomProps> = ({
         ))
       ) : (
         <CustomMenuItem className={'custom-ant-menu-item'} key={0}>
-          <CustomSpin spinning={fetchingFromEmployee}>
+          <CustomSpin spinning={fetchingFromPacientes}>
             <CustomRow
               justify={'center'}
               style={{
                 height: '150px',
               }}
             >
-              {fetchingFromEmployee ? (
+              {fetchingFromPacientes ? (
                 <Skeleton active />
               ) : (
                 <>

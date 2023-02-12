@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useForm } from 'antd/lib/form/Form'
 import React, { useEffect } from 'react'
 import CustomCol from '../components/CustomCol'
@@ -15,18 +16,17 @@ import { LockOutlined } from '@ant-design/icons'
 import CustomPasswordInput from '../components/CustomPasswordInput'
 import { CustomModalConfirmation } from '../components/ConfirmModalMethod'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { updatePass } from '../slicers/employee/employee'
 
 const Profile = (): React.ReactElement => {
   const [form] = useForm()
   const [form2] = useForm()
   const dispatch = useAppDispatch()
-  const { employeeRequestStatus } = useAppSelector((state) => state.employee)
+  const { pacientesRequestStatus } = useAppSelector((state) => state.general)
   useEffect(() => {
-    if (employeeRequestStatus === 'success') {
+    if (pacientesRequestStatus === 'success') {
       form2.resetFields()
     }
-  }, [employeeRequestStatus])
+  }, [pacientesRequestStatus])
 
   useEffect(() => {
     form.setFieldsValue({
@@ -42,14 +42,14 @@ const Profile = (): React.ReactElement => {
       title: '¿Está seguro de cambiar su contraseña?',
       content: 'Se cambiará su contraseña',
       onOk: () => {
-        dispatch(
-          updatePass({
-            condition: {
-              id: getSessionInfo().id,
-              pass: data.nuevo_pass,
-            },
-          })
-        )
+        // dispatch(
+        //   updatePass({
+        //     condition: {
+        //       id: getSessionInfo().id,
+        //       pass: data.nuevo_pass,
+        //     },
+        //   })
+        // )
       },
     })
   }
@@ -91,16 +91,7 @@ const Profile = (): React.ReactElement => {
               <CustomInput placeholder="Usuario" readOnly />
             </CustomFormItem>
           </CustomCol>
-          {/* <CustomCol {...defaultBreakpoints}>
-            <CustomFormItem
-              label={'Cargo'}
-              name={'cargo'}
-              rules={[{ required: true }]}
-              {...formItemLayout}
-            >
-              <CustomInput placeholder="Cargo" readOnly />
-            </CustomFormItem>
-          </CustomCol> */}
+
           <CustomCol {...defaultBreakpoints}>
             <CustomFormItem
               label={'Cedula'}
