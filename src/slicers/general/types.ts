@@ -34,6 +34,14 @@ export type SegurosType = {
   fecha_insercion: string
   estado: string
 }
+export type HorariosType = {
+  id: number
+  id_doctor: number
+  nombre: string
+  nombre_doctor: string
+  fecha_insercion: string
+  estado: string
+}
 export type PersonDataType = {
   person_id: number
   identification: string

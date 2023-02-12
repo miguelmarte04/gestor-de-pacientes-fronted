@@ -10,6 +10,8 @@ import {
 import {
   PATH_CONSULTAS,
   PATH_DOCTORES,
+  PATH_ESPECIALIDADES,
+  PATH_HORARIOS,
   PATH_LOGIN,
   PATH_MAIN,
   PATH_PACIENTES,
@@ -45,6 +47,14 @@ const Routes = (): React.ReactElement => {
             <Route
               path={PATH_DOCTORES}
               element={<SimpleTemplate State={'D'} />}
+            />
+            <Route
+              path={PATH_ESPECIALIDADES}
+              element={<SimpleTemplate State={'E'} />}
+            />
+            <Route
+              path={PATH_HORARIOS}
+              element={<SimpleTemplate State={'H'} />}
             />
             <Route path={'*'} element={<NotFound />} />
           </Route>

@@ -34,15 +34,20 @@ import CustomSpin from '../components/CustomSpin'
 import {
   createConsultas,
   createDoctor,
+  createEspecialidad,
+  createHorarios,
   createPacientes,
   getConsultas,
   getDoctores,
   getEspecialidades,
+  getHorarios,
   getNacionalidades,
   getPacientes,
   getSeguros,
   updateConsultas,
   updateDoctor,
+  updateEspecialidad,
+  updateHorarios,
   updatePacientes,
 } from '../slicers/general/general'
 import { ConsultasType } from '../slicers/general'
@@ -55,7 +60,12 @@ import CustomSelect from '../components/CustomSelect'
 import CustomTextArea from '../components/CustomTextArea'
 import CustomRangePicker from '../components/CustomRangePicker'
 import CustomInput from '../components/CustomInput'
-import { DoctoresType, PacientesType } from '../slicers/general/types'
+import {
+  DoctoresType,
+  EspecilidadesType,
+  HorariosType,
+  PacientesType,
+} from '../slicers/general/types'
 import ConditionalComponent from '../components/ConditionalComponent'
 import CustomDatePicker from '../components/CustomDatePicker'
 import CustomUpload from '../components/CustomUpload'
@@ -76,10 +86,13 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     createConsultasRequestStatus,
     createPacientesRequestStatus,
     createDoctorRequestStatus,
+    createEspecialidadRequestStatus,
+    createHorariosRequestStatus,
     doctores,
     pacientes,
     nacionalidades,
     seguros,
+    horarios,
     especialidades,
   } = useAppSelector((state) => state.general)
 
@@ -95,6 +108,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dispatch(getDoctores({}))
       dispatch(getNacionalidades({}))
       dispatch(getEspecialidades({}))
+    } else if (State === 'E') {
+      dispatch(getEspecialidades({}))
+    } else if (State === 'H') {
+      dispatch(getHorarios({}))
     }
   }, [State])
 
@@ -133,6 +150,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    } else if (State === 'E') {
+      dispatch(
+        updateEspecialidad({
+          condition: {
+            ...record,
+            estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
+    } else if (State === 'H') {
+      dispatch(
+        updateHorarios({
+          condition: {
+            ...record,
+            estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
     }
   }
   const handleEdit = (record: AnyType) => {
@@ -158,6 +193,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       form.setFieldsValue({
         ...record,
         fecha_nacimiento: moment(record.fecha_nacimiento),
+      })
+    } else if (State === 'E' || State === 'H') {
+      form.setFieldsValue({
+        ...record,
       })
     }
   }
@@ -597,6 +636,171 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       },
     },
   ]
+  const columnsEspecialidades: ColumnType<EspecilidadesType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'nombre',
+      title: 'Especialidad',
+      dataIndex: 'nombre',
+    },
+
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <StopOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
+  const columnsHorarios: ColumnType<HorariosType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'nombre',
+      title: 'Nombre',
+      dataIndex: 'nombre',
+    },
+    {
+      key: 'nombre_doctor',
+      title: 'Doctor',
+      dataIndex: 'nombre_doctor',
+      filters:
+        Number(horarios?.length) > 0
+          ? horarios
+              ?.map((item) => ({
+                text: item.nombre_doctor,
+                value: item.nombre_doctor,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nombre_doctor === value
+      },
+    },
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <StopOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
 
   const title = {
     C: {
@@ -668,6 +872,52 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
               search
             )?.filter((item) => item.estado === stateFilter),
     },
+    E: {
+      title: 'Especialidades',
+      titleModal: 'Registrar Especialidad',
+      titleModalEdit: 'Editar Especialidad',
+      placeHolderSearch: 'Buscar por especialidad',
+      columns: columnsEspecialidades,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              especialidades?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre'],
+              search
+            )
+          : searchInArray(
+              especialidades?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
+    H: {
+      title: 'Horarios',
+      titleModal: 'Registrar Horario',
+      titleModalEdit: 'Editar Horario',
+      placeHolderSearch: 'Buscar por doctor',
+      columns: columnsHorarios,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              horarios?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_doctor'],
+              search
+            )
+          : searchInArray(
+              horarios?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_doctor'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
   }
 
   useEffect(() => {
@@ -685,11 +935,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     if (
       createConsultasRequestStatus === 'success' ||
       createPacientesRequestStatus === 'success' ||
-      createDoctorRequestStatus === 'success'
+      createDoctorRequestStatus === 'success' ||
+      createEspecialidadRequestStatus === 'success' ||
+      createHorariosRequestStatus === 'success'
     ) {
       State === 'C' && dispatch(getConsultas({}))
       State === 'P' && dispatch(getPacientes({}))
       State === 'D' && dispatch(getDoctores({}))
+      State === 'E' && dispatch(getEspecialidades({}))
+      State === 'H' && dispatch(getHorarios({}))
       form.resetFields()
       setVisible(false)
       setEdit(undefined)
@@ -699,6 +953,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     createConsultasRequestStatus,
     createPacientesRequestStatus,
     createDoctorRequestStatus,
+    createEspecialidadRequestStatus,
+    createHorariosRequestStatus,
   ])
 
   const handleUpdate = async () => {
@@ -709,6 +965,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dispatch(updatePacientes({ condition: { ...edit, ...data } }))
     } else if (State === 'D') {
       dispatch(updateDoctor({ condition: { ...edit, ...data } }))
+    } else if (State === 'E') {
+      dispatch(updateEspecialidad({ condition: { ...edit, ...data } }))
+    } else if (State === 'H') {
+      dispatch(updateHorarios({ condition: { ...edit, ...data } }))
     }
   }
   const handleCreate = async () => {
@@ -748,6 +1008,22 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             id_especialidad: data.especialidad,
             id_nacionalidad: data.nacionalidad,
             clave: generatePassword(data.nombres, data.apellidos),
+          },
+        })
+      )
+    } else if (State === 'E') {
+      dispatch(
+        createEspecialidad({
+          condition: {
+            ...data,
+          },
+        })
+      )
+    } else if (State === 'H') {
+      dispatch(
+        createHorarios({
+          condition: {
+            ...data,
           },
         })
       )
@@ -1181,6 +1457,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       </CustomFormItem>
                     </CustomCol>
                   </CustomRow>
+                </ConditionalComponent>
+                <ConditionalComponent condition={State === 'E'}>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Especialidad'}
+                      name={'nombre'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 6 }}
+                    >
+                      <CustomInput placeholder="Especialidad" />
+                    </CustomFormItem>
+                  </CustomCol>
                 </ConditionalComponent>
               </CustomModal>
             </CustomForm>

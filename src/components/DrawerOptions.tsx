@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   PATH_CONSULTAS,
   PATH_DOCTORES,
+  PATH_ESPECIALIDADES,
+  PATH_HORARIOS,
   PATH_PACIENTES,
 } from '../constants/Routes'
 import CustomMenu from './CustomMenu'
@@ -77,14 +79,14 @@ const DrawerOptions = (): React.ReactElement => {
           <CustomMenuItem
             key="4"
             icon={<TagOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '4')}
+            onClick={() => handleClick(PATH_ESPECIALIDADES, '4')}
           >
             ESPECIALIDADES
           </CustomMenuItem>
           <CustomMenuItem
             key="5"
             icon={<CalendarOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '5')}
+            onClick={() => handleClick(PATH_HORARIOS, '5')}
           >
             HORARIOS
           </CustomMenuItem>

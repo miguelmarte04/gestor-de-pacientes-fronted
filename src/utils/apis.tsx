@@ -4,12 +4,15 @@ import {
   WEB_SERVICE_API_GET_CONSULTAS,
   WEB_SERVICE_API_GET_DOCTORES,
   WEB_SERVICE_API_GET_ESPECILIDADES,
+  WEB_SERVICE_API_GET_HORARIOS,
   WEB_SERVICE_API_GET_NACIONALIDADES,
   WEB_SERVICE_API_GET_PACIENTES,
   WEB_SERVICE_API_GET_SEGUROS,
   WEB_SERVICE_API_LOGIN,
   WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS,
   WEB_SERVICE_API_UPDATE_CREATE_DOCTORES,
+  WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD,
+  WEB_SERVICE_API_UPDATE_CREATE_HORARIOS,
   WEB_SERVICE_API_UPDATE_CREATE_PACIENTES,
 } from '../constants/Routes'
 import { GeneralType } from '../constants/types'
@@ -96,9 +99,7 @@ const getPacientes = (payload: GeneralType): Promise<AxiosResponse> => {
 const getNacionalidades = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_NACIONALIDADES}`, payload)
 }
-const getEspecialidades = (payload: GeneralType): Promise<AxiosResponse> => {
-  return postRequest(`${WEB_SERVICE_API_GET_ESPECILIDADES}`, payload)
-}
+
 const getSeguros = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_SEGUROS}`, payload)
 }
@@ -114,10 +115,33 @@ const createDoctor = (payload: GeneralType): Promise<AxiosResponse> => {
 const updateDoctor = (payload: GeneralType): Promise<AxiosResponse> => {
   return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DOCTORES}`, payload)
 }
+const getEspecialidades = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_ESPECILIDADES}`, payload)
+}
+const createEspecialidad = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD}`, payload)
+}
+const updateEspecialidad = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD}`, payload)
+}
+const getHorarios = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_HORARIOS}`, payload)
+}
+const createHorarios = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_HORARIOS}`, payload)
+}
+const updateHorarios = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_HORARIOS}`, payload)
+}
 
 export const userApiHelper = {
   getPacientes,
+  getHorarios,
+  createHorarios,
+  updateHorarios,
   getEspecialidades,
+  createEspecialidad,
+  updateEspecialidad,
   getNacionalidades,
   getSeguros,
   createPacientes,

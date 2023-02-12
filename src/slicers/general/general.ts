@@ -3,6 +3,7 @@ import {
   CustomUploadFileType,
   DoctoresType,
   EspecilidadesType,
+  HorariosType,
   NacionalidadesType,
   PacientesType,
   SegurosType,
@@ -21,11 +22,14 @@ export interface GeneralState {
   nacionalidades: NacionalidadesType[]
   especialidades: EspecilidadesType[]
   seguros: SegurosType[]
+  horarios: HorariosType[]
   fetchingFromPacientes: boolean
   pacientesRequestStatus: RequestStatusType
   createConsultasRequestStatus: RequestStatusType
   createPacientesRequestStatus: RequestStatusType
   createDoctorRequestStatus: RequestStatusType
+  createEspecialidadRequestStatus: RequestStatusType
+  createHorariosRequestStatus: RequestStatusType
   fileList: CustomUploadFileType[]
   fetchingGeneralData: boolean
 }
@@ -37,9 +41,12 @@ const initialState: GeneralState = {
   nacionalidades: new Array<NacionalidadesType>(),
   especialidades: new Array<EspecilidadesType>(),
   seguros: new Array<SegurosType>(),
+  horarios: new Array<HorariosType>(),
   fetchingFromPacientes: false,
   pacientesRequestStatus: '',
   createConsultasRequestStatus: '',
+  createEspecialidadRequestStatus: '',
+  createHorariosRequestStatus: '',
   createPacientesRequestStatus: '',
   createDoctorRequestStatus: '',
   fileList: new Array<CustomUploadFileType>(),
@@ -246,6 +253,109 @@ export const updateDoctor = createAsyncThunk(
     return data
   }
 )
+export const createEspecialidad = createAsyncThunk(
+  'general/createEspecialidad',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.createEspecialidad(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha',
+        'seguro',
+        'nacionalidad',
+        'especialidad',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const updateEspecialidad = createAsyncThunk(
+  'general/updateEspecialidad',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.updateEspecialidad(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha_insercion',
+        'key',
+        'index',
+        'nombre_paciente',
+        'apellido_paciente',
+        'nombre_doctor',
+        'apellido_doctor',
+        'fecha',
+        'documento',
+        'seguro',
+        'clave',
+        'especialidad',
+        'nacionalidad',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const getHorarios = createAsyncThunk(
+  'general/getHorarios',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getHorarios(payload)
+    const { data } = response.data
+    return data
+  }
+)
+export const createHorarios = createAsyncThunk(
+  'general/createHorarios',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.createHorarios(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha',
+        'seguro',
+        'nacionalidad',
+        'especialidad',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+    return data
+  }
+)
+export const updateHorarios = createAsyncThunk(
+  'general/updateHorarios',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.updateHorarios(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha_insercion',
+        'key',
+        'index',
+        'nombre_paciente',
+        'apellido_paciente',
+        'nombre_doctor',
+        'apellido_doctor',
+        'fecha',
+        'documento',
+        'seguro',
+        'clave',
+        'especialidad',
+        'nacionalidad',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
 
 export const setFileList = createAction(
   'general/setFileList',
@@ -427,6 +537,28 @@ export const generalSlice = createSlice({
           type: 'error',
         })
       })
+      .addCase(createEspecialidad.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createEspecialidadRequestStatus = 'pending'
+      })
+      .addCase(createEspecialidad.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createEspecialidadRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Especialidad Insertado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(createEspecialidad.rejected, (state) => {
+        state.createEspecialidadRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo Insertar el Especialidad',
+          type: 'error',
+        })
+      })
       .addCase(updatePacientes.pending, (state) => {
         state.fetchingGeneralData = true
         state.createPacientesRequestStatus = 'pending'
@@ -468,6 +600,83 @@ export const generalSlice = createSlice({
         showNotification({
           title: 'Error',
           description: 'No se pudo actualizar el Doctor',
+          type: 'error',
+        })
+      })
+      .addCase(updateEspecialidad.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createEspecialidadRequestStatus = 'pending'
+      })
+      .addCase(updateEspecialidad.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createEspecialidadRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Especialidad actualizado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(updateEspecialidad.rejected, (state) => {
+        state.createEspecialidadRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo actualizar el Especialidad',
+          type: 'error',
+        })
+      })
+      .addCase(getHorarios.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getHorarios.fulfilled, (state, action) => {
+        state.horarios = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getHorarios.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.horarios = initialState.horarios
+      })
+      .addCase(updateHorarios.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createHorariosRequestStatus = 'pending'
+      })
+      .addCase(updateHorarios.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createHorariosRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Horarios actualizado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(updateHorarios.rejected, (state) => {
+        state.createHorariosRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo actualizar el Horarios',
+          type: 'error',
+        })
+      })
+      .addCase(createHorarios.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createHorariosRequestStatus = 'pending'
+      })
+      .addCase(createHorarios.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createHorariosRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Horarios actualizado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(createHorarios.rejected, (state) => {
+        state.createHorariosRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo actualizar el Horarios',
           type: 'error',
         })
       })

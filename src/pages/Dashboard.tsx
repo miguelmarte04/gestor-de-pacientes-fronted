@@ -35,7 +35,11 @@ import PieChart from '../components/PieChart'
 // import { CONSULTAR_NOMINA } from '../constants/Routes'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { getConsultas } from '../slicers/general'
-import { getPacientes } from '../slicers/general/general'
+import {
+  getDoctores,
+  getEspecialidades,
+  getPacientes,
+} from '../slicers/general/general'
 import { sortByDate } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
 
@@ -47,7 +51,9 @@ const StyledLayout = styled(CustomLayout)`
 
 const Dashboard = (): React.ReactElement => {
   const dispatch = useAppDispatch()
-  const { Consultas } = useAppSelector((state) => state.general)
+  const { Consultas, pacientes, doctores, especialidades } = useAppSelector(
+    (state) => state.general
+  )
 
   const buildDataSource = <T, K extends keyof T>(arr: T[], k: K) => {
     const data = new Array<number>()
@@ -94,6 +100,8 @@ const Dashboard = (): React.ReactElement => {
   useEffect(() => {
     const condition = {}
     dispatch(getConsultas(condition))
+    dispatch(getDoctores(condition))
+    dispatch(getEspecialidades(condition))
     dispatch(
       getPacientes({
         condition: {
@@ -114,19 +122,19 @@ const Dashboard = (): React.ReactElement => {
   const dynamicCardDataSources: DynamicCardType[] = [
     {
       title: 'Pacientes',
-      description: CardDescription('Total', '0'),
+      description: CardDescription('Total', `${pacientes?.length ?? 0}`),
       icon: <TeamOutlined />,
       color: '#ffe58f',
     },
     {
       title: 'Doctores',
-      description: CardDescription('Total', '0'),
+      description: CardDescription('Total', `${doctores?.length ?? 0}`),
       icon: <UserOutlined />,
       color: '#f4ffb8',
     },
     {
       title: 'Especialidades',
-      description: CardDescription('Total', '0'),
+      description: CardDescription('Total', `${especialidades?.length ?? 0}`),
       icon: <TagOutlined />,
       color: '#95de64',
     },
