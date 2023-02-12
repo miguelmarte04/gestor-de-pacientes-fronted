@@ -112,6 +112,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dispatch(getEspecialidades({}))
     } else if (State === 'H') {
       dispatch(getHorarios({}))
+      dispatch(getDoctores({}))
     }
   }, [State])
 
@@ -1467,6 +1468,35 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       labelCol={{ span: 6 }}
                     >
                       <CustomInput placeholder="Especialidad" />
+                    </CustomFormItem>
+                  </CustomCol>
+                </ConditionalComponent>
+                {/* Horarios  */}
+                <ConditionalComponent condition={State === 'H'}>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Nombre'}
+                      name={'nombre'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
+                      <CustomInput placeholder="Nombre" />
+                    </CustomFormItem>
+                  </CustomCol>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Doctor'}
+                      name={'id_doctor'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
+                      <CustomSelect
+                        placeholder={'Seleccione un doctor'}
+                        options={doctores?.map((item) => ({
+                          label: item.nombre,
+                          value: item.id,
+                        }))}
+                      />
                     </CustomFormItem>
                   </CustomCol>
                 </ConditionalComponent>
