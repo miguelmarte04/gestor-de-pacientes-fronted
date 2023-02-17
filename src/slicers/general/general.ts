@@ -405,6 +405,7 @@ export const generalSlice = createSlice({
       })
       .addCase(getConsultas.rejected, (state) => {
         state.fetchingGeneralData = false
+        state.Consultas = initialState.Consultas
       })
       .addCase(createConsultas.pending, (state) => {
         state.fetchingGeneralData = true

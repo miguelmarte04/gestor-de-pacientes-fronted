@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  CheckOutlined,
   DeleteOutlined,
   EditOutlined,
+  FileAddOutlined,
   PlusOutlined,
   PrinterFilled,
   StopOutlined,
@@ -76,6 +78,7 @@ import { maskedInput } from '../constants/general'
 import { getSessionInfo } from '../utils/session'
 import PrintTemplate from '../components/PrintTemplate'
 import { useReactToPrint } from 'react-to-print'
+import { FilterValue } from 'antd/lib/table/interface'
 interface TemplateProps {
   State: string
 }
@@ -90,6 +93,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [loading, setLoading] = useState<boolean>()
 
   const [currentRef, setCurrentRef] = useState<string>(undefined)
+  const [filters, setFilters] = useState<Record<string, FilterValue>>()
 
   const ref: Record<ComponentsRef, React.RefObject<HTMLDivElement>> = {
     print: printRef,
@@ -151,6 +155,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         getConsultas({
           condition: {
             id_paciente: getSessionInfo().id,
+            estado: 'A',
           },
         })
       )
@@ -159,6 +164,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         getConsultas({
           condition: {
             id_doctor: getSessionInfo().id,
+            estado: 'A',
           },
         })
       )
@@ -173,7 +179,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [stateFilter, setStateFilter] = useState<string>('A')
 
   const handleDelete = (record: ConsultasType | PacientesType) => {
-    if (State === 'C') {
+    if (State === 'C' || State === 'CD') {
       dispatch(
         updateConsultas({
           condition: {
@@ -215,6 +221,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           condition: {
             ...record,
             estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
+    }
+  }
+  const handleFinish = (record: ConsultasType | PacientesType) => {
+    if (State === 'CD') {
+      dispatch(
+        updateConsultas({
+          condition: {
+            ...record,
+            estado: 'T',
           },
         })
       )
@@ -516,6 +534,107 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           : [],
       onFilter(value, record) {
         return moment(record.fin).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+            <CustomTooltip
+              key={'addReceta'}
+              title={
+                item.estado === 'A'
+                  ? 'Agregar Receta'
+                  : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<FileAddOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'finish'}
+              title={
+                item.estado === 'A'
+                  ? 'Finalizar consulta'
+                  : 'Inactivo, no permite esta acción'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content: '¿Está seguro que desea terminar la consulta?',
+                    onOk: () => {
+                      handleFinish(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={<CheckOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <StopOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
       },
     },
   ]
@@ -1186,11 +1305,19 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       createHorariosRequestStatus === 'success'
     ) {
       State === 'C' && dispatch(getConsultas({}))
-
       State === 'P' && dispatch(getPacientes({}))
       State === 'D' && dispatch(getDoctores({}))
       State === 'E' && dispatch(getEspecialidades({}))
       State === 'H' && dispatch(getHorarios({}))
+      State === 'CD' &&
+        dispatch(
+          getConsultas({
+            condition: {
+              id_doctor: getSessionInfo().id,
+              estado: 'A',
+            },
+          })
+        )
       form.resetFields()
       setVisible(false)
       setEdit(undefined)
@@ -1344,6 +1471,11 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   columns={title[`${State}`]?.columns}
                   dataSource={title[`${State}`]?.dataSource}
                   pagination={{ pageSize: 5 }}
+                  onChange={(_, filters) => {
+                    setFilters(filters)
+                    // eslint-disable-next-line no-console
+                    console.log('params', filters)
+                  }}
                   extra={
                     <CustomRow justify={'end'} width={'100%'}>
                       <CustomTooltip title={'Imprimir'}>
