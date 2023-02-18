@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   CalendarOutlined,
+  FieldTimeOutlined,
   HomeOutlined,
   LineChartOutlined,
   ProfileOutlined,
@@ -96,13 +97,22 @@ const DrawerOptions = (): React.ReactElement => {
         </>
       )}
       {getSessionInfo().privilegios === 2 && (
-        <CustomMenuItem
-          key="1"
-          icon={<ProfileOutlined />}
-          onClick={() => handleClick(PATH_CONSULTAS_PACIENTES, '1')}
-        >
-          MIS CONSULTAS
-        </CustomMenuItem>
+        <>
+          <CustomMenuItem
+            key="1"
+            icon={<ProfileOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS_PACIENTES, '1')}
+          >
+            MIS CONSULTAS
+          </CustomMenuItem>
+          <CustomMenuItem
+            key="2"
+            icon={<FieldTimeOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS_DOCTORES, '2')}
+          >
+            HISTORIAL
+          </CustomMenuItem>
+        </>
       )}
       {getSessionInfo().privilegios === 3 && (
         <>
@@ -113,14 +123,13 @@ const DrawerOptions = (): React.ReactElement => {
           >
             MIS CONSULTAS
           </CustomMenuItem>
-
-          {/* <CustomMenuItem
+          <CustomMenuItem
             key="2"
-            icon={<TeamOutlined />}
-            onClick={() => handleClick(PATH_PACIENTES_DOCTORES, '2')}
+            icon={<FieldTimeOutlined />}
+            onClick={() => handleClick(PATH_CONSULTAS_DOCTORES, '2')}
           >
-            MIS PACIENTES
-          </CustomMenuItem> */}
+            HISTORIAL
+          </CustomMenuItem>
         </>
       )}
     </CustomMenu>

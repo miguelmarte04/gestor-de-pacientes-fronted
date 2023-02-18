@@ -3,6 +3,7 @@ import {
   CheckOutlined,
   DeleteOutlined,
   EditOutlined,
+  EyeOutlined,
   FileAddOutlined,
   PlusOutlined,
   PrinterFilled,
@@ -79,6 +80,7 @@ import { getSessionInfo } from '../utils/session'
 import PrintTemplate from '../components/PrintTemplate'
 import { useReactToPrint } from 'react-to-print'
 import { FilterValue } from 'antd/lib/table/interface'
+import CustomText from '../components/CustomText'
 interface TemplateProps {
   State: string
 }
@@ -176,6 +178,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [view, setView] = useState(false)
   const [pacienteSelected, setpacienteSelected] = useState<PacientesType>()
   const [visible, setVisible] = useState(false)
+  const [visibleReceta, setVisibleReceta] = useState(false)
+  const [visibleDetalles, setVisibleDetalles] = useState(false)
   const [stateFilter, setStateFilter] = useState<string>('A')
 
   const handleDelete = (record: ConsultasType | PacientesType) => {
@@ -236,6 +240,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    }
+  }
+  const handleAddReceta = (record: ConsultasType) => {
+    setVisibleReceta(true)
+    setEdit(record)
+    if (State === 'CD') {
+      form.setFieldsValue({
+        ...record,
+      })
+    }
+  }
+  const handleAddDetalles = (record: ConsultasType) => {
+    setVisibleDetalles(true)
+    setEdit(record)
+    if (State === 'CD') {
+      form.setFieldsValue({
+        ...record,
+      })
     }
   }
   const handleEdit = (record: AnyType) => {
@@ -544,17 +566,27 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (_, item: AnyType) => {
         return (
           <CustomSpace>
+            <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
+              <CustomButton
+                // onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EyeOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
             <CustomTooltip
               key={'edit'}
               title={
-                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+                item.estado === 'A'
+                  ? 'Agregar Detalles'
+                  : 'Inactivo, no permite edición'
               }
             >
               <CustomButton
                 disabled={item.estado === 'I'}
-                onClick={() => handleEdit(item)}
+                onClick={() => handleAddDetalles(item)}
                 type={'link'}
-                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                icon={<PlusOutlined style={{ fontSize: '18px' }} />}
                 className={'editPhoneButton'}
               />
             </CustomTooltip>
@@ -568,7 +600,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             >
               <CustomButton
                 disabled={item.estado === 'I'}
-                onClick={() => handleEdit(item)}
+                onClick={() => handleAddReceta(item)}
                 type={'link'}
                 icon={<FileAddOutlined style={{ fontSize: '18px' }} />}
                 className={'editPhoneButton'}
@@ -1893,6 +1925,67 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             value: item.id,
                           }))}
                         />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </ConditionalComponent>
+                </CustomModal>
+                <CustomModal
+                  title={<CustomTitle>Receta</CustomTitle>}
+                  width={'30%'}
+                  visible={visibleReceta}
+                  onCancel={() => {
+                    CustomModalConfirmation({
+                      content:
+                        '¿Está seguro que desea salir sin guardar los cambios?',
+                      onOk: () => {
+                        setVisibleReceta(false)
+                        setEdit(undefined)
+                        form.resetFields()
+                      },
+                    })
+                  }}
+                  // onOk={() => {
+                  //   edit?.id ? handleUpdate() : handleCreate()
+                  // }}
+                >
+                  <ConditionalComponent condition={State === 'CD'}>
+                    <CustomUpload
+                      form={form}
+                      previewTitle={'Receta'}
+                      label={'Receta'}
+                      name={'receta'}
+                      labelCol={{ span: 6 }}
+                    />
+                  </ConditionalComponent>
+                </CustomModal>
+                <CustomModal
+                  title={<CustomTitle>Detalles de la consulta</CustomTitle>}
+                  width={'65%'}
+                  visible={visibleDetalles}
+                  onCancel={() => {
+                    CustomModalConfirmation({
+                      content:
+                        '¿Está seguro que desea salir sin guardar los cambios?',
+                      onOk: () => {
+                        setVisibleDetalles(false)
+                        setEdit(undefined)
+                        form.resetFields()
+                      },
+                    })
+                  }}
+                  // onOk={() => {
+                  //   edit?.id ? handleUpdate() : handleCreate()
+                  // }}
+                >
+                  <ConditionalComponent condition={State === 'CD'}>
+                    <CustomCol xs={24}>
+                      <CustomFormItem
+                        label={'Detalles'}
+                        name={'detalles'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomTextArea maxLength={1000} />
                       </CustomFormItem>
                     </CustomCol>
                   </ConditionalComponent>

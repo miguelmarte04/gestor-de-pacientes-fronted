@@ -36,11 +36,12 @@ import Cookies from 'js-cookie'
 import CustomCol from './CustomCol'
 import { defaultTheme } from '../themes'
 import CustomSpace from './CustomSpace'
+import { formatter } from '../utils/general'
 
 const { Header, Content } = Layout
 
 const iconButtonStyle: CSSProperties = {
-  color: '#fff',
+  color: 'black',
   cursor: 'pointer',
   maxHeight: '40px',
   padding: '3px',
@@ -131,7 +132,10 @@ const MenuRoutesWrapper = (): React.ReactElement => {
               fontSize: collapsed ? '10px' : '18px',
             }}
           >
-            {getSessionInfo()?.usuario}
+            {formatter({
+              value: getSessionInfo()?.usuario,
+              type: 'identity_doc',
+            })}
           </h5>
         </CustomCol>
         <CustomDivider />
@@ -218,7 +222,10 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                       onClick={() => HandleFullScreen()}
                     >
                       <Avatar
-                        style={{ backgroundColor: 'transparent' }}
+                        style={{
+                          backgroundColor: 'transparent',
+                          color: 'black',
+                        }}
                         size={'large'}
                         icon={
                           fullScreen ? (
