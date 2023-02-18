@@ -1463,19 +1463,23 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         </CustomFormItem>
                       </CustomCol>
 
-                      <CustomCol xs={4} md={2} lg={3} xl={2}>
-                        <CustomTooltip title={'Nuevo'}>
-                          <CustomButton
-                            icon={<PlusOutlined />}
-                            shape={'circle'}
-                            size={'middle'}
-                            type={'primary'}
-                            onClick={() => {
-                              setVisible(true)
-                            }}
-                          />
-                        </CustomTooltip>
-                      </CustomCol>
+                      <ConditionalComponent
+                        condition={State !== 'CD' && State !== 'CP'}
+                      >
+                        <CustomCol xs={4} md={2} lg={3} xl={2}>
+                          <CustomTooltip title={'Nuevo'}>
+                            <CustomButton
+                              icon={<PlusOutlined />}
+                              shape={'circle'}
+                              size={'middle'}
+                              type={'primary'}
+                              onClick={() => {
+                                setVisible(true)
+                              }}
+                            />
+                          </CustomTooltip>
+                        </CustomCol>
+                      </ConditionalComponent>
                     </CustomRow>
                   </CustomCol>
 
