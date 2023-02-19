@@ -6,14 +6,13 @@ import {
   LoginOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  QuestionCircleOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import CustomLayout from './CustomLayout'
 import CustomSider from './CustomSider'
 import CustomMenu from './CustomMenu'
 import CustomContainer from './CustomContainer'
-import CustomFooter from './CustomFooter'
-import Copyright from './Copyright'
 import CustomRow from './CustomRow'
 import CustomButton from './CustomButton'
 import CustomTooltip from './CustomTooltip'
@@ -37,6 +36,9 @@ import CustomCol from './CustomCol'
 import { defaultTheme } from '../themes'
 import CustomSpace from './CustomSpace'
 import { formatter } from '../utils/general'
+import CustomModal from './CustomModal'
+import CustomTitle from './CustomTitle'
+import CustomText from './CustomText'
 
 const { Header, Content } = Layout
 
@@ -51,6 +53,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
   const history = useNavigate()
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const [fullScreen, setFullScreen] = useState<boolean>(false)
+  const [modalVisible, SetModalVisible] = useState<boolean>(false)
   // const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
 
   if (!isLoggedIn()) {
@@ -186,7 +189,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                   fontSize: '25px',
                 }}
               >
-                {'Gestor de Pacientes'}
+                {'Instituto Demonológico Integral'}
               </h2>
 
               <CustomSpace size={'large'} style={{ marginRight: '-35px' }}>
@@ -200,10 +203,13 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                       type={'link'}
                       style={iconButtonStyle}
                     >
-                      {/* <Avatar size={'large'} src={getSessionInfo().imagen} /> */}
-                      {`${getSessionInfo().nombres} ${
-                        getSessionInfo().apellidos
-                      }`}
+                      {getSessionInfo()?.privilegios === 3
+                        ? `Dr. ${getSessionInfo().nombres} ${
+                            getSessionInfo().apellidos
+                          }`
+                        : `${getSessionInfo().nombres} ${
+                            getSessionInfo().apellidos
+                          }`}
                     </CustomButton>
                   </CustomDropdown>
                 </CustomCol>
@@ -260,6 +266,22 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                     }}
                   />
                 </Affix>
+                <Affix
+                  style={{
+                    position: 'fixed',
+                    left: collapsed ? '100px' : '300px',
+                    top: '90%',
+                  }}
+                >
+                  <CustomTooltip title={'Contactanos'}>
+                    <CustomButton
+                      icon={<QuestionCircleOutlined />}
+                      type={'primary'}
+                      size={'large'}
+                      onClick={() => SetModalVisible(true)}
+                    />
+                  </CustomTooltip>
+                </Affix>
               </CustomSpace>
             </CustomRow>
           </Header>
@@ -277,12 +299,44 @@ const MenuRoutesWrapper = (): React.ReactElement => {
             <CustomContainer>
               <Outlet />
             </CustomContainer>
-            <CustomFooter>
+            {/* <CustomFooter>
               <Copyright />
-            </CustomFooter>
+            </CustomFooter> */}
           </Content>
         </CustomRow>
       </CustomLayout>
+      <CustomModal
+        title={<CustomTitle>Contactanos</CustomTitle>}
+        width={'40%'}
+        visible={modalVisible}
+        onCancel={() => {
+          SetModalVisible(false)
+        }}
+        okButtonProps={{
+          style: {
+            display: 'none',
+          },
+        }}
+        cancelButtonProps={{
+          style: {
+            display: 'none',
+          },
+        }}
+      >
+        <CustomCol xs={24}>
+          <CustomRow justify={'center'}>
+            <CustomCol xs={24}>
+              <CustomText>Telefono: 829-855-5622</CustomText>
+            </CustomCol>
+            <CustomCol xs={24}>
+              <CustomText>Email: 829-855-5622</CustomText>
+            </CustomCol>
+            <CustomCol xs={24}>
+              <CustomText>Direccion: 829-855-5622</CustomText>
+            </CustomCol>
+          </CustomRow>
+        </CustomCol>
+      </CustomModal>
     </CustomLayout>
   )
 }

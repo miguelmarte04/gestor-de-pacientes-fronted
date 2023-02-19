@@ -3,13 +3,11 @@ import {
   CheckOutlined,
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
-  FieldTimeOutlined,
   FileAddOutlined,
   PlusOutlined,
   PrinterFilled,
+  RollbackOutlined,
   SolutionOutlined,
-  StopOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons'
 import { Form, Image, Select, TimePicker } from 'antd'
@@ -221,14 +219,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     {
       value: '5',
       label: 'Viernes',
-    },
-    {
-      value: '6',
-      label: 'Sábado',
-    },
-    {
-      value: '7',
-      label: 'Domingo',
     },
   ]
   const handleDelete = (record: ConsultasType | PacientesType) => {
@@ -472,7 +462,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       }}
                     />
                   ) : (
-                    <StopOutlined
+                    <RollbackOutlined
                       className="disabledColor"
                       style={{ fontSize: '18px' }}
                     />
@@ -712,7 +702,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       }}
                     />
                   ) : (
-                    <StopOutlined
+                    <RollbackOutlined
                       className="disabledColor"
                       style={{ fontSize: '18px' }}
                     />
@@ -1054,7 +1044,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       }}
                     />
                   ) : (
-                    <StopOutlined
+                    <RollbackOutlined
                       className="disabledColor"
                       style={{ fontSize: '18px' }}
                     />
@@ -1212,7 +1202,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       }}
                     />
                   ) : (
-                    <StopOutlined
+                    <RollbackOutlined
                       className="disabledColor"
                       style={{ fontSize: '18px' }}
                     />
@@ -1286,7 +1276,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       }}
                     />
                   ) : (
-                    <StopOutlined
+                    <RollbackOutlined
                       className="disabledColor"
                       style={{ fontSize: '18px' }}
                     />
@@ -1311,21 +1301,14 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'oficina',
     },
     {
-      key: 'hora_inicio',
-      title: 'Hora inicio',
-      dataIndex: 'hora_inicio',
+      key: 'tanda',
+      title: 'Tanda',
+      dataIndex: 'tanda',
       render: (value) => {
-        return moment(value).format('hh:mm a')
+        return value === 'M' ? 'Mañana' : 'Tarde'
       },
     },
-    {
-      key: 'hora_fin',
-      title: 'Hora fin',
-      dataIndex: 'hora_fin',
-      render: (value) => {
-        return moment(value).format('hh:mm a')
-      },
-    },
+
     {
       key: 'nombre_doctor',
       title: 'Doctor',
@@ -1393,7 +1376,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       }}
                     />
                   ) : (
-                    <StopOutlined
+                    <RollbackOutlined
                       className="disabledColor"
                       style={{ fontSize: '18px' }}
                     />
@@ -1661,8 +1644,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           condition: {
             ...edit,
             ...data,
-            hora_inicio: data.horario[0],
-            hora_fin: data.horario[1],
             dias: diasSelected?.toString(),
           },
         })
@@ -1722,8 +1703,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         createHorarios({
           condition: {
             ...data,
-            hora_inicio: data.horario[0],
-            hora_fin: data.horario[1],
             dias: diasSelected?.toString(),
           },
         })
@@ -2233,11 +2212,17 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       </CustomCol>
                       <CustomCol {...defaultBreakpoints}>
                         <CustomFormItem
-                          label={'Horario'}
-                          name={'horario'}
+                          label={'Tanda'}
+                          name={'tanda'}
                           rules={[{ required: true }]}
                         >
-                          <TimePicker.RangePicker use12Hours />
+                          <CustomSelect
+                            placeholder={'Seleccione una tanda'}
+                            options={[
+                              { label: 'Mañana', value: 'M' },
+                              { label: 'Tarde', value: 'T' },
+                            ]}
+                          />
                         </CustomFormItem>
                       </CustomCol>
                       <CustomCol {...defaultBreakpoints} />
