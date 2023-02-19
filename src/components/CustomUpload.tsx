@@ -32,6 +32,7 @@ type PropsType = UploadProps & {
   previewTitle: React.ReactNode
   imageCrop?: boolean
   imageCropProps?: ImgCropProps
+  readonly?: boolean
 }
 
 const CustomUpload: React.FC<PropsType> = ({
@@ -50,6 +51,7 @@ const CustomUpload: React.FC<PropsType> = ({
   onlyImages = true,
   previewTitle,
   required = false,
+  readonly = false,
   ...props
 }): React.ReactElement => {
   const [fileList, setFileList] = useState<AnyType>()
@@ -184,7 +186,6 @@ const CustomUpload: React.FC<PropsType> = ({
   }
 
   const commonProps = {
-    onRemove: handleOnRemove,
     accept: 'image/*',
     customRequest: dummyRequest,
     fileList: fileList,
@@ -194,6 +195,9 @@ const CustomUpload: React.FC<PropsType> = ({
     onPreview: handlePreview,
     ...itemRender,
     ...props,
+    onRemove: readonly ? null : handleOnRemove,
+    readonly: readonly,
+    deleteImage: !readonly,
   }
 
   return (
@@ -240,7 +244,11 @@ const CustomUpload: React.FC<PropsType> = ({
             </Upload>
           </ImgCrop>
         ) : (
-          <Upload onChange={handleOnChange} {...commonProps}>
+          <Upload
+            onChange={handleOnChange}
+            {...commonProps}
+            disabled={readonly}
+          >
             {fileList?.length >= 1 ? null : (
               <CustomButton
                 showAlways
@@ -261,7 +269,7 @@ const CustomUpload: React.FC<PropsType> = ({
         footer={false}
       >
         <CustomRow justify={'center'}>
-          <Image preview={false} src={preview.previewImage} />
+          <Image src={preview.previewImage} />
         </CustomRow>
       </CustomModal>
     </>

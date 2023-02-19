@@ -314,11 +314,12 @@ export const createHorarios = createAsyncThunk(
   async (payload: GeneralType) => {
     const response = await userApiHelper.createHorarios(
       removeField(payload.condition, [
-        'dias',
+        // 'dias',
         'SEARCH_EMPLOYEE',
         'doc_identidad',
         'fecha',
         'seguro',
+        'horario',
         'nacionalidad',
         'especialidad',
         'documento',
@@ -333,7 +334,7 @@ export const updateHorarios = createAsyncThunk(
   async (payload: GeneralType) => {
     const response = await userApiHelper.updateHorarios(
       removeField(payload.condition, [
-        'dias',
+        'horario',
         'SEARCH_EMPLOYEE',
         'doc_identidad',
         'fecha_insercion',

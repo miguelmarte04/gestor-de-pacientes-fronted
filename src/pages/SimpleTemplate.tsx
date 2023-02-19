@@ -4,12 +4,15 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  FieldTimeOutlined,
   FileAddOutlined,
   PlusOutlined,
   PrinterFilled,
+  SolutionOutlined,
   StopOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons'
-import { Form } from 'antd'
+import { Form, Image, Select, TimePicker } from 'antd'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { defaultBreakpoints, defaultTheme } from '../themes'
@@ -36,6 +39,7 @@ import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
 import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
 import CustomSpin from '../components/CustomSpin'
+
 import {
   createConsultas,
   createDoctor,
@@ -80,7 +84,6 @@ import { getSessionInfo } from '../utils/session'
 import PrintTemplate from '../components/PrintTemplate'
 import { useReactToPrint } from 'react-to-print'
 import { FilterValue } from 'antd/lib/table/interface'
-import CustomText from '../components/CustomText'
 interface TemplateProps {
   State: string
 }
@@ -95,6 +98,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [loading, setLoading] = useState<boolean>()
 
   const [currentRef, setCurrentRef] = useState<string>(undefined)
+  const [diasSelected, setSelectedDias] = useState<string[]>([])
   const [filters, setFilters] = useState<Record<string, FilterValue>>()
 
   const ref: Record<ComponentsRef, React.RefObject<HTMLDivElement>> = {
@@ -126,8 +130,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   } = useAppSelector((state) => state.general)
 
   const handleUsePrint = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log(ref[currentRef as ComponentsRef]?.current)
     if (ref[currentRef as ComponentsRef]?.current) {
       handlePrint()
     }
@@ -161,6 +163,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    } else if (State === 'HD' && getSessionInfo().id) {
+      dispatch(
+        getConsultas({
+          condition: {
+            id_doctor: getSessionInfo().id,
+            estado: 'T',
+          },
+        })
+      )
+    } else if (State === 'HP' && getSessionInfo().id) {
+      dispatch(
+        getConsultas({
+          condition: {
+            id_paciente: getSessionInfo().id,
+            estado: 'T',
+          },
+        })
+      )
     } else if (State === 'CD' && getSessionInfo().id) {
       dispatch(
         getConsultas({
@@ -181,7 +201,36 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [visibleReceta, setVisibleReceta] = useState(false)
   const [visibleDetalles, setVisibleDetalles] = useState(false)
   const [stateFilter, setStateFilter] = useState<string>('A')
-
+  const diasDeLaSemana = [
+    {
+      value: '1',
+      label: 'Lunes',
+    },
+    {
+      value: '2',
+      label: 'Martes',
+    },
+    {
+      value: '3',
+      label: 'Miercoles',
+    },
+    {
+      value: '4',
+      label: 'Jueves',
+    },
+    {
+      value: '5',
+      label: 'Viernes',
+    },
+    {
+      value: '6',
+      label: 'Sábado',
+    },
+    {
+      value: '7',
+      label: 'Domingo',
+    },
+  ]
   const handleDelete = (record: ConsultasType | PacientesType) => {
     if (State === 'C' || State === 'CD') {
       dispatch(
@@ -245,7 +294,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const handleAddReceta = (record: ConsultasType) => {
     setVisibleReceta(true)
     setEdit(record)
-    if (State === 'CD') {
+    if (State === 'CD' || State === 'HD' || State === 'HP') {
       form.setFieldsValue({
         ...record,
       })
@@ -254,7 +303,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const handleAddDetalles = (record: ConsultasType) => {
     setVisibleDetalles(true)
     setEdit(record)
-    if (State === 'CD') {
+    if (State === 'CD' || State === 'HD') {
       form.setFieldsValue({
         ...record,
       })
@@ -284,9 +333,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         ...record,
         fecha_nacimiento: moment(record.fecha_nacimiento),
       })
-    } else if (State === 'E' || State === 'H') {
+    } else if (State === 'E') {
       form.setFieldsValue({
         ...record,
+      })
+    } else if (State === 'H') {
+      form.setFieldsValue({
+        ...record,
+        dias: record.dias.split(','),
+        horario: [moment(record.hora_inicio), moment(record.hora_fin)],
       })
     }
   }
@@ -566,14 +621,14 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (_, item: AnyType) => {
         return (
           <CustomSpace>
-            <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
+            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
               <CustomButton
                 // onClick={() => handleEdit(item)}
                 type={'link'}
                 icon={<EyeOutlined style={{ fontSize: '18px' }} />}
                 className={'editPhoneButton'}
               />
-            </CustomTooltip>
+            </CustomTooltip> */}
             <CustomTooltip
               key={'edit'}
               title={
@@ -663,6 +718,190 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     />
                   )
                 }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
+  const columnsHistorialDoctor: ColumnType<ConsultasType>[] = [
+    {
+      key: 'paciente',
+      title: 'Paciente',
+      dataIndex: 'paciente',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
+              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.inicio).format('DD/MM/YYYY'),
+              value: moment(item.inicio).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.inicio).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.fin).format('DD/MM/YYYY'),
+              value: moment(item.fin).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.fin).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
+              <CustomButton
+                // onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<FieldTimeOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip> */}
+            <CustomTooltip key={'edit'} title={'Ver Detalles'}>
+              <CustomButton
+                onClick={() => handleAddDetalles(item)}
+                type={'link'}
+                icon={<UnorderedListOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+            <CustomTooltip key={'addReceta'} title={'Ver Receta'}>
+              <CustomButton
+                onClick={() => handleAddReceta(item)}
+                type={'link'}
+                icon={<SolutionOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
+  const columnsHistorialPacientes: ColumnType<ConsultasType>[] = [
+    {
+      key: 'doctor',
+      title: 'Doctor',
+      dataIndex: 'Doctor',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
+              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.inicio).format('DD/MM/YYYY'),
+              value: moment(item.inicio).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.inicio).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.fin).format('DD/MM/YYYY'),
+              value: moment(item.fin).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.fin).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip key={'addReceta'} title={'Ver Receta'}>
+              <CustomButton
+                onClick={() => handleAddReceta(item)}
+                type={'link'}
+                icon={<SolutionOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
               />
             </CustomTooltip>
           </CustomSpace>
@@ -1067,9 +1306,25 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'id',
     },
     {
-      key: 'nombre',
-      title: 'Nombre',
-      dataIndex: 'nombre',
+      key: 'oficina',
+      title: 'Oficina',
+      dataIndex: 'oficina',
+    },
+    {
+      key: 'hora_inicio',
+      title: 'Hora inicio',
+      dataIndex: 'hora_inicio',
+      render: (value) => {
+        return moment(value).format('hh:mm a')
+      },
+    },
+    {
+      key: 'hora_fin',
+      title: 'Hora fin',
+      dataIndex: 'hora_fin',
+      render: (value) => {
+        return moment(value).format('hh:mm a')
+      },
     },
     {
       key: 'nombre_doctor',
@@ -1315,6 +1570,30 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
               search
             )?.filter((item) => item.estado === stateFilter),
     },
+    HD: {
+      title: 'Historial de Consultas',
+      titleModal: 'Registrar Consulta',
+      titleModalEdit: 'Editar Consulta',
+      placeHolderSearch: 'Buscar por nombre paciente',
+      columns: columnsHistorialDoctor,
+      dataSource: searchInArray(
+        Consultas?.filter((item) => item.estado === 'T'),
+        ['nombre_paciente'],
+        search
+      ),
+    },
+    HP: {
+      title: 'Historial de Consultas',
+      titleModal: 'Registrar Consulta',
+      titleModalEdit: 'Editar Consulta',
+      placeHolderSearch: 'Buscar por nombre doctor',
+      columns: columnsHistorialPacientes,
+      dataSource: searchInArray(
+        Consultas?.filter((item) => item.estado === 'T'),
+        ['nombre_paciente'],
+        search
+      ),
+    },
   }
 
   useEffect(() => {
@@ -1337,6 +1616,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       createHorariosRequestStatus === 'success'
     ) {
       State === 'C' && dispatch(getConsultas({}))
+      State === 'HD' && dispatch(getConsultas({}))
       State === 'P' && dispatch(getPacientes({}))
       State === 'D' && dispatch(getDoctores({}))
       State === 'E' && dispatch(getEspecialidades({}))
@@ -1352,6 +1632,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         )
       form.resetFields()
       setVisible(false)
+      setVisibleDetalles(false)
+      setVisibleReceta(false)
       setEdit(undefined)
       setView(false)
     }
@@ -1365,7 +1647,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
   const handleUpdate = async () => {
     const data = await form.validateFields()
-    if (State === 'C') {
+    if (State === 'C' || State === 'CD') {
       dispatch(updateConsultas({ condition: { ...edit, ...data } }))
     } else if (State === 'P') {
       dispatch(updatePacientes({ condition: { ...edit, ...data } }))
@@ -1374,7 +1656,17 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     } else if (State === 'E') {
       dispatch(updateEspecialidad({ condition: { ...edit, ...data } }))
     } else if (State === 'H') {
-      dispatch(updateHorarios({ condition: { ...edit, ...data } }))
+      dispatch(
+        updateHorarios({
+          condition: {
+            ...edit,
+            ...data,
+            hora_inicio: data.horario[0],
+            hora_fin: data.horario[1],
+            dias: diasSelected?.toString(),
+          },
+        })
+      )
     }
   }
   const handleCreate = async () => {
@@ -1430,6 +1722,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         createHorarios({
           condition: {
             ...data,
+            hora_inicio: data.horario[0],
+            hora_fin: data.horario[1],
+            dias: diasSelected?.toString(),
           },
         })
       )
@@ -1464,7 +1759,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       </CustomCol>
 
                       <ConditionalComponent
-                        condition={State !== 'CD' && State !== 'CP'}
+                        condition={
+                          State !== 'CD' &&
+                          State !== 'CP' &&
+                          State !== 'HP' &&
+                          State !== 'HD'
+                        }
                       >
                         <CustomCol xs={4} md={2} lg={3} xl={2}>
                           <CustomTooltip title={'Nuevo'}>
@@ -1482,26 +1782,29 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       </ConditionalComponent>
                     </CustomRow>
                   </CustomCol>
-
-                  <CustomCol span={12}>
-                    <CustomRow justify={'end'}>
-                      <CustomFormItem
-                        label={'Ver: '}
-                        className={'grupoPersona'}
-                      >
-                        <CustomRadioGroup
-                          value={stateFilter}
-                          defaultValue={'A'}
-                          onChange={(e) => {
-                            setStateFilter(e.target.value)
-                          }}
+                  <ConditionalComponent
+                    condition={State !== 'HD' && State !== 'HP'}
+                  >
+                    <CustomCol span={12}>
+                      <CustomRow justify={'end'}>
+                        <CustomFormItem
+                          label={'Ver: '}
+                          className={'grupoPersona'}
                         >
-                          <CustomRadio value={'A'}>Activos</CustomRadio>
-                          <CustomRadio value={'I'}>Inactivos</CustomRadio>
-                        </CustomRadioGroup>
-                      </CustomFormItem>
-                    </CustomRow>
-                  </CustomCol>
+                          <CustomRadioGroup
+                            value={stateFilter}
+                            defaultValue={'A'}
+                            onChange={(e) => {
+                              setStateFilter(e.target.value)
+                            }}
+                          >
+                            <CustomRadio value={'A'}>Activos</CustomRadio>
+                            <CustomRadio value={'I'}>Inactivos</CustomRadio>
+                          </CustomRadioGroup>
+                        </CustomFormItem>
+                      </CustomRow>
+                    </CustomCol>
+                  </ConditionalComponent>
                 </CustomRow>
                 <CustomTable
                   columns={title[`${State}`]?.columns}
@@ -1509,8 +1812,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   pagination={{ pageSize: 5 }}
                   onChange={(_, filters) => {
                     setFilters(filters)
-                    // eslint-disable-next-line no-console
-                    console.log('params', filters)
                   }}
                   extra={
                     <CustomRow justify={'end'} width={'100%'}>
@@ -1905,94 +2206,157 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   </ConditionalComponent>
                   {/* Horarios  */}
                   <ConditionalComponent condition={State === 'H'}>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Nombre'}
-                        name={'nombre'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
-                        <CustomInput placeholder="Nombre" />
-                      </CustomFormItem>
-                    </CustomCol>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Doctor'}
-                        name={'id_doctor'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
-                        <CustomSelect
-                          placeholder={'Seleccione un doctor'}
-                          options={doctores?.map((item) => ({
-                            label: item.nombre,
-                            value: item.id,
-                          }))}
-                        />
-                      </CustomFormItem>
-                    </CustomCol>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Doctor'}
+                          name={'id_doctor'}
+                          rules={[{ required: true }]}
+                        >
+                          <CustomSelect
+                            placeholder={'Seleccione un doctor'}
+                            options={doctores?.map((item) => ({
+                              label: item.nombre,
+                              value: item.id,
+                            }))}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Oficina'}
+                          name={'oficina'}
+                          rules={[{ required: true }]}
+                        >
+                          <CustomInput placeholder="Oficina" />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Horario'}
+                          name={'horario'}
+                          rules={[{ required: true }]}
+                        >
+                          <TimePicker.RangePicker use12Hours />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints} />
+                      <CustomCol xs={24}>
+                        <CustomFormItem
+                          label={'Dias'}
+                          name={'dias'}
+                          rules={[{ required: true }]}
+                          labelCol={{ xs: 2 }}
+                        >
+                          <CustomSelect
+                            mode="multiple"
+                            onChange={(value: string[]) => {
+                              setSelectedDias(value)
+                            }}
+                            placeholder={'Seleccione un doctor'}
+                            options={diasDeLaSemana}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </CustomRow>
                   </ConditionalComponent>
                 </CustomModal>
                 <CustomModal
                   title={<CustomTitle>Receta</CustomTitle>}
-                  width={'30%'}
+                  width={State === 'HD' || State === 'HP' ? '50%' : '30%'}
                   visible={visibleReceta}
                   onCancel={() => {
-                    CustomModalConfirmation({
-                      content:
-                        '¿Está seguro que desea salir sin guardar los cambios?',
-                      onOk: () => {
-                        setVisibleReceta(false)
-                        setEdit(undefined)
-                        form.resetFields()
-                      },
-                    })
+                    if (State === 'HD' || State === 'HP') {
+                      setVisibleReceta(false)
+                      setEdit(undefined)
+                      form.resetFields()
+                    } else {
+                      CustomModalConfirmation({
+                        content:
+                          '¿Está seguro que desea salir sin guardar los cambios?',
+                        onOk: () => {
+                          setVisibleReceta(false)
+                          setEdit(undefined)
+                          form.resetFields()
+                        },
+                      })
+                    }
                   }}
-                  // onOk={() => {
-                  //   edit?.id ? handleUpdate() : handleCreate()
-                  // }}
+                  onOk={() => {
+                    handleUpdate()
+                  }}
+                  okButtonProps={{
+                    style: {
+                      display: (State === 'HD' || State === 'HP') && 'none',
+                    },
+                  }}
+                  cancelText={(State === 'HD' || State === 'HP') && 'Salir'}
                 >
-                  <ConditionalComponent condition={State === 'CD'}>
+                  <ConditionalComponent
+                    condition={State !== 'HD' && State !== 'HP'}
+                  >
                     <CustomUpload
                       form={form}
                       previewTitle={'Receta'}
                       label={'Receta'}
+                      readonly={State === 'HD' || State === 'HP'}
                       name={'receta'}
                       labelCol={{ span: 6 }}
                     />
                   </ConditionalComponent>
+                  <ConditionalComponent
+                    condition={State === 'HD' || State === 'HP'}
+                  >
+                    <CustomRow justify={'center'}>
+                      <Image src={edit?.receta} />
+                    </CustomRow>
+                  </ConditionalComponent>
                 </CustomModal>
                 <CustomModal
                   title={<CustomTitle>Detalles de la consulta</CustomTitle>}
-                  width={'65%'}
+                  width={'40%'}
                   visible={visibleDetalles}
                   onCancel={() => {
-                    CustomModalConfirmation({
-                      content:
-                        '¿Está seguro que desea salir sin guardar los cambios?',
-                      onOk: () => {
-                        setVisibleDetalles(false)
-                        setEdit(undefined)
-                        form.resetFields()
-                      },
-                    })
+                    if (State === 'HD') {
+                      setVisibleDetalles(false)
+                      setEdit(undefined)
+                      form.resetFields()
+                    } else {
+                      CustomModalConfirmation({
+                        content:
+                          '¿Está seguro que desea salir sin guardar los cambios?',
+                        onOk: () => {
+                          setVisibleDetalles(false)
+                          setEdit(undefined)
+                          form.resetFields()
+                        },
+                      })
+                    }
                   }}
-                  // onOk={() => {
-                  //   edit?.id ? handleUpdate() : handleCreate()
-                  // }}
+                  onOk={() => {
+                    handleUpdate()
+                  }}
+                  okButtonProps={{
+                    style: {
+                      display: State === 'HD' && 'none',
+                    },
+                  }}
+                  cancelText={State === 'HD' && 'Salir'}
                 >
-                  <ConditionalComponent condition={State === 'CD'}>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Detalles'}
-                        name={'detalles'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 6 }}
-                      >
-                        <CustomTextArea maxLength={1000} />
-                      </CustomFormItem>
-                    </CustomCol>
-                  </ConditionalComponent>
+                  <CustomCol xs={24}>
+                    <CustomFormItem
+                      label={'Detalles'}
+                      name={'detalles_consulta'}
+                      rules={[{ required: true }]}
+                      labelCol={{ span: 4 }}
+                    >
+                      <CustomTextArea
+                        maxLength={1000}
+                        autoSize
+                        disabled={State === 'HD'}
+                      />
+                    </CustomFormItem>
+                  </CustomCol>
                 </CustomModal>
               </CustomForm>
             </CustomCol>

@@ -16,6 +16,7 @@ import { LockOutlined } from '@ant-design/icons'
 import CustomPasswordInput from '../components/CustomPasswordInput'
 import { CustomModalConfirmation } from '../components/ConfirmModalMethod'
 import { useAppDispatch, useAppSelector } from '../hooks'
+import { formatter } from '../utils/general'
 
 const Profile = (): React.ReactElement => {
   const [form] = useForm()
@@ -32,8 +33,10 @@ const Profile = (): React.ReactElement => {
     form.setFieldsValue({
       nombres: getSessionInfo().nombres,
       apellidos: getSessionInfo().apellidos,
-      // cargo: getSessionInfo().cargo,
-      usuario: getSessionInfo().usuario,
+      cedula: formatter({
+        value: getSessionInfo().usuario,
+        type: 'identity_doc',
+      }),
     })
   }, [])
   const handleChangePass = async () => {
@@ -83,17 +86,6 @@ const Profile = (): React.ReactElement => {
           </CustomCol>
           <CustomCol {...defaultBreakpoints}>
             <CustomFormItem
-              label={'Usuario'}
-              name={'usuario'}
-              rules={[{ required: true }]}
-              {...formItemLayout}
-            >
-              <CustomInput placeholder="Usuario" readOnly />
-            </CustomFormItem>
-          </CustomCol>
-
-          <CustomCol {...defaultBreakpoints}>
-            <CustomFormItem
               label={'Cedula'}
               name={'cedula'}
               rules={[{ required: true }]}
@@ -102,6 +94,7 @@ const Profile = (): React.ReactElement => {
               <CustomInput placeholder="cedula" readOnly />
             </CustomFormItem>
           </CustomCol>
+          <CustomCol {...defaultBreakpoints} />
         </CustomRow>
       </CustomForm>
       <CustomForm form={form2}>

@@ -18,6 +18,8 @@ import {
   PATH_CONSULTAS_PACIENTES,
   PATH_DOCTORES,
   PATH_ESPECIALIDADES,
+  PATH_HISTORIAL_DOCTORES,
+  PATH_HISTORIAL_PACIENTES,
   PATH_HORARIOS,
   PATH_PACIENTES,
   PATH_PACIENTES_DOCTORES,
@@ -108,7 +110,7 @@ const DrawerOptions = (): React.ReactElement => {
           <CustomMenuItem
             key="2"
             icon={<FieldTimeOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS_DOCTORES, '2')}
+            onClick={() => handleClick(PATH_HISTORIAL_PACIENTES, '2')}
           >
             HISTORIAL
           </CustomMenuItem>
@@ -126,7 +128,7 @@ const DrawerOptions = (): React.ReactElement => {
           <CustomMenuItem
             key="2"
             icon={<FieldTimeOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS_DOCTORES, '2')}
+            onClick={() => handleClick(PATH_HISTORIAL_DOCTORES, '2')}
           >
             HISTORIAL
           </CustomMenuItem>
