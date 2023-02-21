@@ -37,7 +37,7 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
         </CustomCol>
         <CustomCol xs={24}>
           <CustomRow justify={'center'}>
-            <Text strong>{'Instituto Demonológico Integral'}</Text>
+            <Text strong>{'Instituto Dermatológico Integral'}</Text>
           </CustomRow>
         </CustomCol>
 

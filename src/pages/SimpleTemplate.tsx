@@ -102,6 +102,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const ref: Record<ComponentsRef, React.RefObject<HTMLDivElement>> = {
     print: printRef,
   }
+
   const handlePrint = useReactToPrint({
     content: () => ref[currentRef as ComponentsRef]?.current,
     onAfterPrint: () => {
@@ -138,6 +139,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   useEffect(() => {
     if (State === 'C') {
       dispatch(getConsultas({}))
+      dispatch(getPacientes({}))
       dispatch(getDoctores({}))
     } else if (State === 'P') {
       dispatch(getPacientes({}))
@@ -317,11 +319,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         ...record,
         fecha_nacimiento: moment(record.fecha_nacimiento),
         imagen: record.imagen ? record.imagen : [],
+        nacionalidad: record.id_nacionalidad,
+        seguro: record.id_seguro,
       })
     } else if (State === 'D') {
       form.setFieldsValue({
         ...record,
         fecha_nacimiento: moment(record.fecha_nacimiento),
+        nacionalidad: record.id_nacionalidad,
+        especialidad: record.id_especialidad,
       })
     } else if (State === 'E') {
       form.setFieldsValue({
@@ -541,6 +547,181 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     },
   ]
   const columnsConsultasDoctor: ColumnType<ConsultasType>[] = [
+    {
+      key: 'paciente',
+      title: 'Paciente',
+      dataIndex: 'paciente',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
+              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.inicio).format('DD/MM/YYYY'),
+              value: moment(item.inicio).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.inicio).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.fin).format('DD/MM/YYYY'),
+              value: moment(item.fin).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.fin).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
+              <CustomButton
+                // onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EyeOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip> */}
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A'
+                  ? 'Agregar Detalles'
+                  : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleAddDetalles(item)}
+                type={'link'}
+                icon={<PlusOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+            <CustomTooltip
+              key={'addReceta'}
+              title={
+                item.estado === 'A'
+                  ? 'Agregar Receta'
+                  : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleAddReceta(item)}
+                type={'link'}
+                icon={<FileAddOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'finish'}
+              title={
+                item.estado === 'A'
+                  ? 'Finalizar consulta'
+                  : 'Inactivo, no permite esta acción'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content: '¿Está seguro que desea terminar la consulta?',
+                    onOk: () => {
+                      handleFinish(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={<CheckOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <RollbackOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
+  const columnsAdministrador: ColumnType<ConsultasType>[] = [
     {
       key: 'paciente',
       title: 'Paciente',
@@ -1511,7 +1692,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Mis Consultas',
       titleModal: 'Registrar Consulta',
       titleModalEdit: 'Editar Consulta',
-      placeHolderSearch: 'Buscar por nombre paciente / doctor',
+      placeHolderSearch: 'Buscar por nombre doctor',
       columns: columnsConsultasPacientes,
       dataSource:
         stateFilter === ''
@@ -1536,6 +1717,29 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       titleModalEdit: 'Editar Consulta',
       placeHolderSearch: 'Buscar por nombre paciente',
       columns: columnsConsultasDoctor,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              Consultas?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_paciente'],
+              search
+            )
+          : searchInArray(
+              Consultas?.filter(
+                (item) => item.estado === 'A' || item.estado === 'I'
+              ),
+              ['nombre_paciente'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
+    A: {
+      title: 'Administradores',
+      titleModal: 'Registrar Administrador',
+      titleModalEdit: 'Editar Administrador',
+      placeHolderSearch: 'Buscar por nombre paciente',
+      columns: columnsAdministrador,
       dataSource:
         stateFilter === ''
           ? searchInArray(
@@ -1633,9 +1837,30 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     if (State === 'C' || State === 'CD') {
       dispatch(updateConsultas({ condition: { ...edit, ...data } }))
     } else if (State === 'P') {
-      dispatch(updatePacientes({ condition: { ...edit, ...data } }))
+      dispatch(
+        updatePacientes({
+          condition: {
+            ...edit,
+            ...data,
+            cedula: replaceAll(data.cedula, '-', ''),
+            telefono: replaceAll(data.cedula, '-', ''),
+            id_nacionalidad: data.nacionalidad,
+          },
+        })
+      )
     } else if (State === 'D') {
-      dispatch(updateDoctor({ condition: { ...edit, ...data } }))
+      dispatch(
+        updateDoctor({
+          condition: {
+            ...edit,
+            ...data,
+            cedula: replaceAll(data.cedula, '-', ''),
+            telefono: replaceAll(data.cedula, '-', ''),
+            id_especialidad: data.especialidad,
+            id_nacionalidad: data.nacionalidad,
+          },
+        })
+      )
     } else if (State === 'E') {
       dispatch(updateEspecialidad({ condition: { ...edit, ...data } }))
     } else if (State === 'H') {
@@ -1669,8 +1894,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         createPacientes({
           condition: {
             ...data,
-            telefono: replaceAll(data.telefono, ' ', ''),
             cedula: replaceAll(data.cedula, '-', ''),
+            telefono: replaceAll(data.cedula, '-', ''),
             id_seguro: data.seguro,
             id_nacionalidad: data.nacionalidad,
             clave: generatePassword(data.nombres, data.apellidos),
@@ -1682,8 +1907,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         createDoctor({
           condition: {
             ...data,
-            telefono: replaceAll(data.telefono, ' ', ''),
             cedula: replaceAll(data.cedula, '-', ''),
+            telefono: replaceAll(data.cedula, '-', ''),
             id_especialidad: data.especialidad,
             id_nacionalidad: data.nacionalidad,
             clave: generatePassword(data.nombres, data.apellidos),
@@ -1762,7 +1987,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     </CustomRow>
                   </CustomCol>
                   <ConditionalComponent
-                    condition={State !== 'HD' && State !== 'HP'}
+                    condition={
+                      State !== 'HD' && State !== 'HP' && State !== 'CP'
+                    }
                   >
                     <CustomCol span={12}>
                       <CustomRow justify={'end'}>
@@ -1793,18 +2020,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     setFilters(filters)
                   }}
                   extra={
-                    <CustomRow justify={'end'} width={'100%'}>
-                      <CustomTooltip title={'Imprimir'}>
-                        <CustomButton
-                          onClick={async () => {
-                            setCurrentRef('print')
-                            setLoading(true)
-                          }}
-                          type={'link'}
-                          icon={<PrinterFilled style={{ fontSize: '22px' }} />}
-                        />
-                      </CustomTooltip>
-                    </CustomRow>
+                    <ConditionalComponent
+                      condition={State !== 'CP' && State !== 'HP'}
+                    >
+                      <CustomRow justify={'end'} width={'100%'}>
+                        <CustomTooltip title={'Imprimir'}>
+                          <CustomButton
+                            onClick={async () => {
+                              setCurrentRef('print')
+                              setLoading(true)
+                            }}
+                            type={'link'}
+                            icon={
+                              <PrinterFilled style={{ fontSize: '22px' }} />
+                            }
+                          />
+                        </CustomTooltip>
+                      </CustomRow>
+                    </ConditionalComponent>
                   }
                 />
 
@@ -1853,14 +2086,21 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           {edit?.nombre_paciente ? (
                             <CustomInput disabled placeholder="paciente" />
                           ) : (
-                            <CustomSearchPacientes
-                              showInitialValue
-                              style={{ marginBottom: '2%' }}
-                              placeholder={
-                                'Buscar por: documento de identidad o nombres'
-                              }
-                              onSelect={(_, employee) => {
-                                setpacienteSelected(employee)
+                            <CustomSelect
+                              placeholder={'Seleccione un Paciente'}
+                              options={pacientes?.map((item) => ({
+                                label: `${formatter({
+                                  value: item.cedula,
+                                  type: 'identity_doc',
+                                })} - ${item.nombres} ${item.apellidos}`,
+                                value: item.id,
+                              }))}
+                              onSelect={(_, item) => {
+                                setpacienteSelected(
+                                  pacientes?.find(
+                                    (paciente) => paciente.id === item.value
+                                  )
+                                )
                               }}
                             />
                           )}

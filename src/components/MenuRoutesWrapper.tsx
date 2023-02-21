@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react'
 import { Affix, Avatar, Image, Layout } from 'antd'
 import {
@@ -66,13 +67,13 @@ const MenuRoutesWrapper = (): React.ReactElement => {
 
   const PerfilMenu = (
     <CustomMenu key={1}>
-      <CustomMenuItem
+      {/* <CustomMenuItem
         key="1"
         icon={<UserOutlined />}
         onClick={() => history('/account')}
       >
         Perfil
-      </CustomMenuItem>
+      </CustomMenuItem> */}
       <CustomMenuItem onClick={removeSession} key="2" icon={<LoginOutlined />}>
         Cerrar Sesión
       </CustomMenuItem>
@@ -189,7 +190,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                   fontSize: '25px',
                 }}
               >
-                {'Instituto Demonológico Integral'}
+                {'Instituto Dermatológico Integral'}
               </h2>
 
               <CustomSpace size={'large'} style={{ marginRight: '-35px' }}>

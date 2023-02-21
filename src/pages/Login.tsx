@@ -78,7 +78,6 @@ const Login = (): React.ReactElement => {
                       Inicio de sesión
                     </CustomTitle>
                   </CustomCol>
-                  
                 </CustomRow>
               </CustomFormItem>
               <CustomFormItem
@@ -86,7 +85,7 @@ const Login = (): React.ReactElement => {
                 rules={[
                   {
                     required: true,
-                    message: 'Por favor introduzca el Usuario!',
+                    message: 'Por favor introduzca la Cedula!',
                   },
                 ]}
               >
@@ -98,7 +97,8 @@ const Login = (): React.ReactElement => {
                   }}
                   autoComplete={'off'}
                   prefix={<UserOutlined className="site-form-item-icon" />}
-                  placeholder="Usuario"
+                  placeholder="Cedula"
+                  maxLength={11}
                 />
               </CustomFormItem>
               <CustomFormItem

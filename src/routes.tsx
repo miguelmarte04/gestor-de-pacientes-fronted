@@ -8,6 +8,7 @@ import {
   Routes as Switch,
 } from 'react-router-dom'
 import {
+  PATH_ADMINISTRADORES,
   PATH_CONSULTAS,
   PATH_CONSULTAS_DOCTORES,
   PATH_CONSULTAS_PACIENTES,
@@ -80,6 +81,10 @@ const Routes = (): React.ReactElement => {
             <Route
               path={PATH_HORARIOS}
               element={<SimpleTemplate State={'H'} />}
+            />
+            <Route
+              path={PATH_ADMINISTRADORES}
+              element={<SimpleTemplate State={'A'} />}
             />
             <Route path={'*'} element={<NotFound />} />
           </Route>

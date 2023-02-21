@@ -13,6 +13,7 @@ import {
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  PATH_ADMINISTRADORES,
   PATH_CONSULTAS,
   PATH_CONSULTAS_DOCTORES,
   PATH_CONSULTAS_PACIENTES,
@@ -95,6 +96,13 @@ const DrawerOptions = (): React.ReactElement => {
             onClick={() => handleClick(PATH_HORARIOS, '5')}
           >
             HORARIOS
+          </CustomMenuItem>
+          <CustomMenuItem
+            key="6"
+            icon={<TeamOutlined />}
+            onClick={() => handleClick(PATH_ADMINISTRADORES, '6')}
+          >
+            ADMINISTRADORES
           </CustomMenuItem>
         </>
       )}
