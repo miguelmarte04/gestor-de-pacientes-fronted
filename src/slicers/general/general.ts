@@ -1,4 +1,5 @@
 import {
+  AdministradoresType,
   ConsultasType,
   CustomUploadFileType,
   DoctoresType,
@@ -17,6 +18,7 @@ import { removeField, showNotification } from '../../utils/general'
 
 export interface GeneralState {
   Consultas: ConsultasType[]
+  Administradores: AdministradoresType[]
   doctores: DoctoresType[]
   pacientes: PacientesType[]
   nacionalidades: NacionalidadesType[]
@@ -26,6 +28,7 @@ export interface GeneralState {
   fetchingFromPacientes: boolean
   pacientesRequestStatus: RequestStatusType
   createConsultasRequestStatus: RequestStatusType
+  createAdministradoresRequestStatus: RequestStatusType
   createPacientesRequestStatus: RequestStatusType
   createDoctorRequestStatus: RequestStatusType
   createEspecialidadRequestStatus: RequestStatusType
@@ -36,6 +39,7 @@ export interface GeneralState {
 
 const initialState: GeneralState = {
   Consultas: [],
+  Administradores: [],
   doctores: [],
   pacientes: new Array<PacientesType>(),
   nacionalidades: new Array<NacionalidadesType>(),
@@ -45,6 +49,7 @@ const initialState: GeneralState = {
   fetchingFromPacientes: false,
   pacientesRequestStatus: '',
   createConsultasRequestStatus: '',
+  createAdministradoresRequestStatus: '',
   createEspecialidadRequestStatus: '',
   createHorariosRequestStatus: '',
   createPacientesRequestStatus: '',
@@ -107,6 +112,57 @@ export const updateConsultas = createAsyncThunk(
         'key',
         'index',
         'nombres',
+        'nombre_paciente',
+        'apellido_paciente',
+        'nombre_doctor',
+        'apellido_doctor',
+        'fecha',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const getAdministradores = createAsyncThunk(
+  'general/getAdministradores',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getAdministradores(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const createAdministradores = createAsyncThunk(
+  'general/createAdministradores',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.createAdministradores(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const updateAdministradores = createAsyncThunk(
+  'general/updateAdministradores',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.updateAdministradores(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha_insercion',
+        'key',
+        'index',
         'nombre_paciente',
         'apellido_paciente',
         'nombre_doctor',
@@ -444,6 +500,61 @@ export const generalSlice = createSlice({
         })
       })
       .addCase(updateConsultas.rejected, (state) => {
+        state.createConsultasRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo actualizar el Consulta',
+          type: 'error',
+        })
+      })
+      .addCase(getAdministradores.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getAdministradores.fulfilled, (state, action) => {
+        state.Administradores = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getAdministradores.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.Administradores = initialState.Administradores
+      })
+      .addCase(createAdministradores.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createAdministradoresRequestStatus = 'pending'
+      })
+      .addCase(createAdministradores.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createAdministradoresRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Consulta Insertado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(createAdministradores.rejected, (state) => {
+        state.createAdministradoresRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo Insertar el Consulta',
+          type: 'error',
+        })
+      })
+      .addCase(updateAdministradores.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createAdministradoresRequestStatus = 'pending'
+      })
+      .addCase(updateAdministradores.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createAdministradoresRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Consulta actualizado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(updateAdministradores.rejected, (state) => {
         state.createConsultasRequestStatus = 'error'
         state.fetchingGeneralData = false
         showNotification({

@@ -105,6 +105,16 @@ export type ConsultasType = {
   nombre_doctor: string
   nombre_paciente: string
 }
+export type AdministradoresType = {
+  id: number
+  nombres: string
+  apellidos: string
+  imagen: string
+  cedula: string
+  clave: string
+  fecha_insercion: string
+  estado: string
+}
 
 export type PaymentType = {
   id: number

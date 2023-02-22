@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 import { getSessionToken } from './session'
 import {
+  WEB_SERVICE_API_GET_ADMINISTRADORES,
   WEB_SERVICE_API_GET_CONSULTAS,
   WEB_SERVICE_API_GET_DOCTORES,
   WEB_SERVICE_API_GET_ESPECILIDADES,
@@ -9,6 +10,7 @@ import {
   WEB_SERVICE_API_GET_PACIENTES,
   WEB_SERVICE_API_GET_SEGUROS,
   WEB_SERVICE_API_LOGIN,
+  WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES,
   WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS,
   WEB_SERVICE_API_UPDATE_CREATE_DOCTORES,
   WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD,
@@ -88,6 +90,22 @@ const createConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
 const updateConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
   return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS}`, payload)
 }
+const getAdministradores = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_ADMINISTRADORES}`, payload)
+}
+const createAdministradores = (
+  payload: GeneralType
+): Promise<AxiosResponse> => {
+  return postRequest(
+    `${WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES}`,
+    payload
+  )
+}
+const updateAdministradores = (
+  payload: GeneralType
+): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES}`, payload)
+}
 
 const getDoctores = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_DOCTORES}`, payload)
@@ -153,4 +171,7 @@ export const userApiHelper = {
   createConsultas,
   updateConsultas,
   getDoctores,
+  getAdministradores,
+  createAdministradores,
+  updateAdministradores,
 }

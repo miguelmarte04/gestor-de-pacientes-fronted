@@ -42,11 +42,13 @@ import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
 import CustomSpin from '../components/CustomSpin'
 
 import {
+  createAdministradores,
   createConsultas,
   createDoctor,
   createEspecialidad,
   createHorarios,
   createPacientes,
+  getAdministradores,
   getConsultas,
   getDoctores,
   getEspecialidades,
@@ -54,6 +56,7 @@ import {
   getNacionalidades,
   getPacientes,
   getSeguros,
+  updateAdministradores,
   updateConsultas,
   updateDoctor,
   updateEspecialidad,
@@ -71,6 +74,7 @@ import CustomTextArea from '../components/CustomTextArea'
 import CustomRangePicker from '../components/CustomRangePicker'
 import CustomInput from '../components/CustomInput'
 import {
+  AdministradoresType,
   DoctoresType,
   EspecilidadesType,
   HorariosType,
@@ -85,6 +89,7 @@ import { getSessionInfo } from '../utils/session'
 import PrintTemplate from '../components/PrintTemplate'
 import { useReactToPrint } from 'react-to-print'
 import { FilterValue } from 'antd/lib/table/interface'
+import CustomInputDate from '../components/CustomInputDate'
 interface TemplateProps {
   State: string
 }
@@ -120,9 +125,11 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   })
   const {
     Consultas,
+    Administradores,
     fetchingGeneralData,
     createConsultasRequestStatus,
     createPacientesRequestStatus,
+    createAdministradoresRequestStatus,
     createDoctorRequestStatus,
     createEspecialidadRequestStatus,
     createHorariosRequestStatus,
@@ -198,6 +205,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    } else if (State === 'A' && getSessionInfo().id) {
+      dispatch(getAdministradores({}))
     }
   }, [State])
 
@@ -277,6 +286,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    } else if (State === 'A') {
+      dispatch(
+        updateAdministradores({
+          condition: {
+            ...record,
+            estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
     }
   }
   const handleFinish = (record: ConsultasType | PacientesType) => {
@@ -337,7 +355,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         nacionalidad: record.id_nacionalidad,
         especialidad: record.id_especialidad,
       })
-    } else if (State === 'E') {
+    } else if (State === 'E' || State === 'A') {
       form.setFieldsValue({
         ...record,
       })
@@ -673,49 +691,61 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       },
     },
   ]
-  const columnsAdministrador: ColumnType<ConsultasType>[] = [
+  const columnsAdministrador: ColumnType<AdministradoresType>[] = [
     {
-      key: 'paciente',
-      title: 'Paciente',
-      dataIndex: 'paciente',
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'nombres',
+      title: 'Nombre',
+      dataIndex: 'nombres',
       render: (_, record) => {
-        return `${record.nombre_paciente} ${record.apellido_paciente}`
+        return `${record.nombres} ${record.apellidos}`
       },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
-              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
-            }))?.unique('text')
-          : [],
+    },
+    {
+      key: 'cedula',
+      title: 'Cédula',
+      width: '12%',
+      dataIndex: 'cedula',
+      render: (_, record) => {
+        return formatter({ value: record.cedula, type: 'identity_doc' })
+      },
+    },
+    // {
+    //   key: 'fecha_nacimiento',
+    //   title: 'Fecha de nacimiento',
+    //   width: '10%',
+    //   dataIndex: 'fecha_nacimiento',
+    //   render: (_, record) => {
+    //     return moment(record.fecha_nacimiento).format('DD/MM/YYYY')
+    //   },
+    // },
+    // {
+    //   key: 'sexo',
+    //   title: 'Sexo',
+    //   width: '10%',
+    //   dataIndex: 'sexo',
+    //   render: (item) => {
+    //     return item === 'M' ? 'Masculino' : 'Femenino'
+    //   },
+    //   filters:
+    //     Number(pacientes?.length) > 0
+    //       ? pacientes
+    //           ?.map((item) => ({
+    //             text: item.sexo === 'M' ? 'Masculino' : 'Femenino',
+    //             value: item.sexo,
+    //           }))
+    //           ?.unique('text')
+    //       : [],
 
-      onFilter(value, record) {
-        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
-      },
-    },
-    {
-      key: 'asunto',
-      title: 'Asunto',
-      dataIndex: 'asunto',
-    },
-    {
-      key: 'inicio',
-      title: 'Inicio',
-      width: '10%',
-      dataIndex: 'inicio',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
+    //   onFilter(value, record) {
+    //     return record.sexo === value
+    //   },
+    // },
+
     {
       key: 'acciones',
       title: 'Acciones',
@@ -724,67 +754,17 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (_, item: AnyType) => {
         return (
           <CustomSpace>
-            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
-              <CustomButton
-                // onClick={() => handleEdit(item)}
-                type={'link'}
-                icon={<EyeOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip> */}
             <CustomTooltip
               key={'edit'}
               title={
-                item.estado === 'A'
-                  ? 'Agregar Detalles'
-                  : 'Inactivo, no permite edición'
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
               }
             >
               <CustomButton
                 disabled={item.estado === 'I'}
-                onClick={() => handleAddDetalles(item)}
+                onClick={() => handleEdit(item)}
                 type={'link'}
-                icon={<PlusOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip>
-            <CustomTooltip
-              key={'addReceta'}
-              title={
-                item.estado === 'A'
-                  ? 'Agregar Receta'
-                  : 'Inactivo, no permite edición'
-              }
-            >
-              <CustomButton
-                disabled={item.estado === 'I'}
-                onClick={() => handleAddReceta(item)}
-                type={'link'}
-                icon={<FileAddOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip>
-
-            <CustomTooltip
-              key={'finish'}
-              title={
-                item.estado === 'A'
-                  ? 'Finalizar consulta'
-                  : 'Inactivo, no permite esta acción'
-              }
-            >
-              <CustomButton
-                disabled={item.estado === 'I'}
-                onClick={() => {
-                  CustomModalConfirmation({
-                    content: '¿Está seguro que desea terminar la consulta?',
-                    onOk: () => {
-                      handleFinish(item)
-                    },
-                  })
-                }}
-                type={'link'}
-                icon={<CheckOutlined style={{ fontSize: '18px' }} />}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
                 className={'editPhoneButton'}
               />
             </CustomTooltip>
@@ -1655,22 +1635,22 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Administradores',
       titleModal: 'Registrar Administrador',
       titleModalEdit: 'Editar Administrador',
-      placeHolderSearch: 'Buscar por nombre paciente',
+      placeHolderSearch: 'Buscar por nombre o cedula',
       columns: columnsAdministrador,
       dataSource:
         stateFilter === ''
           ? searchInArray(
-              Consultas?.filter(
+              Administradores?.filter(
                 (item) => item.estado === 'A' || item.estado === 'I'
               ),
-              ['nombre_paciente'],
+              ['nombres', 'apellidos', 'cedula'],
               search
             )
           : searchInArray(
-              Consultas?.filter(
+              Administradores?.filter(
                 (item) => item.estado === 'A' || item.estado === 'I'
               ),
-              ['nombre_paciente'],
+              ['nombres', 'apellidos', 'cedula'],
               search
             )?.filter((item) => item.estado === stateFilter),
     },
@@ -1715,6 +1695,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     if (
       createConsultasRequestStatus === 'success' ||
       createPacientesRequestStatus === 'success' ||
+      createAdministradoresRequestStatus === 'success' ||
       createDoctorRequestStatus === 'success' ||
       createEspecialidadRequestStatus === 'success' ||
       createHorariosRequestStatus === 'success'
@@ -1725,6 +1706,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       State === 'D' && dispatch(getDoctores({}))
       State === 'E' && dispatch(getEspecialidades({}))
       State === 'H' && dispatch(getHorarios({}))
+      State === 'A' && dispatch(getAdministradores({}))
       State === 'CD' &&
         dispatch(
           getConsultas({
@@ -1747,6 +1729,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     createDoctorRequestStatus,
     createEspecialidadRequestStatus,
     createHorariosRequestStatus,
+    createAdministradoresRequestStatus,
   ])
 
   const handleUpdate = async () => {
@@ -1788,6 +1771,16 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             ...data,
             tanda_manana: selectedDiasManana?.toString() ?? null,
             tanda_tarde: selectedDiasTarde?.toString() ?? null,
+          },
+        })
+      )
+    } else if (State === 'A') {
+      dispatch(
+        updateAdministradores({
+          condition: {
+            ...edit,
+            ...data,
+            cedula: replaceAll(data.cedula, '-', ''),
           },
         })
       )
@@ -1848,6 +1841,16 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             ...data,
             tanda_manana: selectedDiasManana?.toString() ?? null,
             tanda_tarde: selectedDiasTarde?.toString() ?? null,
+          },
+        })
+      )
+    } else if (State === 'A') {
+      dispatch(
+        createAdministradores({
+          condition: {
+            ...data,
+            cedula: replaceAll(data.cedula, '-', ''),
+            clave: generatePassword(data.nombres, data.apellidos),
           },
         })
       )
@@ -2232,6 +2235,46 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     </CustomCol> */}
                     </CustomRow>
                   </ConditionalComponent>
+                  {/* Administradores  */}
+                  <ConditionalComponent condition={State === 'A'}>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Nombre'}
+                          name={'nombres'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomInput placeholder="Nombre" />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Apellido'}
+                          name={'apellidos'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomInput placeholder="Apellido" />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </CustomRow>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Cédula'}
+                          name={'cedula'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomMaskedInput
+                            mask={maskedInput.doc_identidad}
+                            placeholder="Cedula"
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </CustomRow>
+                  </ConditionalComponent>
                   {/* Doctor  */}
                   <ConditionalComponent condition={State === 'D'}>
                     <CustomRow justify="space-between">
@@ -2510,7 +2553,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 </CustomModal>
                 <CustomModal
                   title={<CustomTitle>Detalles de la consulta</CustomTitle>}
-                  width={'40%'}
+                  width={'70%'}
                   visible={visibleDetalles}
                   onCancel={() => {
                     if (State === 'HD') {
@@ -2539,9 +2582,113 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   }}
                   cancelText={State === 'HD' && 'Salir'}
                 >
-                  <CustomCol xs={24}>
+                  <CustomDivider>
+                    <CustomTitle level={4} style={{ textAlign: 'center' }}>
+                      Síntomas
+                    </CustomTitle>
+                  </CustomDivider>
+                  <CustomRow justify={'space-between'}>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Tipo de lesión'}
+                        name={'tipo_lesion'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Selecciona el Tipo de lesión'}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Localización'}
+                        name={'localizacion'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 7 }}
+                      >
+                        <CustomInput placeholder="Localización de la lesión" />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Color'}
+                        name={'color_lesion'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Selecciona el color de la lesión'}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints} pull={1}>
+                      <CustomFormItem
+                        label={'Antecedentes Patol.'}
+                        name={'antecedentes_patologicos'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 9 }}
+                      >
+                        <CustomInput
+                          placeholder="Antecedentes Patológicos Familiares"
+                          style={{ width: '113%' }}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints} pull={1}>
+                      <CustomFormItem
+                        label={'Tratamiento previo'}
+                        name={'tratamiento_previo'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 8 }}
+                      >
+                        <CustomInput
+                          placeholder="Tratamientos utilizados Anteriormente"
+                          style={{ width: '112%' }}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                  <CustomDivider>
+                    <CustomTitle level={4} style={{ textAlign: 'center' }}>
+                      Tiempo de Evolución
+                    </CustomTitle>
+                  </CustomDivider>
+                  <CustomRow justify={'space-between'}>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Desde cuando'}
+                        name={'desde_cuando'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomDatePicker />
+                      </CustomFormItem>
+                    </CustomCol>
+
+                    <CustomCol {...defaultBreakpoints} pull={1}>
+                      <CustomFormItem
+                        label={'Lesiones anteriores'}
+                        name={'lesiones_anteriores'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 9 }}
+                      >
+                        <CustomRadioGroup
+                        // value={stateFilter}
+
+                        // onChange={(e) => {
+                        //   setStateFilter(e.target.value)
+                        // }}
+                        >
+                          <CustomRadio value={'S'}>Si</CustomRadio>
+                          <CustomRadio value={'N'}>No</CustomRadio>
+                        </CustomRadioGroup>
+                      </CustomFormItem>
+                    </CustomCol>
+                  </CustomRow>
+                  <CustomCol xs={24} pull={1}>
                     <CustomFormItem
-                      label={'Detalles'}
+                      label={'Detalles extras'}
                       name={'detalles_consulta'}
                       rules={[{ required: true }]}
                       labelCol={{ span: 4 }}
@@ -2550,6 +2697,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         maxLength={1000}
                         autoSize
                         disabled={State === 'HD'}
+                        width={'105%'}
                       />
                     </CustomFormItem>
                   </CustomCol>
