@@ -15,11 +15,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { defaultBreakpoints, defaultTheme } from '../themes'
 import {
+  filterByDates,
   formatter,
   generatePassword,
+  getKeyValue,
   removeFilters,
   replaceAll,
   searchInArray,
+  searchInArrayMultiple,
 } from '../utils/general'
 import { CustomModalConfirmation } from '../components/ConfirmModalMethod'
 import CustomButton from '../components/CustomButton'
@@ -96,8 +99,11 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [loading, setLoading] = useState<boolean>()
 
   const [currentRef, setCurrentRef] = useState<string>(undefined)
-  const [diasSelected, setSelectedDias] = useState<string[]>([])
-  const [filters, setFilters] = useState<Record<string, FilterValue>>()
+  const [selectedDiasManana, setSelectedDiasManana] = useState<string[]>([])
+  const [selectedDiasTarde, setSelectedDiasTarde] = useState<string[]>([])
+  const [fechaSelected, setFechaSelected] =
+    useState<[moment.Moment, moment.Moment]>(null)
+  const [filters, setFilters] = useState<AnyType[]>()
 
   const ref: Record<ComponentsRef, React.RefObject<HTMLDivElement>> = {
     print: printRef,
@@ -137,6 +143,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   useEffect(handleUsePrint, [handleUsePrint])
 
   useEffect(() => {
+    setFechaSelected(null)
+    setFilters([])
     if (State === 'C') {
       dispatch(getConsultas({}))
       dispatch(getPacientes({}))
@@ -336,8 +344,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     } else if (State === 'H') {
       form.setFieldsValue({
         ...record,
-        dias: record.dias.split(','),
-        horario: [moment(record.hora_inicio), moment(record.hora_fin)],
+        tanda_manana:
+          record.tanda_manana === '' ? [] : record.tanda_manana.split(','),
+        tanda_tarde:
+          record.tanda_tarde === '' ? [] : record.tanda_tarde.split(','),
       })
     }
   }
@@ -388,16 +398,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.inicio).format('DD/MM/YYYY'),
-              value: moment(item.inicio).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.inicio).format('DD/MM/YYYY') === value
-      },
     },
     {
       key: 'fin',
@@ -406,16 +406,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'fin',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
-      },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
       },
     },
 
@@ -514,16 +504,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.inicio).format('DD/MM/YYYY'),
-              value: moment(item.inicio).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.inicio).format('DD/MM/YYYY') === value
-      },
     },
 
     {
@@ -579,16 +559,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.inicio).format('DD/MM/YYYY'),
-              value: moment(item.inicio).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.inicio).format('DD/MM/YYYY') === value
-      },
     },
     {
       key: 'fin',
@@ -597,16 +567,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'fin',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
-      },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
       },
     },
     {
@@ -617,14 +577,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (_, item: AnyType) => {
         return (
           <CustomSpace>
-            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
-              <CustomButton
-                // onClick={() => handleEdit(item)}
-                type={'link'}
-                icon={<EyeOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip> */}
             <CustomTooltip
               key={'edit'}
               title={
@@ -754,16 +706,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.inicio).format('DD/MM/YYYY'),
-              value: moment(item.inicio).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.inicio).format('DD/MM/YYYY') === value
-      },
     },
     {
       key: 'fin',
@@ -772,16 +714,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'fin',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
-      },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
       },
     },
     {
@@ -929,16 +861,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.inicio).format('DD/MM/YYYY'),
-              value: moment(item.inicio).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.inicio).format('DD/MM/YYYY') === value
-      },
     },
     {
       key: 'fin',
@@ -1028,16 +950,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'inicio',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
-      },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.inicio).format('DD/MM/YYYY'),
-              value: moment(item.inicio).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.inicio).format('DD/MM/YYYY') === value
       },
     },
     {
@@ -1484,9 +1396,14 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     {
       key: 'tanda',
       title: 'Tanda',
-      dataIndex: 'tanda',
-      render: (value) => {
-        return value === 'M' ? 'Mañana' : 'Tarde'
+      render: (_, record) => {
+        return record.tanda_manana !== '' && record.tanda_tarde !== ''
+          ? 'Mañana y Tarde'
+          : record.tanda_manana !== ''
+          ? 'Mañana'
+          : record.tanda_tarde !== ''
+          ? 'Tarde'
+          : ''
       },
     },
 
@@ -1869,7 +1786,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           condition: {
             ...edit,
             ...data,
-            dias: diasSelected?.toString(),
+            tanda_manana: selectedDiasManana?.toString() ?? null,
+            tanda_tarde: selectedDiasTarde?.toString() ?? null,
           },
         })
       )
@@ -1928,7 +1846,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         createHorarios({
           condition: {
             ...data,
-            dias: diasSelected?.toString(),
+            tanda_manana: selectedDiasManana?.toString() ?? null,
+            tanda_tarde: selectedDiasTarde?.toString() ?? null,
           },
         })
       )
@@ -1986,13 +1905,30 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       </ConditionalComponent>
                     </CustomRow>
                   </CustomCol>
-                  <ConditionalComponent
-                    condition={
-                      State !== 'HD' && State !== 'HP' && State !== 'CP'
-                    }
-                  >
-                    <CustomCol span={12}>
-                      <CustomRow justify={'end'}>
+
+                  <CustomCol xs={24} style={{ marginBottom: '1%' }}>
+                    <CustomRow justify={'space-between'}>
+                      {State === 'C' ||
+                      State === 'CD' ||
+                      State === 'HD' ||
+                      State === 'CP' ||
+                      State === 'HP' ? (
+                        <CustomFormItem label={'Filtrar por Fecha'}>
+                          <CustomRangePicker
+                            format={'DD/MM/YYYY'}
+                            onChange={(item) => {
+                              setFechaSelected(item)
+                            }}
+                          />
+                        </CustomFormItem>
+                      ) : (
+                        <CustomFormItem />
+                      )}
+                      <ConditionalComponent
+                        condition={
+                          State !== 'HD' && State !== 'HP' && State !== 'CP'
+                        }
+                      >
                         <CustomFormItem
                           label={'Ver: '}
                           className={'grupoPersona'}
@@ -2008,16 +1944,30 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             <CustomRadio value={'I'}>Inactivos</CustomRadio>
                           </CustomRadioGroup>
                         </CustomFormItem>
-                      </CustomRow>
-                    </CustomCol>
-                  </ConditionalComponent>
+                      </ConditionalComponent>
+                    </CustomRow>
+                  </CustomCol>
                 </CustomRow>
                 <CustomTable
+                  key={State}
                   columns={title[`${State}`]?.columns}
-                  dataSource={title[`${State}`]?.dataSource}
+                  dataSource={
+                    fechaSelected !== null
+                      ? filterByDates(
+                          title[`${State}`]?.dataSource,
+                          'inicio',
+                          'fin',
+                          fechaSelected
+                        )
+                      : title[`${State}`]?.dataSource
+                  }
                   pagination={{ pageSize: 5 }}
                   onChange={(_, filters) => {
-                    setFilters(filters)
+                    setFilters(
+                      getKeyValue(filters)?.filter(
+                        (item) => item.value !== undefined
+                      )
+                    )
                   }}
                   extra={
                     <ConditionalComponent
@@ -2450,36 +2400,57 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           <CustomInput placeholder="Oficina" />
                         </CustomFormItem>
                       </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Tanda'}
-                          name={'tanda'}
-                          rules={[{ required: true }]}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione una tanda'}
-                            options={[
-                              { label: 'Mañana', value: 'M' },
-                              { label: 'Tarde', value: 'T' },
-                            ]}
-                          />
-                        </CustomFormItem>
+
+                      <CustomCol
+                        {...defaultBreakpoints}
+                        style={{ marginTop: '2%' }}
+                      >
+                        <CustomTitle style={{ textAlign: 'center' }}>
+                          Tanda de la Mañana
+                        </CustomTitle>
                       </CustomCol>
-                      <CustomCol {...defaultBreakpoints} />
-                      <CustomCol xs={24}>
+                      <CustomCol
+                        {...defaultBreakpoints}
+                        style={{ marginTop: '2%' }}
+                      >
+                        <CustomTitle style={{ textAlign: 'center' }}>
+                          Tanda de la Tarde
+                        </CustomTitle>
+                      </CustomCol>
+                      {/* <CustomCol {...defaultBreakpoints} /> */}
+                      <CustomCol {...defaultBreakpoints} push={1}>
                         <CustomFormItem
-                          label={'Dias'}
-                          name={'dias'}
-                          rules={[{ required: true }]}
-                          labelCol={{ xs: 2 }}
+                          label={'Días de la tanda de la mañana'}
+                          name={'tanda_manana'}
+                          // rules={[{ required: true }]}
+                          noStyle
                         >
                           <CustomSelect
                             mode="multiple"
                             onChange={(value: string[]) => {
-                              setSelectedDias(value)
+                              setSelectedDiasManana(value)
                             }}
-                            placeholder={'Seleccione un doctor'}
+                            placeholder={'Seleccione los dias'}
                             options={diasDeLaSemana}
+                            width={'80%'}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints} push={1}>
+                        <CustomFormItem
+                          label={'Días de la tanda de la tarde'}
+                          name={'tanda_tarde'}
+                          // rules={[{ required: true }]}
+                          noStyle
+                        >
+                          <CustomSelect
+                            mode="multiple"
+                            onChange={(value: string[]) => {
+                              setSelectedDiasTarde(value)
+                            }}
+                            placeholder={'Seleccione los dias'}
+                            options={diasDeLaSemana}
+                            width={'80%'}
                           />
                         </CustomFormItem>
                       </CustomCol>
@@ -2593,7 +2564,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   ...(item.key === 'acciones' ? {} : item),
                 }))
               )}
-              dataSource={title[`${State}`]?.dataSource}
+              dataSource={searchInArrayMultiple(
+                fechaSelected !== null
+                  ? filterByDates(
+                      title[`${State}`]?.dataSource,
+                      'inicio',
+                      'fin',
+                      fechaSelected
+                    )
+                  : title[`${State}`]?.dataSource,
+                [...(filters?.map((item) => item.key) ?? [])],
+                [...(filters?.map((item) => item.value) ?? [])]
+              )}
               pagination={false}
               title={() => (
                 <CustomDivider>

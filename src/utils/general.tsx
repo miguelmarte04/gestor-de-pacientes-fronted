@@ -199,6 +199,40 @@ export function searchInArray<T, K extends keyof T>(
     ? arraySearch?.slice(0, maxResults)?.unique('key' as never)
     : arraySearch?.unique('key' as never)
 }
+//searchInArray para multiples keys y multiples search
+export function searchInArrayMultiple<T, K extends keyof T>(
+  array: T[],
+  keys: K[],
+  search: string[],
+  maxResults?: number,
+  deleteSpecialChars = true
+): T[] {
+  const arraySearch = new Array<T>()
+  if (search?.length > 0) {
+    addKeyToArray(array)?.forEach((item, index) => {
+      keys?.forEach?.((key) => {
+        const condition = String(item[key])?.trim()?.toLowerCase()
+        search?.forEach((searchItem) => {
+          if (
+            deleteSpecialChars
+              ? deleteSpecialCharacters(condition).search(
+                  deleteSpecialCharacters(searchItem)?.toLowerCase()
+                ) !== -1
+              : condition?.search(searchItem?.trim()?.toLowerCase()) !== -1
+          ) {
+            arraySearch.push({ ...item, index })
+          }
+        })
+      })
+    })
+    return maxResults
+      ? arraySearch?.slice(0, maxResults)?.unique('key' as never)
+      : arraySearch?.unique('key' as never)
+  } else {
+    return array
+  }
+}
+
 //array de objetos eliminar objetos vacios
 export const removeEmpty = (array: AnyType[]): AnyType[] => {
   const arrayClean: AnyType[] = []
@@ -544,5 +578,31 @@ export const removeFilters = (columns: AnyType[]): AnyType[] => {
       align: 'center',
       className: 'print-column',
     }
+  })
+}
+
+// filtrar array por fecha inicial
+export const filterByDates = (
+  array: AnyType[],
+  keyInicio: string,
+  keyFin: string,
+  date: [moment.Moment, moment.Moment]
+): AnyType[] => {
+  const newArray = [...array]
+  return newArray?.filter((item) => {
+    const dateItemInicio = new Date(item[keyInicio])
+    const dateItemFin = new Date(item[keyFin])
+    return (
+      moment(dateItemInicio).isSameOrAfter(date?.[0]) &&
+      moment(dateItemFin).isSameOrBefore(date?.[1])
+    )
+  })
+}
+
+// [s: string] obtener el key y value de un objeto y retornarlos en un array
+export const getKeyValue = (obj: AnyType): AnyType[] => {
+  const newObj = { ...obj }
+  return Object?.keys(newObj)?.map((key) => {
+    return { key, value: newObj[key]?.[0] }
   })
 }

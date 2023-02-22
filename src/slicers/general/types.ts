@@ -39,6 +39,8 @@ export type HorariosType = {
   id_doctor: number
   nombre: string
   nombre_doctor: string
+  tanda_manana: string
+  tanda_tarde: string
   fecha_insercion: string
   estado: string
 }
