@@ -44,6 +44,7 @@ import CustomSpin from '../components/CustomSpin'
 import {
   createAdministradores,
   createConsultas,
+  createDetCitas,
   createDoctor,
   createEspecialidad,
   createHorarios,
@@ -61,6 +62,7 @@ import {
   getTipoLesion,
   updateAdministradores,
   updateConsultas,
+  updateDetCitas,
   updateDoctor,
   updateEspecialidad,
   updateHorarios,
@@ -134,6 +136,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     Administradores,
     fetchingGeneralData,
     createConsultasRequestStatus,
+    createDetCitasRequestStatus,
     createPacientesRequestStatus,
     createAdministradoresRequestStatus,
     createDoctorRequestStatus,
@@ -252,11 +255,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   ]
   useEffect(() => {
     if (DetCitas?.id) {
-      if (State === 'CD' || State === 'HD') {
-        form.setFieldsValue({
-          ...DetCitas,
-        })
-      }
+      form.setFieldsValue({
+        ...DetCitas,
+        fecha_lesion_anterior: moment(DetCitas.fecha_lesion_anterior),
+      })
     }
   }, [DetCitas])
   const handleDelete = (record: ConsultasType | PacientesType) => {
@@ -1706,6 +1708,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         }),
       })
   }, [pacienteSelected])
+
   useEffect(() => {
     if (
       createConsultasRequestStatus === 'success' ||
@@ -1713,7 +1716,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       createAdministradoresRequestStatus === 'success' ||
       createDoctorRequestStatus === 'success' ||
       createEspecialidadRequestStatus === 'success' ||
-      createHorariosRequestStatus === 'success'
+      createHorariosRequestStatus === 'success' ||
+      createDetCitasRequestStatus === 'success'
     ) {
       State === 'C' && dispatch(getConsultas({}))
       State === 'HD' && dispatch(getConsultas({}))
@@ -1745,6 +1749,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     createEspecialidadRequestStatus,
     createHorariosRequestStatus,
     createAdministradoresRequestStatus,
+    createDetCitasRequestStatus,
   ])
 
   const handleUpdate = async () => {
@@ -2589,8 +2594,27 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       })
                     }
                   }}
-                  onOk={() => {
-                    handleUpdate()
+                  onOk={async () => {
+                    const data = await form.validateFields()
+                    if (DetCitas?.id) {
+                      dispatch(
+                        updateDetCitas({
+                          condition: {
+                            ...DetCitas,
+                            ...data,
+                          },
+                        })
+                      )
+                    } else {
+                      dispatch(
+                        createDetCitas({
+                          condition: {
+                            ...data,
+                            id_cita: edit?.id,
+                          },
+                        })
+                      )
+                    }
                   }}
                   okButtonProps={{
                     style: {
@@ -2608,7 +2632,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     <CustomCol {...defaultBreakpoints}>
                       <CustomFormItem
                         label={'Tipo de lesión'}
-                        name={'tipo_lesion'}
+                        name={'id_tipo_lesion'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 6 }}
                       >
@@ -2618,6 +2642,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             label: item.nombre,
                             value: item.id,
                           }))}
+                          disabled={State === 'HD'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2628,13 +2653,16 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         rules={[{ required: true }]}
                         labelCol={{ span: 7 }}
                       >
-                        <CustomInput placeholder="Localización de la lesión" />
+                        <CustomInput
+                          placeholder="Localización de la lesión"
+                          disabled={State === 'HD'}
+                        />
                       </CustomFormItem>
                     </CustomCol>
                     <CustomCol {...defaultBreakpoints}>
                       <CustomFormItem
                         label={'Color'}
-                        name={'color_lesion'}
+                        name={'id_color_lesion'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 6 }}
                       >
@@ -2644,6 +2672,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             label: item.color,
                             value: item.id,
                           }))}
+                          disabled={State === 'HD'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2657,6 +2686,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomInput
                           placeholder="Antecedentes Patológicos Familiares"
                           style={{ width: '113%' }}
+                          disabled={State === 'HD'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2670,6 +2700,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomInput
                           placeholder="Tratamientos utilizados Anteriormente"
                           style={{ width: '112%' }}
+                          disabled={State === 'HD'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2688,11 +2719,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         labelCol={{ span: 8 }}
                       >
                         <CustomRadioGroup
-                        // value={stateFilter}
+                          // value={stateFilter}
 
-                        // onChange={(e) => {
-                        //   setStateFilter(e.target.value)
-                        // }}
+                          // onChange={(e) => {
+                          //   setStateFilter(e.target.value)
+                          // }}
+                          disabled={State === 'HD'}
                         >
                           <CustomRadio value={'S'}>Si</CustomRadio>
                           <CustomRadio value={'N'}>No</CustomRadio>
@@ -2702,18 +2734,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     <CustomCol {...defaultBreakpoints} pull={1}>
                       <CustomFormItem
                         label={'Desde cuando'}
-                        name={'desde_cuando'}
+                        name={'fecha_lesion_anterior'}
                         // rules={[{ required: true }]}
                         labelCol={{ span: 9 }}
                       >
-                        <CustomDatePicker />
+                        <CustomDatePicker disabled={State === 'HD'} />
                       </CustomFormItem>
                     </CustomCol>
                   </CustomRow>
                   <CustomCol xs={24} pull={1}>
                     <CustomFormItem
                       label={'Detalles extras'}
-                      name={'detalles_consulta'}
+                      name={'detalles_extras'}
                       // rules={[{ required: true }]}
                       labelCol={{ span: 4 }}
                     >

@@ -116,13 +116,20 @@ export type AdministradoresType = {
   estado: string
 }
 export type DetCitasType = {
+  antecedentes_patologicos: string
+  color: string
+  detalles_extras: string
+  estado: string
+  fecha_insercion: string
+  fecha_lesion_anterior: string
   id: number
   id_cita: number
-  id_tipo_lesion: number
   id_color_lesion: number
+  id_tipo_lesion: number
+  lesiones_anteriores: string
   localizacion: string
-  fecha_insercion: string
-  estado: string
+  tipo_lesion: string
+  tratamiento_previo: string
 }
 export type TipoLesionType = {
   id: number
