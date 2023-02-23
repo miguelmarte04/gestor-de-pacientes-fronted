@@ -1,13 +1,16 @@
 import {
   AdministradoresType,
+  ColorLesionType,
   ConsultasType,
   CustomUploadFileType,
+  DetCitasType,
   DoctoresType,
   EspecilidadesType,
   HorariosType,
   NacionalidadesType,
   PacientesType,
   SegurosType,
+  TipoLesionType,
 } from './types'
 import { GeneralType, RequestStatusType } from '../../constants/types'
 
@@ -19,6 +22,9 @@ import { removeField, showNotification } from '../../utils/general'
 export interface GeneralState {
   Consultas: ConsultasType[]
   Administradores: AdministradoresType[]
+  DetCitas: DetCitasType
+  TipoLesion: TipoLesionType[]
+  ColorLesion: ColorLesionType[]
   doctores: DoctoresType[]
   pacientes: PacientesType[]
   nacionalidades: NacionalidadesType[]
@@ -28,6 +34,7 @@ export interface GeneralState {
   fetchingFromPacientes: boolean
   pacientesRequestStatus: RequestStatusType
   createConsultasRequestStatus: RequestStatusType
+  createDetCitasRequestStatus: RequestStatusType
   createAdministradoresRequestStatus: RequestStatusType
   createPacientesRequestStatus: RequestStatusType
   createDoctorRequestStatus: RequestStatusType
@@ -40,6 +47,9 @@ export interface GeneralState {
 const initialState: GeneralState = {
   Consultas: [],
   Administradores: [],
+  TipoLesion: [],
+  ColorLesion: [],
+  DetCitas: {} as DetCitasType,
   doctores: [],
   pacientes: new Array<PacientesType>(),
   nacionalidades: new Array<NacionalidadesType>(),
@@ -50,6 +60,7 @@ const initialState: GeneralState = {
   pacientesRequestStatus: '',
   createConsultasRequestStatus: '',
   createAdministradoresRequestStatus: '',
+  createDetCitasRequestStatus: '',
   createEspecialidadRequestStatus: '',
   createHorariosRequestStatus: '',
   createPacientesRequestStatus: '',
@@ -156,6 +167,77 @@ export const updateAdministradores = createAsyncThunk(
   'general/updateAdministradores',
   async (payload: GeneralType) => {
     const response = await userApiHelper.updateAdministradores(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha_insercion',
+        'key',
+        'index',
+        'nombre_paciente',
+        'apellido_paciente',
+        'nombre_doctor',
+        'apellido_doctor',
+        'fecha',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const getDetCitas = createAsyncThunk(
+  'general/getDetCitas',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getDetCitas(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const getTipoLesion = createAsyncThunk(
+  'general/getTipoLesion',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getTipoLesion(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const getColorLesion = createAsyncThunk(
+  'general/getColorLesion',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getColorLesion(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const createDetCitas = createAsyncThunk(
+  'general/createDetCitas',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.createDetCitas(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const updateDetCitas = createAsyncThunk(
+  'general/updateDetCitas',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.updateDetCitas(
       removeField(payload.condition, [
         'dias',
         'SEARCH_EMPLOYEE',
@@ -555,6 +637,83 @@ export const generalSlice = createSlice({
         })
       })
       .addCase(updateAdministradores.rejected, (state) => {
+        state.createConsultasRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo actualizar el Consulta',
+          type: 'error',
+        })
+      })
+      .addCase(getDetCitas.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getDetCitas.fulfilled, (state, action) => {
+        state.DetCitas = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getDetCitas.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.DetCitas = initialState.DetCitas
+      })
+      .addCase(getTipoLesion.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getTipoLesion.fulfilled, (state, action) => {
+        state.TipoLesion = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getTipoLesion.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.TipoLesion = initialState.TipoLesion
+      })
+      .addCase(getColorLesion.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getColorLesion.fulfilled, (state, action) => {
+        state.ColorLesion = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getColorLesion.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.ColorLesion = initialState.ColorLesion
+      })
+      .addCase(createDetCitas.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createDetCitasRequestStatus = 'pending'
+      })
+      .addCase(createDetCitas.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createDetCitasRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Consulta Insertado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(createDetCitas.rejected, (state) => {
+        state.createDetCitasRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo Insertar el Consulta',
+          type: 'error',
+        })
+      })
+      .addCase(updateDetCitas.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createDetCitasRequestStatus = 'pending'
+      })
+      .addCase(updateDetCitas.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createDetCitasRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Consulta actualizado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(updateDetCitas.rejected, (state) => {
         state.createConsultasRequestStatus = 'error'
         state.fetchingGeneralData = false
         showNotification({

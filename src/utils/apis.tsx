@@ -2,16 +2,20 @@ import axios, { AxiosResponse } from 'axios'
 import { getSessionToken } from './session'
 import {
   WEB_SERVICE_API_GET_ADMINISTRADORES,
+  WEB_SERVICE_API_GET_COLOR_LESION,
   WEB_SERVICE_API_GET_CONSULTAS,
+  WEB_SERVICE_API_GET_DET_CITAS,
   WEB_SERVICE_API_GET_DOCTORES,
   WEB_SERVICE_API_GET_ESPECILIDADES,
   WEB_SERVICE_API_GET_HORARIOS,
   WEB_SERVICE_API_GET_NACIONALIDADES,
   WEB_SERVICE_API_GET_PACIENTES,
   WEB_SERVICE_API_GET_SEGUROS,
+  WEB_SERVICE_API_GET_TIPO_LESION,
   WEB_SERVICE_API_LOGIN,
   WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES,
   WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS,
+  WEB_SERVICE_API_UPDATE_CREATE_DET_CITAS,
   WEB_SERVICE_API_UPDATE_CREATE_DOCTORES,
   WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD,
   WEB_SERVICE_API_UPDATE_CREATE_HORARIOS,
@@ -106,6 +110,21 @@ const updateAdministradores = (
 ): Promise<AxiosResponse> => {
   return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES}`, payload)
 }
+const getDetCitas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_DET_CITAS}`, payload)
+}
+const getTipoLesion = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_TIPO_LESION}`, payload)
+}
+const getColorLesion = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_COLOR_LESION}`, payload)
+}
+const createDetCitas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DET_CITAS}`, payload)
+}
+const updateDetCitas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DET_CITAS}`, payload)
+}
 
 const getDoctores = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_DOCTORES}`, payload)
@@ -174,4 +193,9 @@ export const userApiHelper = {
   getAdministradores,
   createAdministradores,
   updateAdministradores,
+  getDetCitas,
+  createDetCitas,
+  getTipoLesion,
+  getColorLesion,
+  updateDetCitas,
 }

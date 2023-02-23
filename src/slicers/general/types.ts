@@ -115,6 +115,25 @@ export type AdministradoresType = {
   fecha_insercion: string
   estado: string
 }
+export type DetCitasType = {
+  id: number
+  id_cita: number
+  id_tipo_lesion: number
+  id_color_lesion: number
+  localizacion: string
+  fecha_insercion: string
+  estado: string
+}
+export type TipoLesionType = {
+  id: number
+  nombre: string
+  estado: string
+}
+export type ColorLesionType = {
+  id: number
+  color: string
+  estado: string
+}
 
 export type PaymentType = {
   id: number

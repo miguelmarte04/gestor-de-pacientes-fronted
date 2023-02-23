@@ -49,13 +49,16 @@ import {
   createHorarios,
   createPacientes,
   getAdministradores,
+  getColorLesion,
   getConsultas,
+  getDetCitas,
   getDoctores,
   getEspecialidades,
   getHorarios,
   getNacionalidades,
   getPacientes,
   getSeguros,
+  getTipoLesion,
   updateAdministradores,
   updateConsultas,
   updateDoctor,
@@ -125,6 +128,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   })
   const {
     Consultas,
+    DetCitas,
+    ColorLesion,
+    TipoLesion,
     Administradores,
     fetchingGeneralData,
     createConsultasRequestStatus,
@@ -187,6 +193,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+      dispatch(getTipoLesion({}))
+      dispatch(getColorLesion({}))
     } else if (State === 'HP' && getSessionInfo().id) {
       dispatch(
         getConsultas({
@@ -205,6 +213,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+      dispatch(getTipoLesion({}))
+      dispatch(getColorLesion({}))
     } else if (State === 'A' && getSessionInfo().id) {
       dispatch(getAdministradores({}))
     }
@@ -240,6 +250,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       label: 'Viernes',
     },
   ]
+  useEffect(() => {
+    if (DetCitas?.id) {
+      if (State === 'CD' || State === 'HD') {
+        form.setFieldsValue({
+          ...DetCitas,
+        })
+      }
+    }
+  }, [DetCitas])
   const handleDelete = (record: ConsultasType | PacientesType) => {
     if (State === 'C' || State === 'CD') {
       dispatch(
@@ -319,13 +338,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     }
   }
   const handleAddDetalles = (record: ConsultasType) => {
+    dispatch(getDetCitas({ condition: { id_cita: record.id } }))
     setVisibleDetalles(true)
     setEdit(record)
-    if (State === 'CD' || State === 'HD') {
-      form.setFieldsValue({
-        ...record,
-      })
-    }
   }
   const handleEdit = (record: AnyType) => {
     setVisible(true)
@@ -2597,6 +2612,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       >
                         <CustomSelect
                           placeholder={'Selecciona el Tipo de lesión'}
+                          options={TipoLesion?.map((item) => ({
+                            label: item.nombre,
+                            value: item.id,
+                          }))}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2619,6 +2638,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       >
                         <CustomSelect
                           placeholder={'Selecciona el color de la lesión'}
+                          options={ColorLesion?.map((item) => ({
+                            label: item.color,
+                            value: item.id,
+                          }))}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2639,7 +2662,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       <CustomFormItem
                         label={'Tratamiento previo'}
                         name={'tratamiento_previo'}
-                        rules={[{ required: true }]}
+                        // rules={[{ required: true }]}
                         labelCol={{ span: 8 }}
                       >
                         <CustomInput
@@ -2655,23 +2678,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     </CustomTitle>
                   </CustomDivider>
                   <CustomRow justify={'space-between'}>
-                    <CustomCol {...defaultBreakpoints}>
-                      <CustomFormItem
-                        label={'Desde cuando'}
-                        name={'desde_cuando'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 6 }}
-                      >
-                        <CustomDatePicker />
-                      </CustomFormItem>
-                    </CustomCol>
-
                     <CustomCol {...defaultBreakpoints} pull={1}>
                       <CustomFormItem
                         label={'Lesiones anteriores'}
                         name={'lesiones_anteriores'}
                         rules={[{ required: true }]}
-                        labelCol={{ span: 9 }}
+                        labelCol={{ span: 8 }}
                       >
                         <CustomRadioGroup
                         // value={stateFilter}
@@ -2685,12 +2697,22 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         </CustomRadioGroup>
                       </CustomFormItem>
                     </CustomCol>
+                    <CustomCol {...defaultBreakpoints} pull={1}>
+                      <CustomFormItem
+                        label={'Desde cuando'}
+                        name={'desde_cuando'}
+                        // rules={[{ required: true }]}
+                        labelCol={{ span: 9 }}
+                      >
+                        <CustomDatePicker />
+                      </CustomFormItem>
+                    </CustomCol>
                   </CustomRow>
                   <CustomCol xs={24} pull={1}>
                     <CustomFormItem
                       label={'Detalles extras'}
                       name={'detalles_consulta'}
-                      rules={[{ required: true }]}
+                      // rules={[{ required: true }]}
                       labelCol={{ span: 4 }}
                     >
                       <CustomTextArea
@@ -2698,6 +2720,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         autoSize
                         disabled={State === 'HD'}
                         width={'105%'}
+                        placeholder={'Detalles de la consulta del paciente'}
                       />
                     </CustomFormItem>
                   </CustomCol>
