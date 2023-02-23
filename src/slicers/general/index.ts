@@ -1,5 +1,6 @@
 import generalReducer, {
   generalSelector,
+  generalSlice,
   GeneralState,
   getConsultas,
   getDoctores,
@@ -24,7 +25,9 @@ import {
   TypesPermissions,
 } from './types'
 
-export { getConsultas, getDoctores, resetAction, generalSelector }
+const { setDetCitas } = generalSlice.actions
+
+export { getConsultas, getDoctores, resetAction, generalSelector, setDetCitas }
 
 export type {
   PersonDataType,

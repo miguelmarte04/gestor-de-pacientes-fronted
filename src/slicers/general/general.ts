@@ -516,7 +516,11 @@ export const setFileList = createAction(
 export const generalSlice = createSlice({
   name: 'general',
   initialState,
-  reducers: {},
+  reducers: {
+    setDetCitas: (state, action) => {
+      state.DetCitas = action.payload
+    },
+  },
   extraReducers: (build) => {
     build
       .addCase(setFileList, (state, action) => {

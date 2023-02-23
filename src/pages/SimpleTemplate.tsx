@@ -66,7 +66,7 @@ import {
   updateHorarios,
   updatePacientes,
 } from '../slicers/general/general'
-import { ConsultasType } from '../slicers/general'
+import { ConsultasType, setDetCitas } from '../slicers/general'
 import CustomTable from '../components/CustomTable'
 import { ColumnType } from 'antd/lib/table'
 import { AnyType } from '../constants/types'
@@ -2573,6 +2573,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   onCancel={() => {
                     if (State === 'HD') {
                       setVisibleDetalles(false)
+                      dispatch(setDetCitas([]))
                       setEdit(undefined)
                       form.resetFields()
                     } else {
@@ -2581,6 +2582,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           '¿Está seguro que desea salir sin guardar los cambios?',
                         onOk: () => {
                           setVisibleDetalles(false)
+                          dispatch(setDetCitas([]))
                           setEdit(undefined)
                           form.resetFields()
                         },
