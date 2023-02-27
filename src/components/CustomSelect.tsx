@@ -39,8 +39,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             ...item,
             label:
               Number(item?.label?.toString()?.length) >= 35
-                ? item.label?.toString()?.substring(0, 35) + '...'
-                : item.label,
+                ? item?.label?.toString()?.substring(0, 35) + '...'
+                : item?.label,
           }))
           .unique('label') as never
       }

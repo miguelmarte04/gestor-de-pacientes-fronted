@@ -15,6 +15,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { defaultBreakpoints, defaultTheme } from '../themes'
 import {
+  filterByArray,
   filterByDates,
   formatter,
   generatePassword,
@@ -111,6 +112,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   const [currentRef, setCurrentRef] = useState<string>(undefined)
   const [selectedDiasManana, setSelectedDiasManana] = useState<string[]>([])
   const [selectedDiasTarde, setSelectedDiasTarde] = useState<string[]>([])
+  const [tandaSelected, setTandaSelected] = useState<string>()
   const [fechaSelected, setFechaSelected] =
     useState<[moment.Moment, moment.Moment]>(null)
   const [filters, setFilters] = useState<AnyType[]>()
@@ -165,6 +167,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dispatch(getConsultas({}))
       dispatch(getPacientes({}))
       dispatch(getDoctores({}))
+      dispatch(getHorarios({}))
     } else if (State === 'P') {
       dispatch(getPacientes({}))
       dispatch(getNacionalidades({}))
@@ -356,6 +359,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           type: 'identity_doc',
         }),
         fecha: [moment(record.inicio), moment(record.fin)],
+        dia: record.dia,
       })
     } else if (State === 'P') {
       form.setFieldsValue({
@@ -425,20 +429,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Asunto',
       dataIndex: 'asunto',
     },
+
     {
-      key: 'inicio',
-      title: 'Inicio',
+      key: 'fecha_insercion',
+      title: 'Fecha',
       width: '10%',
-      dataIndex: 'inicio',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
+      dataIndex: 'fecha_insercion',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
@@ -1815,8 +1811,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           condition: {
             ...data,
             id_paciente: pacienteSelected.id,
-            inicio: moment(data.fecha[0]).format('YYYY-MM-DD'),
-            fin: moment(data.fecha[1]).format('YYYY-MM-DD'),
           },
         })
       )
@@ -2061,13 +2055,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           ) : (
                             <CustomSelect
                               placeholder={'Seleccione un Paciente'}
-                              options={pacientes?.map((item) => ({
-                                label: `${formatter({
-                                  value: item.cedula,
-                                  type: 'identity_doc',
-                                })} - ${item.nombres} ${item.apellidos}`,
-                                value: item.id,
-                              }))}
+                              options={pacientes
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: `${formatter({
+                                    value: item.cedula,
+                                    type: 'identity_doc',
+                                  })} - ${item.nombres} ${item.apellidos}`,
+                                  value: item.id,
+                                }))}
                               onSelect={(_, item) => {
                                 setpacienteSelected(
                                   pacientes?.find(
@@ -2089,10 +2085,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       >
                         <CustomSelect
                           placeholder={'Seleccione un doctor'}
-                          options={doctores?.map((item) => ({
-                            label: item.nombre,
-                            value: item.id,
-                          }))}
+                          options={doctores
+                            ?.filter((item) => item.estado === 'A')
+                            ?.map((item) => ({
+                              label: item.nombre,
+                              value: item.id,
+                            }))}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2108,12 +2106,65 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     </CustomCol>
                     <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
                       <CustomFormItem
-                        label={'Fecha'}
-                        name={'fecha'}
+                        label={'Tanda'}
+                        name={'id_tanda'}
                         rules={[{ required: true }]}
                         labelCol={{ span: 4 }}
                       >
-                        <CustomRangePicker />
+                        <CustomSelect
+                          placeholder={'Seleccione la tanda'}
+                          options={[
+                            horarios?.find(async (item) => {
+                              item.id_doctor ===
+                                (await form.getFieldValue('id_doctor'))
+                            })?.tanda_manana !== ''
+                              ? {
+                                  label: 'Mañana',
+                                  value: 'M',
+                                }
+                              : null,
+                            horarios?.find(async (item) => {
+                              item.id_doctor ===
+                                (await form.getFieldValue('id_doctor'))
+                            })?.tanda_tarde !== ''
+                              ? {
+                                  label: 'Tarde',
+                                  value: 'T',
+                                }
+                              : null,
+                          ]?.filter((item) => item !== null)}
+                          onSelect={async (value) => {
+                            setTandaSelected(value)
+                          }}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
+                      <CustomFormItem
+                        label={'Dia'}
+                        name={'dia'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 4 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Seleccione el dia'}
+                          options={filterByArray(
+                            diasDeLaSemana,
+                            tandaSelected === 'M'
+                              ? horarios
+                                  ?.find(async (item) => {
+                                    item.id_doctor ===
+                                      (await form.getFieldValue('id_doctor'))
+                                  })
+                                  ?.tanda_manana?.split(',')
+                              : horarios
+                                  ?.find(async (item2) => {
+                                    item2.id_doctor ===
+                                      (await form.getFieldValue('id_doctor'))
+                                  })
+                                  ?.tanda_tarde?.split(',')
+                          )}
+                        />
                       </CustomFormItem>
                     </CustomCol>
                   </ConditionalComponent>
@@ -2152,10 +2203,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           <CustomSelect
                             placeholder={'Seleccione una nacionalidad'}
                             width={'112%'}
-                            options={nacionalidades?.map((item) => ({
-                              label: item.nombre,
-                              value: item.id,
-                            }))}
+                            options={nacionalidades
+                              ?.filter((item) => item.estado === 'A')
+                              ?.map((item) => ({
+                                label: item.nombre,
+                                value: item.id,
+                              }))}
                           />
                         </CustomFormItem>
                       </CustomCol>
@@ -2211,10 +2264,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         >
                           <CustomSelect
                             placeholder={'Seleccione el Seguro'}
-                            options={seguros?.map((item) => ({
-                              label: item.nombre,
-                              value: item.id,
-                            }))}
+                            options={seguros
+                              ?.filter((item) => item.estado === 'A')
+                              ?.map((item) => ({
+                                label: item.nombre,
+                                value: item.id,
+                              }))}
                           />
                         </CustomFormItem>
                       </CustomCol>
@@ -2330,10 +2385,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           <CustomSelect
                             placeholder={'Seleccione una nacionalidad'}
                             width={'112%'}
-                            options={nacionalidades?.map((item) => ({
-                              label: item.nombre,
-                              value: item.id,
-                            }))}
+                            options={nacionalidades
+                              ?.filter((item) => item.estado === 'A')
+                              ?.map((item) => ({
+                                label: item.nombre,
+                                value: item.id,
+                              }))}
                           />
                         </CustomFormItem>
                       </CustomCol>
@@ -2389,10 +2446,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         >
                           <CustomSelect
                             placeholder={'Seleccionar Especialidad'}
-                            options={especialidades?.map((item) => ({
-                              label: item.nombre,
-                              value: item.id,
-                            }))}
+                            options={especialidades
+                              ?.filter((item) => item.estado === 'A')
+                              ?.map((item) => ({
+                                label: item.nombre,
+                                value: item.id,
+                              }))}
                           />
                         </CustomFormItem>
                       </CustomCol>
@@ -2447,10 +2506,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         >
                           <CustomSelect
                             placeholder={'Seleccione un doctor'}
-                            options={doctores?.map((item) => ({
-                              label: item.nombre,
-                              value: item.id,
-                            }))}
+                            options={doctores
+                              ?.filter((item) => item.estado === 'A')
+                              ?.map((item) => ({
+                                label: item.nombre,
+                                value: item.id,
+                              }))}
                           />
                         </CustomFormItem>
                       </CustomCol>
@@ -2638,7 +2699,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       >
                         <CustomSelect
                           placeholder={'Selecciona el Tipo de lesión'}
-                          options={TipoLesion?.map((item) => ({
+                          options={TipoLesion?.filter(
+                            (item) => item.estado === 'A'
+                          )?.map((item) => ({
                             label: item.nombre,
                             value: item.id,
                           }))}
@@ -2668,7 +2731,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       >
                         <CustomSelect
                           placeholder={'Selecciona el color de la lesión'}
-                          options={ColorLesion?.map((item) => ({
+                          options={ColorLesion?.filter(
+                            (item) => item.estado === 'A'
+                          )?.map((item) => ({
                             label: item.color,
                             value: item.id,
                           }))}

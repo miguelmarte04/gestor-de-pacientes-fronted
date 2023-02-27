@@ -136,10 +136,11 @@ const MenuRoutesWrapper = (): React.ReactElement => {
               fontSize: collapsed ? '10px' : '18px',
             }}
           >
-            {formatter({
-              value: getSessionInfo()?.usuario,
-              type: 'identity_doc',
-            })}
+            {getSessionInfo()?.privilegios === 1
+              ? 'Administrador'
+              : getSessionInfo()?.privilegios === 2
+              ? 'Paciente'
+              : 'Doctor'}
           </h5>
         </CustomCol>
         <CustomDivider />

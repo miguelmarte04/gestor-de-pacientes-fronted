@@ -606,3 +606,14 @@ export const getKeyValue = (obj: AnyType): AnyType[] => {
     return { key, value: newObj[key]?.[0] }
   })
 }
+
+// filtar { value: string; label: string; }[] por los valores de un array de string
+export const filterByArray = (
+  array: AnyType[],
+  values: string[]
+): AnyType[] => {
+  const newArray = [...array]
+  return newArray?.filter((item) => {
+    return values?.includes(item.value)
+  })
+}
