@@ -29,25 +29,29 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
               src={'/assets/logo.png'}
               alt={'Logo'}
               style={{
-                width: '120px',
-                height: '120px',
+                width: '130px',
+                height: '130px',
               }}
             />
           </CustomRow>
         </CustomCol>
         <CustomCol xs={24}>
           <CustomRow justify={'center'}>
-            <Text strong>{'Instituto Dermatológico Integral'}</Text>
+            <Text strong style={{ fontSize: '20px' }}>
+              {'Instituto Dermatológico Integral'}
+            </Text>
           </CustomRow>
         </CustomCol>
 
         <CustomRow justify={'end'}>
-          <Text type={'secondary'}>{moment().format('DD MMMM YYYY')}</Text>
+          <Text type={'secondary'} style={{ fontSize: '20px' }}>
+            {moment().format('DD MMMM YYYY')}
+          </Text>
           <Separated />
           <CustomCol xs={24}>{children}</CustomCol>
           <Separated />
-          <Text type={'secondary'}>
-            Usuario:{' '}
+          <Text type={'secondary'} style={{ fontSize: '20px' }}>
+            Usuario:
             <strong>{`${getSessionInfo().nombres} ${
               getSessionInfo().apellidos
             }`}</strong>

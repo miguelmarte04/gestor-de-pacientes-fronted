@@ -51,7 +51,7 @@ const initialState: GeneralState = {
   ColorLesion: [],
   DetCitas: {} as DetCitasType,
   doctores: [],
-  pacientes: new Array<PacientesType>(),
+  pacientes: [] as PacientesType[],
   nacionalidades: new Array<NacionalidadesType>(),
   especialidades: new Array<EspecilidadesType>(),
   seguros: new Array<SegurosType>(),
@@ -539,6 +539,7 @@ export const generalSlice = createSlice({
       })
       .addCase(getDoctores.rejected, (state) => {
         state.fetchingGeneralData = false
+        state.doctores = initialState.doctores
       })
 
       .addCase(getConsultas.pending, (state) => {
@@ -737,6 +738,7 @@ export const generalSlice = createSlice({
       })
       .addCase(getPacientes.rejected, (state) => {
         state.fetchingGeneralData = false
+        state.pacientes = initialState.pacientes
       })
       .addCase(getNacionalidades.pending, (state) => {
         state.fetchingGeneralData = true

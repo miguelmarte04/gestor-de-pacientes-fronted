@@ -607,7 +607,6 @@ export const getKeyValue = (obj: AnyType): AnyType[] => {
   })
 }
 
-// filtar { value: string; label: string; }[] por los valores de un array de string
 export const filterByArray = (
   array: AnyType[],
   values: string[]

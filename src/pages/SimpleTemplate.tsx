@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   CheckOutlined,
   DeleteOutlined,
@@ -10,7 +9,7 @@ import {
   SolutionOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons'
-import { Form, Image, Select, TimePicker } from 'antd'
+import { Form, Image } from 'antd'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { defaultBreakpoints, defaultTheme } from '../themes'
@@ -36,7 +35,6 @@ import CustomRadio from '../components/CustomRadio'
 import CustomRadioGroup from '../components/CustomRadioGroup'
 import CustomRow from '../components/CustomRow'
 import CustomSearch from '../components/CustomSearch'
-import CustomSearchPacientes from '../components/CustomSearchPacientes'
 import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
 import CustomLayoutBoxShadow from '../components/CustomLayoutBoxShadow'
@@ -94,22 +92,24 @@ import { maskedInput } from '../constants/general'
 import { getSessionInfo } from '../utils/session'
 import PrintTemplate from '../components/PrintTemplate'
 import { useReactToPrint } from 'react-to-print'
-import { FilterValue } from 'antd/lib/table/interface'
-import CustomInputDate from '../components/CustomInputDate'
+import { Typography } from 'antd'
 interface TemplateProps {
   State: string
 }
-type ComponentsRef = 'print'
+type ComponentsRef = 'print' | 'printDatos'
 
 const SimpleTemplate: React.FC<TemplateProps> = ({
   State,
 }): React.ReactElement => {
   const [form] = Form.useForm()
+  const { Text } = Typography
   const dispatch = useAppDispatch()
   const printRef = useRef<HTMLDivElement>(null)
+  const printRefDatos = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState<boolean>()
 
   const [currentRef, setCurrentRef] = useState<string>(undefined)
+  const [dataPrint, setDataPrint] = useState<AnyType>()
   const [selectedDiasManana, setSelectedDiasManana] = useState<string[]>([])
   const [selectedDiasTarde, setSelectedDiasTarde] = useState<string[]>([])
   const [tandaSelected, setTandaSelected] = useState<string>()
@@ -119,6 +119,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
   const ref: Record<ComponentsRef, React.RefObject<HTMLDivElement>> = {
     print: printRef,
+    printDatos: printRefDatos,
   }
 
   const handlePrint = useReactToPrint({
@@ -126,6 +127,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     onAfterPrint: () => {
       setCurrentRef(undefined)
       setLoading(false)
+      setDataPrint(undefined)
     },
     documentTitle: 'Reporte',
     bodyClass: 'print-report',
@@ -781,6 +783,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 className={'editPhoneButton'}
               />
             </CustomTooltip>
+            <CustomTooltip
+              key={'print'}
+              title={
+                item.estado === 'A' ? 'Imprimir' : 'Inactivo, no permite acción'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={async () => {
+                  setDataPrint(item)
+                  setCurrentRef('printDatos')
+                  setLoading(true)
+                }}
+                type={'link'}
+                icon={<PrinterFilled style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
 
             <CustomTooltip
               key={'delete'}
@@ -1105,6 +1125,25 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             </CustomTooltip>
 
             <CustomTooltip
+              key={'print'}
+              title={
+                item.estado === 'A' ? 'Imprimir' : 'Inactivo, no permite acción'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={async () => {
+                  setDataPrint(item)
+                  setCurrentRef('printDatos')
+                  setLoading(true)
+                }}
+                type={'link'}
+                icon={<PrinterFilled style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
               key={'delete'}
               title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
             >
@@ -1258,6 +1297,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 onClick={() => handleEdit(item)}
                 type={'link'}
                 icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+            <CustomTooltip
+              key={'print'}
+              title={
+                item.estado === 'A' ? 'Imprimir' : 'Inactivo, no permite acción'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={async () => {
+                  setDataPrint(item)
+                  setCurrentRef('printDatos')
+                  setLoading(true)
+                }}
+                type={'link'}
+                icon={<PrinterFilled style={{ fontSize: '18px' }} />}
                 className={'editPhoneButton'}
               />
             </CustomTooltip>
@@ -1514,16 +1571,20 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataSource:
         stateFilter === ''
           ? searchInArray(
-              pacientes?.filter(
-                (item) => item.estado === 'A' || item.estado === 'I'
-              ),
+              Array.isArray(pacientes)
+                ? pacientes?.filter(
+                    (item) => item.estado === 'A' || item.estado === 'I'
+                  )
+                : [],
               ['nombres', 'apellidos', 'cedula'],
               search
             )
           : searchInArray(
-              pacientes?.filter(
-                (item) => item.estado === 'A' || item.estado === 'I'
-              ),
+              Array.isArray(pacientes)
+                ? pacientes?.filter(
+                    (item) => item.estado === 'A' || item.estado === 'I'
+                  )
+                : [],
               ['nombres', 'apellidos', 'cedula'],
               search
             )?.filter((item) => item.estado === stateFilter),
@@ -1836,7 +1897,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             telefono: replaceAll(data.cedula, '-', ''),
             id_especialidad: data.especialidad,
             id_nacionalidad: data.nacionalidad,
-            clave: generatePassword(data.nombres, data.apellidos),
+            clave: generatePassword(data.nombre, data.apellido),
           },
         })
       )
@@ -2457,6 +2518,16 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       </CustomCol>
                       <CustomCol {...defaultBreakpoints}>
                         <CustomFormItem
+                          label={'Exequatur'}
+                          name={'exequatur'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomInput placeholder={'Exequatur'} />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
                           label={'Teléfono'}
                           name={'telefono'}
                           rules={[{ required: true }]}
@@ -2855,6 +2926,24 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 </CustomDivider>
               )}
             />
+          </PrintTemplate>
+          <PrintTemplate ref={printRefDatos} className={'print-report'}>
+            <CustomTitle style={{ textAlign: 'center' }}>{`Datos de ${
+              getSessionInfo().nombres
+            } ${getSessionInfo().apellidos}`}</CustomTitle>
+
+            <CustomRow justify="space-between">
+              <CustomCol {...defaultBreakpoints}>
+                <Text strong style={{ fontSize: '20px' }}>
+                  {`Usuario: ${dataPrint?.cedula}`}
+                </Text>
+              </CustomCol>
+              <CustomCol {...defaultBreakpoints}>
+                <Text strong style={{ fontSize: '20px' }}>
+                  {`Contraseña: ${dataPrint?.clave}`}
+                </Text>
+              </CustomCol>
+            </CustomRow>
           </PrintTemplate>
         </CustomSpin>
       </CustomSpin>
