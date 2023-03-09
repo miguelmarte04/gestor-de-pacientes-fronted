@@ -1206,13 +1206,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       },
     },
     {
-      key: 'fecha_nacimiento',
-      title: 'Fecha de nacimiento',
+      key: 'exequatur',
+      title: 'Exequatur',
       width: '10%',
-      dataIndex: 'fecha_nacimiento',
-      render: (_, record) => {
-        return moment(record.fecha_nacimiento).format('DD/MM/YYYY')
-      },
+      dataIndex: 'exequatur',
     },
     {
       key: 'sexo',
@@ -2351,7 +2348,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomFormItem
                           label={'Email'}
                           name={'email'}
-                          rules={[{ required: true, type: 'email' }]}
+                          rules={[{ type: 'email' }]}
                           labelCol={{ span: 6 }}
                         >
                           <CustomInput
@@ -2543,7 +2540,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomFormItem
                           label={'Email'}
                           name={'correo'}
-                          rules={[{ required: true, type: 'email' }]}
+                          rules={[{ type: 'email' }]}
                           labelCol={{ span: 6 }}
                         >
                           <CustomInput

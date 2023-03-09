@@ -335,6 +335,7 @@ export const updatePacientes = createAsyncThunk(
         'nombre_doctor',
         'apellido_doctor',
         'fecha',
+        'clave',
         'documento',
         'seguro',
         'nacionalidad',

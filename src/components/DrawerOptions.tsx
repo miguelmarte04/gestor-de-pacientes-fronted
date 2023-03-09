@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  BarChartOutlined,
   CalendarOutlined,
   FieldTimeOutlined,
   HomeOutlined,
@@ -22,6 +23,7 @@ import {
   PATH_HISTORIAL_DOCTORES,
   PATH_HISTORIAL_PACIENTES,
   PATH_HORARIOS,
+  PATH_MAIN,
   PATH_PACIENTES,
   PATH_PACIENTES_DOCTORES,
 } from '../constants/Routes'
@@ -60,6 +62,13 @@ const DrawerOptions = (): React.ReactElement => {
       onOpenChange={onOpenChange}
       style={{ border: 'none', outline: 'none', backgroundColor: '#fff' }}
     >
+      <CustomMenuItem
+        key="01"
+        icon={<BarChartOutlined />}
+        onClick={() => handleClick(PATH_MAIN, '01')}
+      >
+        DASHBOARD
+      </CustomMenuItem>
       {getSessionInfo().privilegios === 1 && (
         <>
           <CustomMenuItem

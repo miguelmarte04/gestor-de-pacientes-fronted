@@ -125,7 +125,8 @@ const MenuRoutesWrapper = (): React.ReactElement => {
               style={{
                 cursor: 'pointer',
                 height: collapsed ? '50px' : '120px',
-                width: collapsed ? '50px' : '120px',
+                width: collapsed ? '50px' : '220px',
+                marginTop: '10px',
               }}
             />
           </CustomRow>
