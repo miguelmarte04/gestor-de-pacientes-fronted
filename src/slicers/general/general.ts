@@ -174,6 +174,7 @@ export const updateAdministradores = createAsyncThunk(
         'fecha_insercion',
         'key',
         'index',
+        'clave',
         'nombre_paciente',
         'apellido_paciente',
         'nombre_doctor',

@@ -937,18 +937,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Doctor',
       dataIndex: 'Doctor',
       render: (_, record) => {
-        return `${record.nombre_paciente} ${record.apellido_paciente}`
+        return `${record.nombre_doctor} ${record.apellido_doctor}`
       },
       filters:
         Number(Consultas?.length) > 0
           ? Consultas?.map((item: AnyType) => ({
-              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
-              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
+              text: `${item.nombre_doctor} ${item.apellido_doctor}`,
+              value: `${item.nombre_doctor} ${item.apellido_doctor}`,
             }))?.unique('text')
           : [],
 
       onFilter(value, record) {
-        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+        return `${record.nombre_doctor} ${record.apellido_doctor}` === value
       },
     },
     {

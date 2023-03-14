@@ -616,3 +616,82 @@ export const filterByArray = (
     return values?.includes(item.value)
   })
 }
+const colors = [
+  'rgba(255, 99, 132, 0.5)', // red
+  'rgba(53, 162, 235, 0.5)', // blue
+  'rgba(75, 192, 192, 0.5)', // green
+  'rgba(255, 206, 86, 0.5)', // yellow
+  'rgba(153, 102, 255, 0.5)', // purple
+  'rgba(255, 159, 64, 0.5)', // orange
+  'rgba(128, 128, 0, 0.5)', // olive green
+  'rgba(0, 128, 128, 0.5)', // teal
+  'rgba(128, 0, 0, 0.5)', // maroon
+  'rgba(0, 0, 128, 0.5)', // navy blue
+  'rgba(128, 128, 128, 0.5)', // gray
+  'rgba(192, 192, 192, 0.5)', // silver
+  'rgba(0, 0, 128, 0.5)', // navy blue
+]
+const meses = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+]
+export function createBarDatasets<T>(arr: T[], type: string): AnyType {
+  const datasets = new Array<Record<string, unknown>>()
+  const items: Record<string, unknown> = {}
+
+  const labels = new Array<string>() // meses
+  if (type === 'departamento') {
+    arr?.forEach((item: AnyType, index) => {
+      items['label'] = item?.['DEPARTAMENTO' as keyof T]
+      items['data'] = [item?.['CANTIDAD' as keyof T]]
+      items['backgroundColor'] = colors[index]
+
+      labels.push(item?.['ARTICULO' as keyof T]) // Octubre
+
+      datasets.push({ ...items })
+    })
+  } else {
+    arr?.forEach((item: AnyType, index) => {
+      if (datasets?.find((data) => data['label'] === item?.ARTICULO)) {
+        datasets?.forEach((dataset) => {
+          if (dataset['label'] === item?.['ARTICULO' as keyof T]) {
+            dataset['data'] = [
+              (item?.['CANTIDAD' as keyof T] as number) +
+                Number(dataset['data']),
+            ]
+          }
+        })
+        return
+      } else {
+        items['label'] = item?.['ARTICULO' as keyof T]
+        items['data'] = [item?.['CANTIDAD' as keyof T]]
+        items['backgroundColor'] = colors[index]
+
+        // de la propiedad FECHA_INSERCION del objeto item y filtrar los constante meses para crear el dataset de labels
+        const month = Number(
+          (item?.['FECHA_INSERCION' as keyof T] as unknown as string)?.split(
+            '-'
+          )[1]
+        ) // 10
+        labels.push(meses[month - 1] ?? '') // Octubre
+
+        datasets.push({ ...items })
+      }
+    })
+  }
+
+  return {
+    labels: Array.from(new Set(labels)),
+    datasets, // datos de cada articulo
+  }
+}
