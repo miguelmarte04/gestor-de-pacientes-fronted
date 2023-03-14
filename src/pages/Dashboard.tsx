@@ -46,6 +46,7 @@ import { createBarDatasets, sortByDate } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
 import CustomCalendar from '../components/CustomCalendar'
 import { AnyType } from '../constants/types'
+import moment from 'moment'
 
 const StyledLayout = styled(CustomLayout)`
   background-color: #fff;
@@ -121,7 +122,13 @@ const Dashboard = (): React.ReactElement => {
   useEffect(() => {
     const condition = {}
     if (getSessionInfo().privilegios === 1) {
-      dispatch(getConsultas(condition))
+      dispatch(
+        getConsultas({
+          condition: {
+            estado: 'T',
+          },
+        })
+      )
       dispatch(getDoctores(condition))
       dispatch(getEspecialidades(condition))
       dispatch(
@@ -205,24 +212,47 @@ const Dashboard = (): React.ReactElement => {
   useEffect(handlePrintChart, [handlePrintChart])
 
   const monthCellRender = (value: AnyType) => {
-    const num = 1239
-    return num ? (
-      <div className="notes-month">
-        <section>{num}</section>
-        <span>Backlog number</span>
-      </div>
+    return Consultas?.some(
+      (c) =>
+        moment(c.fecha_insercion, 'YYYY-MM-DD').format('MM') ===
+        moment(value).format('MM')
+    ) ? (
+      <CustomTitle
+        style={{
+          backgroundColor: 'red',
+          padding: 19,
+          borderRadius: 5,
+        }}
+        onClick={() => {
+          // eslint-disable-next-line no-console
+          console.log('click')
+        }}
+      >
+        Consultas
+      </CustomTitle>
     ) : null
   }
 
   const dateCellRender = (value: AnyType) => {
-    const listData = [{ type: 'warning', content: 'This is warning event.' }]
-    return (
-      <ul className="events">
-        {listData.map((item) => (
-          <li key={item.content}>hola</li>
-        ))}
-      </ul>
-    )
+    return Consultas?.some(
+      (c) =>
+        moment(c.fecha_insercion, 'YYYY-MM-DD').format('DD/MM/YYYY') ===
+        moment(value).format('DD/MM/YYYY')
+    ) ? (
+      <CustomTitle
+        style={{
+          backgroundColor: 'red',
+          padding: 19,
+          borderRadius: 5,
+        }}
+        onClick={() => {
+          // eslint-disable-next-line no-console
+          console.log('click')
+        }}
+      >
+        Consultas
+      </CustomTitle>
+    ) : null
   }
   return (
     <CustomSpin spinning={loading}>
@@ -242,6 +272,10 @@ const Dashboard = (): React.ReactElement => {
                       <Calendar
                         dateCellRender={dateCellRender}
                         monthCellRender={monthCellRender}
+                        style={{
+                          maxHeight: '50vh',
+                          overflow: 'auto',
+                        }}
                       />
                     </CustomCard>
                   </CustomCol>
