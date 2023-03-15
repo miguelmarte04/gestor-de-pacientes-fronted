@@ -48,7 +48,7 @@ const BarChart: React.FC<BarChartProps> = ({
     labels,
     datasets: [
       {
-        label: 'Contratados',
+        label: 'consultas por mes',
         data: [...Bardata],
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
       },

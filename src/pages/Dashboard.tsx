@@ -36,17 +36,20 @@ import InfoCard, { InfoCardType } from '../components/InfoCard'
 import PieChart from '../components/PieChart'
 import PrintTemplate from '../components/PrintTemplate'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { getConsultas } from '../slicers/general'
+import { ConsultasType, getConsultas } from '../slicers/general'
 import {
   getDoctores,
   getEspecialidades,
   getPacientes,
 } from '../slicers/general/general'
-import { createBarDatasets, sortByDate } from '../utils/general'
+import { createBarDatasets, searchInArray, sortByDate } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
 import CustomCalendar from '../components/CustomCalendar'
 import { AnyType } from '../constants/types'
-import moment from 'moment'
+import moment, { Moment } from 'moment'
+import CustomModal from '../components/CustomModal'
+import CustomTable from '../components/CustomTable'
+import { ColumnType } from 'antd/lib/table'
 
 const StyledLayout = styled(CustomLayout)`
   background-color: #fff;
@@ -70,6 +73,9 @@ const Dashboard = (): React.ReactElement => {
   const ConsultasRef = useRef<HTMLDivElement>(null)
   const [chartTitle, setChartTitle] = useState<string>()
   const [chartIMG, setChartIMG] = useState<string>()
+  const [visible, setVisible] = useState<boolean>()
+  const [dateSelected, setDateSelected] = useState<string>()
+  const [typeCalendar, setTypeCalendar] = useState<string>()
   const getChartIMG = (chartId: string) => {
     const canvas = document.getElementById(chartId) as HTMLCanvasElement
     const imgData = canvas?.toDataURL('image/png', 1.0) as string
@@ -203,8 +209,6 @@ const Dashboard = (): React.ReactElement => {
   })
   const handlePrintChart = useCallback(() => {
     if ((chartIMG && chartTitle) || ref[currentRef as ComponentsRef]?.current) {
-      // eslint-disable-next-line no-console
-      console.log(ref[currentRef as ComponentsRef]?.current)
       handlePrint()
     }
   }, [chartIMG, chartTitle, currentRef])
@@ -224,8 +228,9 @@ const Dashboard = (): React.ReactElement => {
           borderRadius: 5,
         }}
         onClick={() => {
-          // eslint-disable-next-line no-console
-          console.log('click')
+          setVisible(true)
+          setDateSelected(value)
+          setTypeCalendar('years')
         }}
       >
         Consultas
@@ -246,14 +251,65 @@ const Dashboard = (): React.ReactElement => {
           borderRadius: 5,
         }}
         onClick={() => {
-          // eslint-disable-next-line no-console
-          console.log('click')
+          setVisible(true)
+          setTypeCalendar('meses')
+          setDateSelected(value)
         }}
       >
         Consultas
       </CustomTitle>
     ) : null
   }
+  const columnsConsultas: ColumnType<ConsultasType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'paciente',
+      title: 'Paciente',
+      dataIndex: 'paciente',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+    },
+    {
+      key: 'doctor',
+      title: 'Doctor',
+      dataIndex: 'doctor',
+      render: (_, record) => {
+        return `${record.nombre_doctor} ${record.apellido_doctor}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_doctor} ${item.apellido_doctor}`,
+              value: item.nombre_doctor,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nombre_doctor === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+
+    {
+      key: 'fecha_insercion',
+      title: 'Fecha',
+      width: '10%',
+      dataIndex: 'fecha_insercion',
+      render: (item: string) => {
+        return moment(item, 'YYYY-MM-DD').format('DD/MM/YYYY')
+      },
+    },
+  ]
+
   return (
     <CustomSpin spinning={loading}>
       <StyledLayout>
@@ -326,6 +382,29 @@ const Dashboard = (): React.ReactElement => {
         <CustomDivider>{`Gráfico de ${chartTitle}`}</CustomDivider>
         <Image src={chartIMG} />
       </PrintTemplate>
+      <CustomModal
+        title="Consultas"
+        visible={visible}
+        onCancel={() => setVisible(false)}
+        width={'70%'}
+        okButtonProps={{
+          hidden: true,
+        }}
+        cancelText="Salir"
+      >
+        <CustomTable
+          dataSource={Consultas?.filter((item) => {
+            return typeCalendar === 'meses'
+              ? moment(item.fecha_insercion, 'YYYY-MM-DD')?.format(
+                  'DD/MM/YYYY'
+                ) === moment(dateSelected)?.format('DD/MM/YYYY')
+              : moment(item.fecha_insercion, 'YYYY-MM-DD')?.format('MM') ===
+                  moment(dateSelected)?.format('MM')
+          })}
+          columns={columnsConsultas}
+          rowKey={(record) => record.id}
+        />
+      </CustomModal>
     </CustomSpin>
   )
 }
