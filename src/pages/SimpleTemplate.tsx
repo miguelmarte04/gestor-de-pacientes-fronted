@@ -203,6 +203,16 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       )
       dispatch(getTipoLesion({}))
       dispatch(getColorLesion({}))
+    } else if (State === 'HC') {
+      dispatch(
+        getConsultas({
+          condition: {
+            estado: 'T',
+          },
+        })
+      )
+      dispatch(getTipoLesion({}))
+      dispatch(getColorLesion({}))
     } else if (State === 'HP' && getSessionInfo().id) {
       dispatch(
         getConsultas({
@@ -861,6 +871,115 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
       onFilter(value, record) {
         return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+      },
+    },
+    {
+      key: 'asunto',
+      title: 'Asunto',
+      dataIndex: 'asunto',
+    },
+    {
+      key: 'inicio',
+      title: 'Inicio',
+      width: '10%',
+      dataIndex: 'inicio',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'fin',
+      title: 'Fin',
+      width: '10%',
+      dataIndex: 'fin',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: moment(item.fin).format('DD/MM/YYYY'),
+              value: moment(item.fin).format('DD/MM/YYYY'),
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return moment(record.fin).format('DD/MM/YYYY') === value
+      },
+    },
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
+              <CustomButton
+                // onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<FieldTimeOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip> */}
+            <CustomTooltip key={'edit'} title={'Ver Detalles'}>
+              <CustomButton
+                onClick={() => handleAddDetalles(item)}
+                type={'link'}
+                icon={<UnorderedListOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+            <CustomTooltip key={'addReceta'} title={'Ver Receta'}>
+              <CustomButton
+                onClick={() => handleAddReceta(item)}
+                type={'link'}
+                icon={<SolutionOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
+  const columnsHistorial: ColumnType<ConsultasType>[] = [
+    {
+      key: 'paciente',
+      title: 'Paciente',
+      dataIndex: 'paciente',
+      render: (_, record) => {
+        return `${record.nombre_paciente} ${record.apellido_paciente}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_paciente} ${item.apellido_paciente}`,
+              value: `${item.nombre_paciente} ${item.apellido_paciente}`,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return `${record.nombre_paciente} ${record.apellido_paciente}` === value
+      },
+    },
+    {
+      key: 'doctor',
+      title: 'Doctor',
+      dataIndex: 'doctor',
+      render: (_, record) => {
+        return `${record.nombre_doctor} ${record.apellido_doctor}`
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: `${item.nombre_doctor} ${item.apellido_doctor}`,
+              value: `${item.nombre_doctor} ${item.apellido_doctor}`,
+            }))?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return `${record.nombre_doctor} ${record.apellido_doctor}` === value
       },
     },
     {
@@ -1740,6 +1859,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataSource: searchInArray(
         Consultas?.filter((item) => item.estado === 'T'),
         ['nombre_paciente'],
+        search
+      ),
+    },
+    HC: {
+      title: 'Historial de Consultas',
+      titleModal: 'Registrar Consulta',
+      titleModalEdit: 'Editar Consulta',
+      placeHolderSearch: 'Buscar por nombre paciente o doctor',
+      columns: columnsHistorial,
+      dataSource: searchInArray(
+        Consultas,
+        ['nombre_paciente', 'nombre_doctor'],
         search
       ),
     },
@@ -2658,10 +2789,14 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                 </CustomModal>
                 <CustomModal
                   title={<CustomTitle>Receta</CustomTitle>}
-                  width={State === 'HD' || State === 'HP' ? '50%' : '30%'}
+                  width={
+                    State === 'HD' || State === 'HP' || State === 'HC'
+                      ? '50%'
+                      : '30%'
+                  }
                   visible={visibleReceta}
                   onCancel={() => {
-                    if (State === 'HD' || State === 'HP') {
+                    if (State === 'HD' || State === 'HP' || State === 'HC') {
                       setVisibleReceta(false)
                       setEdit(undefined)
                       form.resetFields()
@@ -2682,25 +2817,36 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   }}
                   okButtonProps={{
                     style: {
-                      display: (State === 'HD' || State === 'HP') && 'none',
+                      display:
+                        (State === 'HD' || State === 'HP' || State === 'HC') &&
+                        'none',
                     },
                   }}
-                  cancelText={(State === 'HD' || State === 'HP') && 'Salir'}
+                  cancelText={
+                    (State === 'HD' || State === 'HP' || State === 'HC') &&
+                    'Salir'
+                  }
                 >
                   <ConditionalComponent
-                    condition={State !== 'HD' && State !== 'HP'}
+                    condition={
+                      State !== 'HD' && State !== 'HP' && State !== 'HC'
+                    }
                   >
                     <CustomUpload
                       form={form}
                       previewTitle={'Receta'}
                       label={'Receta'}
-                      readonly={State === 'HD' || State === 'HP'}
+                      readonly={
+                        State === 'HD' || State === 'HP' || State === 'HC'
+                      }
                       name={'receta'}
                       labelCol={{ span: 6 }}
                     />
                   </ConditionalComponent>
                   <ConditionalComponent
-                    condition={State === 'HD' || State === 'HP'}
+                    condition={
+                      State === 'HD' || State === 'HP' || State === 'HC'
+                    }
                   >
                     <CustomRow justify={'center'}>
                       <Image src={edit?.receta} />
@@ -2712,7 +2858,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   width={'70%'}
                   visible={visibleDetalles}
                   onCancel={() => {
-                    if (State === 'HD') {
+                    if (State === 'HD' || State === 'HC') {
                       setVisibleDetalles(false)
                       dispatch(setDetCitas([]))
                       setEdit(undefined)
@@ -2754,10 +2900,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   }}
                   okButtonProps={{
                     style: {
-                      display: State === 'HD' && 'none',
+                      display: (State === 'HD' || State === 'HC') && 'none',
                     },
                   }}
-                  cancelText={State === 'HD' && 'Salir'}
+                  cancelText={State === 'HD' || (State === 'HC' && 'Salir')}
                 >
                   <CustomDivider>
                     <CustomTitle level={4} style={{ textAlign: 'center' }}>
@@ -2780,7 +2926,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             label: item.nombre,
                             value: item.id,
                           }))}
-                          disabled={State === 'HD'}
+                          disabled={State === 'HD' || State === 'HC'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2793,7 +2939,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       >
                         <CustomInput
                           placeholder="Localización de la lesión"
-                          disabled={State === 'HD'}
+                          disabled={State === 'HD' || State === 'HC'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2812,7 +2958,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             label: item.color,
                             value: item.id,
                           }))}
-                          disabled={State === 'HD'}
+                          disabled={State === 'HD' || State === 'HC'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2826,7 +2972,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomInput
                           placeholder="Antecedentes Patológicos Familiares"
                           style={{ width: '113%' }}
-                          disabled={State === 'HD'}
+                          disabled={State === 'HD' || State === 'HC'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2840,7 +2986,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomInput
                           placeholder="Tratamientos utilizados Anteriormente"
                           style={{ width: '112%' }}
-                          disabled={State === 'HD'}
+                          disabled={State === 'HD' || State === 'HC'}
                         />
                       </CustomFormItem>
                     </CustomCol>
@@ -2864,7 +3010,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           // onChange={(e) => {
                           //   setStateFilter(e.target.value)
                           // }}
-                          disabled={State === 'HD'}
+                          disabled={State === 'HD' || State === 'HC'}
                         >
                           <CustomRadio value={'S'}>Si</CustomRadio>
                           <CustomRadio value={'N'}>No</CustomRadio>
@@ -2878,7 +3024,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         // rules={[{ required: true }]}
                         labelCol={{ span: 9 }}
                       >
-                        <CustomDatePicker disabled={State === 'HD'} />
+                        <CustomDatePicker
+                          disabled={State === 'HD' || State === 'HC'}
+                        />
                       </CustomFormItem>
                     </CustomCol>
                   </CustomRow>
@@ -2892,7 +3040,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       <CustomTextArea
                         maxLength={1000}
                         autoSize
-                        disabled={State === 'HD'}
+                        disabled={State === 'HD' || State === 'HC'}
                         width={'105%'}
                         placeholder={'Detalles de la consulta del paciente'}
                       />
