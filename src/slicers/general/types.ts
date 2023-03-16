@@ -102,6 +102,7 @@ export type ConsultasType = {
   id_doctor: number
   id_paciente: number
   inicio: string
+  id_tanda: string
   nombre_doctor: string
   nombre_paciente: string
 }

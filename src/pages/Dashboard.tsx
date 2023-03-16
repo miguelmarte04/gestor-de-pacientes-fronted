@@ -77,6 +77,8 @@ const Dashboard = (): React.ReactElement => {
   const [visible, setVisible] = useState<boolean>()
   const [dateSelected, setDateSelected] = useState<string>()
   const [typeCalendar, setTypeCalendar] = useState<string>()
+  const [yearSelected, SetYearSelected] = useState<number>(moment().year())
+
   const getChartIMG = (chartId: string) => {
     const canvas = document.getElementById(chartId) as HTMLCanvasElement
     const imgData = canvas?.toDataURL('image/png', 1.0) as string
@@ -111,6 +113,10 @@ const Dashboard = (): React.ReactElement => {
     return data
   }
 
+  const years = []
+  for (let i = 2000; i <= moment().year(); i++) {
+    years.push({ label: i, value: i })
+  }
   const labels = [
     'enero',
     'febrero',
@@ -324,10 +330,10 @@ const Dashboard = (): React.ReactElement => {
                   <DynamicCard dataSources={dynamicCardDataSources} />
 
                   <Separated />
-                  <CustomCol xs={24} style={{ marginBottom: 10 }}>
+                  {/* <CustomCol xs={24} style={{ marginBottom: 10 }}>
                     <CustomCard>
                       <CustomTimeLine />
-                      {/* <Calendar
+                      <Calendar
                         dateCellRender={dateCellRender}
                         monthCellRender={monthCellRender}
                         style={{
@@ -335,48 +341,114 @@ const Dashboard = (): React.ReactElement => {
                           overflow: 'auto',
                           width: '50%',
                         }}
-                      /> */}
-                    </CustomCard>
-                  </CustomCol>
-                  <CustomCol xs={24} style={{ marginBottom: 10 }}>
-                    <CustomCard>
-                      <CustomRow justify={'end'} width={'100%'}>
-                        <CustomTooltip title={'Imprimir'}>
-                          <CustomButton
-                            onClick={async () => {
-                              setLoading(true)
-                              setCurrentRef('consultas')
-                              setChartTitle('Consumo')
-                              getChartIMG('bar-chart')
-                            }}
-                            type={'text'}
-                            icon={
-                              <PrinterFilled style={{ fontSize: '22px' }} />
-                            }
-                          >
-                            Imprimir
-                          </CustomButton>
-                        </CustomTooltip>
-                      </CustomRow>
-                      <CustomRow justify="space-between">
-                        <CustomCol xs={24}>
-                          <CustomDivider>
-                            <CustomTitle level={5}>Consultas</CustomTitle>
-                          </CustomDivider>
-                        </CustomCol>
-                      </CustomRow>
-
-                      <BarChart
-                        title={'Consultas'}
-                        labels={labels}
-                        id={'bar-chart'}
-                        Bardata={buildDataSource(
-                          [...Consultas],
-                          'fecha_insercion'
-                        )}
                       />
                     </CustomCard>
-                  </CustomCol>
+                  </CustomCol> */}
+                  <CustomRow justify="space-between">
+                    <CustomCol xs={11} style={{ marginBottom: 10 }}>
+                      <CustomCard>
+                        <CustomRow justify={'end'} width={'100%'}>
+                          <CustomTooltip title={'Imprimir'}>
+                            <CustomButton
+                              onClick={async () => {
+                                setLoading(true)
+                                setCurrentRef('consultas')
+                                setChartTitle('Consumo')
+                                getChartIMG('bar-chart')
+                              }}
+                              type={'text'}
+                              icon={
+                                <PrinterFilled style={{ fontSize: '22px' }} />
+                              }
+                            >
+                              Imprimir
+                            </CustomButton>
+                          </CustomTooltip>
+                        </CustomRow>
+                        <CustomRow justify="space-between">
+                          <CustomCol xs={18}>
+                            <CustomDivider>
+                              <CustomTitle level={5}>
+                                Consultas por meses
+                              </CustomTitle>
+                            </CustomDivider>
+                          </CustomCol>
+                          <CustomCol xs={6}>
+                            <CustomSelect
+                              placeholder={'Seleccionar Año'}
+                              defaultValue={moment().year()}
+                              options={years}
+                              onChange={(value) => {
+                                SetYearSelected(value)
+                              }}
+                            />
+                          </CustomCol>
+                        </CustomRow>
+
+                        <BarChart
+                          title={'Consultas'}
+                          labels={labels}
+                          id={'bar-chart'}
+                          Bardata={buildDataSource(
+                            [
+                              ...(Consultas?.filter(
+                                (item) =>
+                                  moment(
+                                    item.fecha_insercion,
+                                    'YYYY-MM-DD'
+                                  ).year() === yearSelected
+                              ) ?? []),
+                            ],
+                            'fecha_insercion'
+                          )}
+                        />
+                      </CustomCard>
+                    </CustomCol>
+                    <CustomCol xs={11} style={{ marginBottom: 10 }}>
+                      <CustomCard>
+                        <CustomRow justify={'end'} width={'100%'}>
+                          <CustomTooltip title={'Imprimir'}>
+                            <CustomButton
+                              onClick={async () => {
+                                setLoading(true)
+                                setCurrentRef('consultas')
+                                setChartTitle('Consumo')
+                                getChartIMG('pie-chart')
+                              }}
+                              type={'text'}
+                              icon={
+                                <PrinterFilled style={{ fontSize: '22px' }} />
+                              }
+                            >
+                              Imprimir
+                            </CustomButton>
+                          </CustomTooltip>
+                        </CustomRow>
+                        <CustomRow justify="space-between">
+                          <CustomCol xs={18}>
+                            <CustomDivider>
+                              <CustomTitle level={5}>
+                                Consultas por tanda
+                              </CustomTitle>
+                            </CustomDivider>
+                          </CustomCol>
+                        </CustomRow>
+                        <PieChart
+                          id={'pie-chart'}
+                          title={'Consultas'}
+                          labels={['Mañana', 'Tarde']}
+                          data={[
+                            Consultas?.reduce((a, b) => {
+                              return a + (b.id_tanda === 'M' ? 1 : 0)
+                            }, 0),
+                            Consultas?.reduce((a, b) => {
+                              return a + (b.id_tanda === 'T' ? 1 : 0)
+                            }, 0),
+                          ]}
+                        />
+                      </CustomCard>
+                    </CustomCol>
+                  </CustomRow>
                 </ConditionalComponent>
               </CustomCol>
             </CustomRow>

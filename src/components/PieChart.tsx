@@ -1,9 +1,6 @@
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js'
 import React from 'react'
 import { Pie } from 'react-chartjs-2'
-import CustomCard from './CustomCard'
-import CustomDivider from './CustomDivider'
-import CustomTitle from './CustomTitle'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -23,12 +20,13 @@ interface PieChartProps {
   labels: string[]
   data: number[]
   title: string
+  id?: string
 }
 
 const PieChart: React.FC<PieChartProps> = ({
   labels,
   data,
-  title,
+  id,
 }): React.ReactElement => {
   const datasets = {
     labels,
@@ -58,16 +56,12 @@ const PieChart: React.FC<PieChartProps> = ({
   }
 
   return (
-    <CustomCard style={{ margin: '10px 0' }}>
-      <CustomDivider>
-        <CustomTitle>{title}</CustomTitle>
-      </CustomDivider>
-      <Pie
-        data={datasets}
-        options={options}
-        style={{ maxHeight: '304.22px' }}
-      />
-    </CustomCard>
+    <Pie
+      data={datasets}
+      options={options}
+      id={id}
+      style={{ height: '304.22px', maxHeight: '304.22px' }}
+    />
   )
 }
 

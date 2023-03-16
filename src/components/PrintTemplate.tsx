@@ -47,9 +47,15 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
           <Text type={'secondary'} style={{ fontSize: '20px' }}>
             {moment().format('DD MMMM YYYY')}
           </Text>
-          <Separated />
-          <CustomCol xs={24}>{children}</CustomCol>
-          <Separated />
+        </CustomRow>
+        <Separated />
+
+        <CustomCol xs={24}>
+          <CustomRow justify={'center'}>{children} </CustomRow>
+        </CustomCol>
+
+        <Separated />
+        <CustomRow justify={'end'}>
           <Text type={'secondary'} style={{ fontSize: '20px' }}>
             Usuario:
             <strong>{`${getSessionInfo().nombres} ${
