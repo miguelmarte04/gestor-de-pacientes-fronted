@@ -50,6 +50,7 @@ import moment, { Moment } from 'moment'
 import CustomModal from '../components/CustomModal'
 import CustomTable from '../components/CustomTable'
 import { ColumnType } from 'antd/lib/table'
+import CustomTimeLine from '../components/CustomTimeLine'
 
 const StyledLayout = styled(CustomLayout)`
   background-color: #fff;
@@ -159,25 +160,25 @@ const Dashboard = (): React.ReactElement => {
     {
       title: 'Pacientes',
       description: CardDescription('Total', `${pacientes?.length ?? 0}`),
-      icon: <TeamOutlined />,
+      icon: './assets/pacientes.png',
       color: '#ffe58f',
     },
     {
       title: 'Doctores',
       description: CardDescription('Total', `${doctores?.length ?? 0}`),
-      icon: <UserOutlined />,
+      icon: './assets/doctor.png',
       color: '#f4ffb8',
     },
     {
       title: 'Especialidades',
       description: CardDescription('Total', `${especialidades?.length ?? 0}`),
-      icon: <TagOutlined />,
+      icon: './assets/especialidades.png',
       color: '#95de64',
     },
     {
       title: 'Consultas',
       description: CardDescription('Total', `${Consultas?.length ?? 0}`),
-      icon: <ProfileOutlined />,
+      icon: './assets/consultas.png',
       color: '#87e8de',
     },
   ]
@@ -325,14 +326,16 @@ const Dashboard = (): React.ReactElement => {
                   <Separated />
                   <CustomCol xs={24} style={{ marginBottom: 10 }}>
                     <CustomCard>
-                      <Calendar
+                      <CustomTimeLine />
+                      {/* <Calendar
                         dateCellRender={dateCellRender}
                         monthCellRender={monthCellRender}
                         style={{
                           maxHeight: '50vh',
                           overflow: 'auto',
+                          width: '50%',
                         }}
-                      />
+                      /> */}
                     </CustomCard>
                   </CustomCol>
                   <CustomCol xs={24} style={{ marginBottom: 10 }}>
@@ -346,11 +349,13 @@ const Dashboard = (): React.ReactElement => {
                               setChartTitle('Consumo')
                               getChartIMG('bar-chart')
                             }}
-                            type={'link'}
+                            type={'text'}
                             icon={
                               <PrinterFilled style={{ fontSize: '22px' }} />
                             }
-                          />
+                          >
+                            Imprimir
+                          </CustomButton>
                         </CustomTooltip>
                       </CustomRow>
                       <CustomRow justify="space-between">

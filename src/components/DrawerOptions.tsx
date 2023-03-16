@@ -71,13 +71,27 @@ const DrawerOptions = (): React.ReactElement => {
       </CustomMenuItem>
       {getSessionInfo().privilegios === 1 && (
         <>
-          <CustomMenuItem
-            key="1"
+          <CustomSubMenu
+            key="sub1"
             icon={<ProfileOutlined />}
-            onClick={() => handleClick(PATH_CONSULTAS, '1')}
+            title="CONSULTAS"
           >
-            CONSULTAS
-          </CustomMenuItem>
+            <CustomMenuItem
+              key="1-1"
+              icon={<ProfileOutlined />}
+              onClick={() => handleClick(PATH_CONSULTAS, '1')}
+            >
+              CONSULTAS
+            </CustomMenuItem>
+            <CustomMenuItem
+              key="1-2"
+              icon={<ProfileOutlined />}
+              onClick={() => handleClick(PATH_CONSULTAS, '1')}
+            >
+              HISTORIAL DE CONSULTA
+            </CustomMenuItem>
+          </CustomSubMenu>
+
           <CustomMenuItem
             key="2"
             icon={<TeamOutlined />}

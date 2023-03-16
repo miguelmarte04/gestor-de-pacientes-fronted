@@ -786,7 +786,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             <CustomTooltip
               key={'print'}
               title={
-                item.estado === 'A' ? 'Imprimir' : 'Inactivo, no permite acción'
+                item.estado === 'A'
+                  ? 'Imprimir Datos'
+                  : 'Inactivo, no permite acción'
               }
             >
               <CustomButton
@@ -1127,7 +1129,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             <CustomTooltip
               key={'print'}
               title={
-                item.estado === 'A' ? 'Imprimir' : 'Inactivo, no permite acción'
+                item.estado === 'A'
+                  ? 'Imprimir Datos'
+                  : 'Inactivo, no permite acción'
               }
             >
               <CustomButton
@@ -1137,7 +1141,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   setCurrentRef('printDatos')
                   setLoading(true)
                 }}
-                type={'link'}
+                type={'text'}
                 icon={<PrinterFilled style={{ fontSize: '18px' }} />}
                 className={'editPhoneButton'}
               />
@@ -1300,7 +1304,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             <CustomTooltip
               key={'print'}
               title={
-                item.estado === 'A' ? 'Imprimir' : 'Inactivo, no permite acción'
+                item.estado === 'A'
+                  ? 'Imprimir Datos'
+                  : 'Inactivo, no permite acción'
               }
             >
               <CustomButton
@@ -1943,7 +1949,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
                   <CustomCol xs={24} md={12} />
                   <CustomCol xs={24} md={12}>
-                    <CustomRow justify={'end'} gutter={[10, 0]}>
+                    <CustomRow justify={'space-between'} gutter={[10, 0]}>
                       <CustomCol xs={20}>
                         <CustomFormItem noStyle name={'SEARCH'}>
                           <CustomSearch
@@ -1983,8 +1989,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
                   <CustomCol xs={24} style={{ marginBottom: '1%' }}>
                     <CustomRow justify={'space-between'}>
-                      {State === 'C' ||
-                      State === 'CD' ||
+                      {State === 'CD' ||
                       State === 'HD' ||
                       State === 'CP' ||
                       State === 'HP' ? (
@@ -2059,7 +2064,9 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                             icon={
                               <PrinterFilled style={{ fontSize: '22px' }} />
                             }
-                          />
+                          >
+                            Imprimir
+                          </CustomButton>
                         </CustomTooltip>
                       </CustomRow>
                     </ConditionalComponent>

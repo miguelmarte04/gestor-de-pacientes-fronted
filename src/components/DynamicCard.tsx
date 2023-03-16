@@ -4,11 +4,11 @@ import CustomCard from './CustomCard'
 import CustomCol from './CustomCol'
 import CustomRow from './CustomRow'
 import CustomSpace from './CustomSpace'
-
+import { Image } from 'antd'
 export type DynamicCardType = {
   title: string
   description: React.ReactNode
-  icon: React.ReactNode
+  icon: string
   color: string
 }
 
@@ -61,21 +61,21 @@ const StyledCard = styled(CustomCard)`
   }
 `
 
-const IconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 45px;
-  height: 45px;
-  font-size: 25px;
-  font-weight: 300;
-  border-radius: 50%;
-  background-color: ${(props) => props.color};
-  color: #000;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  border: 1px solid #e8e8e8;
-  box-sizing: border-box;
-`
+// const IconContainer = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 45px;
+//   height: 45px;
+//   font-size: 25px;
+//   font-weight: 300;
+//   border-radius: 50%;
+//   background-color: ${(props) => props.color};
+//   color: #000;
+//   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+//   border: 1px solid #e8e8e8;
+//   box-sizing: border-box;
+// `
 
 const DynamicCard: React.FC<DynamicCardProps> = ({
   dataSources,
@@ -93,7 +93,14 @@ const DynamicCard: React.FC<DynamicCardProps> = ({
               style={{ padding: '10px' }}
             >
               <CustomCol xs={6}>
-                <IconContainer color={item.color}>{item.icon}</IconContainer>
+                <Image
+                  preview={false}
+                  src={item.icon}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                  }}
+                />
               </CustomCol>
               <span>{item.description}</span>
             </CustomRow>
