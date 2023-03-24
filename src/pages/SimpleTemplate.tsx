@@ -1015,42 +1015,42 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         return moment(record.fin).format('DD/MM/YYYY') === value
       },
     },
-    {
-      key: 'acciones',
-      title: 'Acciones',
-      align: 'center',
-      width: '10%',
-      render: (_, item: AnyType) => {
-        return (
-          <CustomSpace>
-            {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
-              <CustomButton
-                // onClick={() => handleEdit(item)}
-                type={'link'}
-                icon={<FieldTimeOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip> */}
-            <CustomTooltip key={'edit'} title={'Ver Detalles'}>
-              <CustomButton
-                onClick={() => handleAddDetalles(item)}
-                type={'link'}
-                icon={<UnorderedListOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip>
-            <CustomTooltip key={'addReceta'} title={'Ver Receta'}>
-              <CustomButton
-                onClick={() => handleAddReceta(item)}
-                type={'link'}
-                icon={<SolutionOutlined style={{ fontSize: '18px' }} />}
-                className={'editPhoneButton'}
-              />
-            </CustomTooltip>
-          </CustomSpace>
-        )
-      },
-    },
+    // {
+    //   key: 'acciones',
+    //   title: 'Acciones',
+    //   align: 'center',
+    //   width: '10%',
+    //   render: (_, item: AnyType) => {
+    //     return (
+    //       <CustomSpace>
+    //         {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
+    //           <CustomButton
+    //             // onClick={() => handleEdit(item)}
+    //             type={'link'}
+    //             icon={<FieldTimeOutlined style={{ fontSize: '18px' }} />}
+    //             className={'editPhoneButton'}
+    //           />
+    //         </CustomTooltip> */}
+    //         <CustomTooltip key={'edit'} title={'Ver Detalles'}>
+    //           <CustomButton
+    //             onClick={() => handleAddDetalles(item)}
+    //             type={'link'}
+    //             icon={<UnorderedListOutlined style={{ fontSize: '18px' }} />}
+    //             className={'editPhoneButton'}
+    //           />
+    //         </CustomTooltip>
+    //         <CustomTooltip key={'addReceta'} title={'Ver Receta'}>
+    //           <CustomButton
+    //             onClick={() => handleAddReceta(item)}
+    //             type={'link'}
+    //             icon={<SolutionOutlined style={{ fontSize: '18px' }} />}
+    //             className={'editPhoneButton'}
+    //           />
+    //         </CustomTooltip>
+    //       </CustomSpace>
+    //     )
+    //   },
+    // },
   ]
   const columnsHistorialPacientes: ColumnType<ConsultasType>[] = [
     {
@@ -2098,7 +2098,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           State !== 'CD' &&
                           State !== 'CP' &&
                           State !== 'HP' &&
-                          State !== 'HD'
+                          State !== 'HD' &&
+                          State !== 'HC'
                         }
                       >
                         <CustomCol xs={4} md={2} lg={3} xl={2}>
@@ -2137,7 +2138,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                       )}
                       <ConditionalComponent
                         condition={
-                          State !== 'HD' && State !== 'HP' && State !== 'CP'
+                          State !== 'HD' &&
+                          State !== 'HP' &&
+                          State !== 'CP' &&
+                          State !== 'HC'
                         }
                       >
                         <CustomFormItem

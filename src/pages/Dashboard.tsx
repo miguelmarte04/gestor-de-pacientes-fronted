@@ -51,6 +51,18 @@ import CustomModal from '../components/CustomModal'
 import CustomTable from '../components/CustomTable'
 import { ColumnType } from 'antd/lib/table'
 import CustomTimeLine from '../components/CustomTimeLine'
+import { Line } from 'react-chartjs-2'
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from 'chart.js'
 
 const StyledLayout = styled(CustomLayout)`
   background-color: #fff;
@@ -78,7 +90,8 @@ const Dashboard = (): React.ReactElement => {
   const [dateSelected, setDateSelected] = useState<string>()
   const [typeCalendar, setTypeCalendar] = useState<string>()
   const [yearSelected, SetYearSelected] = useState<number>(moment().year())
-
+  const [monthSelected, SetMonthSelected] = useState<number>(moment().month())
+  const [especilidadSelected, setEspecilidadSelected] = useState<number>()
   const getChartIMG = (chartId: string) => {
     const canvas = document.getElementById(chartId) as HTMLCanvasElement
     const imgData = canvas?.toDataURL('image/png', 1.0) as string
@@ -86,12 +99,25 @@ const Dashboard = (): React.ReactElement => {
     setChartIMG(imgData)
   }
 
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Filler,
+    Legend
+  )
+
   const buildDataSource = <T, K extends keyof T>(arr: T[], k: K) => {
     const data = new Array<number>()
     const sortedData = sortByDate(arr, k)
 
     // obtener el numero del mes actual
     const currentMonth = new Date().getMonth() + 1
+    // eslint-disable-next-line no-console
+    console.log(currentMonth)
 
     // agrupar los datos por mes, para tener cuantos datos hay por mes
     const groupedData = sortedData?.reduce((acc, curr) => {
@@ -106,7 +132,7 @@ const Dashboard = (): React.ReactElement => {
       return acc
     }, {} as Record<number, number>)
 
-    for (let i = 1; i < currentMonth + 1; i++) {
+    for (let i = 0; i < currentMonth; i++) {
       data.push(groupedData[i] ?? 0)
     }
 
@@ -432,19 +458,135 @@ const Dashboard = (): React.ReactElement => {
                               </CustomTitle>
                             </CustomDivider>
                           </CustomCol>
+                          <CustomCol xs={6}>
+                            <CustomSelect
+                              placeholder={'Seleccionar Mes'}
+                              defaultValue={moment().month()}
+                              options={labels?.map((item, index) => {
+                                return {
+                                  label: item,
+                                  value: index,
+                                }
+                              })}
+                              onChange={(value) => {
+                                SetMonthSelected(value)
+                              }}
+                            />
+                          </CustomCol>
                         </CustomRow>
                         <PieChart
                           id={'pie-chart'}
                           title={'Consultas'}
                           labels={['Mañana', 'Tarde']}
                           data={[
-                            Consultas?.reduce((a, b) => {
+                            Consultas?.filter(
+                              (item) =>
+                                moment(
+                                  item.fecha_insercion,
+                                  'YYYY-MM-DD'
+                                ).month() === monthSelected
+                            )?.reduce((a, b) => {
                               return a + (b.id_tanda === 'M' ? 1 : 0)
                             }, 0),
-                            Consultas?.reduce((a, b) => {
+                            Consultas?.filter(
+                              (item) =>
+                                moment(
+                                  item.fecha_insercion,
+                                  'YYYY-MM-DD'
+                                ).month() === monthSelected
+                            )?.reduce((a, b) => {
                               return a + (b.id_tanda === 'T' ? 1 : 0)
                             }, 0),
                           ]}
+                        />
+                      </CustomCard>
+                    </CustomCol>
+                    <CustomCol xs={11} style={{ marginBottom: 10 }}>
+                      <CustomCard>
+                        <CustomRow justify={'end'} width={'100%'}>
+                          <CustomTooltip title={'Imprimir'}>
+                            <CustomButton
+                              onClick={async () => {
+                                setLoading(true)
+                                setCurrentRef('consultas')
+                                setChartTitle('Consumo')
+                                getChartIMG('line-chart')
+                              }}
+                              type={'text'}
+                              icon={
+                                <PrinterFilled style={{ fontSize: '22px' }} />
+                              }
+                            >
+                              Imprimir
+                            </CustomButton>
+                          </CustomTooltip>
+                        </CustomRow>
+                        <CustomRow justify="space-between">
+                          <CustomCol xs={18}>
+                            <CustomDivider>
+                              <CustomTitle level={5}>
+                                Consultas por especialidad
+                              </CustomTitle>
+                            </CustomDivider>
+                          </CustomCol>
+                          <CustomCol xs={6}>
+                            <CustomSelect
+                              placeholder={'Seleccionar Especialidad'}
+                              options={especialidades?.map((item) => {
+                                return {
+                                  label: item.nombre,
+                                  value: item.id,
+                                }
+                              })}
+                              onChange={(value) => {
+                                setEspecilidadSelected(value)
+                              }}
+                            />
+                          </CustomCol>
+                        </CustomRow>
+                        <Line
+                          id={'line-chart'}
+                          title={'Consultas'}
+                          data={{
+                            labels: [
+                              'Enero',
+                              'Febrero',
+                              'Marzo',
+                              'Abril',
+                              'Mayo',
+                              'Junio',
+                              'Julio',
+                              'Agosto',
+                              'Septiembre',
+                              'Octubre',
+                              'Noviembre',
+                              'Diciembre',
+                            ],
+                            datasets: [
+                              {
+                                label: especilidadSelected
+                                  ? especialidades?.find(
+                                      (item) => item.id === especilidadSelected
+                                    )?.nombre
+                                  : 'Seleccionar especialidad',
+                                data: especilidadSelected
+                                  ? buildDataSource(
+                                      [
+                                        ...(Consultas?.filter(
+                                          (item) =>
+                                            item.id_especialidad ===
+                                            especilidadSelected
+                                        ) ?? []),
+                                      ],
+                                      'fecha_insercion'
+                                    )
+                                  : [],
+                                fill: false,
+                                backgroundColor: 'rgb(75, 192, 192)',
+                                borderColor: 'rgba(75, 192, 192, 0.2)',
+                              },
+                            ],
+                          }}
                         />
                       </CustomCard>
                     </CustomCol>

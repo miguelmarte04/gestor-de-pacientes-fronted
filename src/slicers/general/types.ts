@@ -99,6 +99,7 @@ export type ConsultasType = {
   fecha_insercion: string
   fin: string
   id: number
+  id_especialidad: number
   id_doctor: number
   id_paciente: number
   inicio: string
