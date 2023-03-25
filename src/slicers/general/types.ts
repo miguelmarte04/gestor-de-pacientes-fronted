@@ -100,10 +100,12 @@ export type ConsultasType = {
   fin: string
   id: number
   id_especialidad: number
+  id_enfermedad: number
   id_doctor: number
   id_paciente: number
   inicio: string
   id_tanda: string
+  enfermedad: string
   nombre_doctor: string
   nombre_paciente: string
 }

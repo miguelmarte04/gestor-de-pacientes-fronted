@@ -60,7 +60,7 @@ const PieChart: React.FC<PieChartProps> = ({
       data={datasets}
       options={options}
       id={id}
-      style={{ height: '304.22px', maxHeight: '304.22px' }}
+      style={{ height: '204.22px', maxHeight: '204.22px' }}
     />
   )
 }

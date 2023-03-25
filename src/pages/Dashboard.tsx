@@ -92,6 +92,7 @@ const Dashboard = (): React.ReactElement => {
   const [yearSelected, SetYearSelected] = useState<number>(moment().year())
   const [monthSelected, SetMonthSelected] = useState<number>(moment().month())
   const [especilidadSelected, setEspecilidadSelected] = useState<number>()
+  const [doctorSelected, setDoctorSelected] = useState<number>()
   const getChartIMG = (chartId: string) => {
     const canvas = document.getElementById(chartId) as HTMLCanvasElement
     const imgData = canvas?.toDataURL('image/png', 1.0) as string
@@ -144,18 +145,18 @@ const Dashboard = (): React.ReactElement => {
     years.push({ label: i, value: i })
   }
   const labels = [
-    'enero',
-    'febrero',
-    'marzo',
-    'abril',
-    'mayo',
-    'junio',
-    'julio',
-    'agosto',
-    'septiembre',
-    'octubre',
-    'noviembre',
-    'diciembre',
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
   ]
 
   useEffect(() => {
@@ -587,6 +588,141 @@ const Dashboard = (): React.ReactElement => {
                               },
                             ],
                           }}
+                        />
+                      </CustomCard>
+                    </CustomCol>
+                    <CustomCol xs={11} style={{ marginBottom: 10 }}>
+                      <CustomCard>
+                        <CustomRow justify={'end'} width={'100%'}>
+                          <CustomTooltip title={'Imprimir'}>
+                            <CustomButton
+                              onClick={async () => {
+                                setLoading(true)
+                                setCurrentRef('consultas')
+                                setChartTitle('Consumo')
+                                getChartIMG('line-doc-chart')
+                              }}
+                              type={'text'}
+                              icon={
+                                <PrinterFilled style={{ fontSize: '22px' }} />
+                              }
+                            >
+                              Imprimir
+                            </CustomButton>
+                          </CustomTooltip>
+                        </CustomRow>
+                        <CustomRow justify="space-between">
+                          <CustomCol xs={18}>
+                            <CustomDivider>
+                              <CustomTitle level={5}>
+                                Consultas por Doctor
+                              </CustomTitle>
+                            </CustomDivider>
+                          </CustomCol>
+                          <CustomCol xs={6}>
+                            <CustomSelect
+                              placeholder={'Seleccionar Doctor'}
+                              options={doctores?.map((item) => {
+                                return {
+                                  label: item.nombre,
+                                  value: item.id,
+                                }
+                              })}
+                              onChange={(value) => {
+                                setDoctorSelected(value)
+                              }}
+                            />
+                          </CustomCol>
+                        </CustomRow>
+                        <Line
+                          id={'line-doc-chart'}
+                          title={'Consultas'}
+                          data={{
+                            labels: [
+                              'Enero',
+                              'Febrero',
+                              'Marzo',
+                              'Abril',
+                              'Mayo',
+                              'Junio',
+                              'Julio',
+                              'Agosto',
+                              'Septiembre',
+                              'Octubre',
+                              'Noviembre',
+                              'Diciembre',
+                            ],
+                            datasets: [
+                              {
+                                label: doctorSelected
+                                  ? doctores?.find(
+                                      (item) => item.id === doctorSelected
+                                    )?.nombre
+                                  : 'Seleccionar doctor',
+                                data: doctorSelected
+                                  ? buildDataSource(
+                                      [
+                                        ...(Consultas?.filter(
+                                          (item) =>
+                                            item.id_doctor === doctorSelected
+                                        ) ?? []),
+                                      ],
+                                      'fecha_insercion'
+                                    )
+                                  : [],
+                                fill: false,
+                                backgroundColor: 'rgb(197,100,55)',
+                                borderColor: 'rgba(197,100,55,0.2)',
+                              },
+                            ],
+                          }}
+                        />
+                      </CustomCard>
+                    </CustomCol>
+                    <CustomCol xs={11} style={{ marginBottom: 10 }}>
+                      <CustomCard>
+                        <CustomRow justify={'end'} width={'100%'}>
+                          <CustomTooltip title={'Imprimir'}>
+                            <CustomButton
+                              onClick={async () => {
+                                setLoading(true)
+                                setCurrentRef('consultas')
+                                setChartTitle('Consumo')
+                                getChartIMG('pie-enfermedad-chart')
+                              }}
+                              type={'text'}
+                              icon={
+                                <PrinterFilled style={{ fontSize: '22px' }} />
+                              }
+                            >
+                              Imprimir
+                            </CustomButton>
+                          </CustomTooltip>
+                        </CustomRow>
+                        <CustomRow justify="space-between">
+                          <CustomCol xs={18}>
+                            <CustomDivider>
+                              <CustomTitle level={5}>
+                                Consultas por enfermedad
+                              </CustomTitle>
+                            </CustomDivider>
+                          </CustomCol>
+                        </CustomRow>
+                        <PieChart
+                          id={'pie-enfermedad-chart'}
+                          title={'Consultas'}
+                          labels={Consultas?.unique('enfermedad')?.map(
+                            (item) => {
+                              return item.enfermedad
+                            }
+                          )}
+                          data={
+                            Consultas?.unique('enfermedad')?.map((item) => {
+                              return Consultas?.filter(
+                                (item2) => item2.enfermedad === item.enfermedad
+                              )?.length
+                            }) ?? []
+                          }
                         />
                       </CustomCard>
                     </CustomCol>
