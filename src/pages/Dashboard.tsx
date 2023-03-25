@@ -1,22 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  ApartmentOutlined,
-  BarChartOutlined,
-  CheckCircleOutlined,
-  // DollarCircleOutlined,
-  GifOutlined,
-  IssuesCloseOutlined,
-  PrinterFilled,
-  ProfileOutlined,
-  RedoOutlined,
-  TagOutlined,
-  TeamOutlined,
-  UsergroupAddOutlined,
-  UserOutlined,
-} from '@ant-design/icons'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { PrinterFilled } from '@ant-design/icons'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
-import { Calendar, Image } from 'antd'
+import { Image } from 'antd'
 import styled from 'styled-components'
 import BarChart from '../components/BarChart'
 import ConditionalComponent from '../components/ConditionalComponent'
@@ -27,12 +13,10 @@ import CustomDivider from '../components/CustomDivider'
 import CustomLayout from '../components/CustomLayout'
 import CustomRow from '../components/CustomRow'
 import CustomSelect from '../components/CustomSelect'
-import CustomSpace from '../components/CustomSpace'
 import CustomSpin from '../components/CustomSpin'
 import CustomTitle from '../components/CustomTitle'
 import CustomTooltip from '../components/CustomTooltip'
 import DynamicCard, { DynamicCardType } from '../components/DynamicCard'
-import InfoCard, { InfoCardType } from '../components/InfoCard'
 import PieChart from '../components/PieChart'
 import PrintTemplate from '../components/PrintTemplate'
 import { useAppDispatch, useAppSelector } from '../hooks'
@@ -42,15 +26,14 @@ import {
   getEspecialidades,
   getPacientes,
 } from '../slicers/general/general'
-import { createBarDatasets, searchInArray, sortByDate } from '../utils/general'
+import { sortByDate } from '../utils/general'
 import { getSessionInfo } from '../utils/session'
-import CustomCalendar from '../components/CustomCalendar'
+
 import { AnyType } from '../constants/types'
-import moment, { Moment } from 'moment'
+import moment from 'moment'
 import CustomModal from '../components/CustomModal'
 import CustomTable from '../components/CustomTable'
 import { ColumnType } from 'antd/lib/table'
-import CustomTimeLine from '../components/CustomTimeLine'
 import { Line } from 'react-chartjs-2'
 import {
   CategoryScale,
@@ -117,8 +100,6 @@ const Dashboard = (): React.ReactElement => {
 
     // obtener el numero del mes actual
     const currentMonth = new Date().getMonth() + 1
-    // eslint-disable-next-line no-console
-    console.log(currentMonth)
 
     // agrupar los datos por mes, para tener cuantos datos hay por mes
     const groupedData = sortedData?.reduce((acc, curr) => {
@@ -244,18 +225,6 @@ const Dashboard = (): React.ReactElement => {
     },
   ]
 
-  // const options = {
-  //   responsive: true,
-  //   plugins: {
-  //     legend: {
-  //       position: 'top' as const,
-  //     },
-  //     title: {
-  //       display: true,
-  //       text: '',
-  //     },
-  //   },
-  // }
   const ref: Record<ComponentsRef, React.RefObject<HTMLDivElement>> = {
     consultas: ConsultasRef,
   }
@@ -277,51 +246,51 @@ const Dashboard = (): React.ReactElement => {
 
   useEffect(handlePrintChart, [handlePrintChart])
 
-  const monthCellRender = (value: AnyType) => {
-    return Consultas?.some(
-      (c) =>
-        moment(c.fecha_insercion, 'YYYY-MM-DD').format('MM') ===
-        moment(value).format('MM')
-    ) ? (
-      <CustomTitle
-        style={{
-          backgroundColor: 'red',
-          padding: 19,
-          borderRadius: 5,
-        }}
-        onClick={() => {
-          setVisible(true)
-          setDateSelected(value)
-          setTypeCalendar('years')
-        }}
-      >
-        Consultas
-      </CustomTitle>
-    ) : null
-  }
+  // const monthCellRender = (value: AnyType) => {
+  //   return Consultas?.some(
+  //     (c) =>
+  //       moment(c.fecha_insercion, 'YYYY-MM-DD').format('MM') ===
+  //       moment(value).format('MM')
+  //   ) ? (
+  //     <CustomTitle
+  //       style={{
+  //         backgroundColor: 'red',
+  //         padding: 19,
+  //         borderRadius: 5,
+  //       }}
+  //       onClick={() => {
+  //         setVisible(true)
+  //         setDateSelected(value)
+  //         setTypeCalendar('years')
+  //       }}
+  //     >
+  //       Consultas
+  //     </CustomTitle>
+  //   ) : null
+  // }
 
-  const dateCellRender = (value: AnyType) => {
-    return Consultas?.some(
-      (c) =>
-        moment(c.fecha_insercion, 'YYYY-MM-DD').format('DD/MM/YYYY') ===
-        moment(value).format('DD/MM/YYYY')
-    ) ? (
-      <CustomTitle
-        style={{
-          backgroundColor: 'red',
-          padding: 19,
-          borderRadius: 5,
-        }}
-        onClick={() => {
-          setVisible(true)
-          setTypeCalendar('meses')
-          setDateSelected(value)
-        }}
-      >
-        Consultas
-      </CustomTitle>
-    ) : null
-  }
+  // const dateCellRender = (value: AnyType) => {
+  //   return Consultas?.some(
+  //     (c) =>
+  //       moment(c.fecha_insercion, 'YYYY-MM-DD').format('DD/MM/YYYY') ===
+  //       moment(value).format('DD/MM/YYYY')
+  //   ) ? (
+  //     <CustomTitle
+  //       style={{
+  //         backgroundColor: 'red',
+  //         padding: 19,
+  //         borderRadius: 5,
+  //       }}
+  //       onClick={() => {
+  //         setVisible(true)
+  //         setTypeCalendar('meses')
+  //         setDateSelected(value)
+  //       }}
+  //     >
+  //       Consultas
+  //     </CustomTitle>
+  //   ) : null
+  // }
   const columnsConsultas: ColumnType<ConsultasType>[] = [
     {
       key: 'id',
@@ -757,7 +726,22 @@ const Dashboard = (): React.ReactElement => {
                   </CustomRow>
                 </ConditionalComponent>
               </CustomCol>
-
+              <ConditionalComponent
+                condition={
+                  getSessionInfo().privilegios === 2 ||
+                  getSessionInfo().privilegios === 4
+                }
+              >
+                <CustomCol xs={24} style={{ marginBottom: 10 }}>
+                  <CustomRow justify={'center'}>
+                    <Image
+                      src={'/assets/logo.png'}
+                      alt="Logo"
+                      preview={false}
+                    />
+                  </CustomRow>
+                </CustomCol>
+              </ConditionalComponent>
               <ConditionalComponent
                 condition={getSessionInfo().privilegios === 3}
               >

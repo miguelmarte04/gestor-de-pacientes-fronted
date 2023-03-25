@@ -57,18 +57,8 @@ const MultiConfigForm: React.FC<MultiConfigFormProps> = ({
   const handleOnFinish = async () => {
     try {
       const data = (await form.validateFields()) as AnyType
-
-      // eslint-disable-next-line no-console
-      console.log({ key })
-
       data.usuario_insercion = getSessionInfo().usuario
       data.tipo = key ?? sessionStorage.getItem('key')
-      // if (!isEditing) {
-      //   dispatch(createConfigurations(data))
-      // } else {
-      //   const newData = { ...record, ...data }
-      //   dispatch(updateConfigurations(newData))
-      // }
     } catch (error) {
       showNotification({
         type: 'error',
