@@ -5,6 +5,7 @@ import {
   CustomUploadFileType,
   DetCitasType,
   DoctoresType,
+  EnfermedadesType,
   EspecilidadesType,
   HorariosType,
   NacionalidadesType,
@@ -25,6 +26,7 @@ export interface GeneralState {
   DetCitas: DetCitasType
   TipoLesion: TipoLesionType[]
   ColorLesion: ColorLesionType[]
+  Enfermedades: EnfermedadesType[]
   doctores: DoctoresType[]
   pacientes: PacientesType[]
   nacionalidades: NacionalidadesType[]
@@ -49,6 +51,7 @@ const initialState: GeneralState = {
   Administradores: [],
   TipoLesion: [],
   ColorLesion: [],
+  Enfermedades: [],
   DetCitas: {} as DetCitasType,
   doctores: [],
   pacientes: [] as PacientesType[],
@@ -212,6 +215,16 @@ export const getColorLesion = createAsyncThunk(
   'general/getColorLesion',
   async (payload: GeneralType) => {
     const response = await userApiHelper.getColorLesion(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const getEnfermedades = createAsyncThunk(
+  'general/getEnfermedades',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getEnfermedades(payload)
 
     const { data } = response.data
 
@@ -686,6 +699,17 @@ export const generalSlice = createSlice({
       .addCase(getColorLesion.rejected, (state) => {
         state.fetchingGeneralData = false
         state.ColorLesion = initialState.ColorLesion
+      })
+      .addCase(getEnfermedades.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getEnfermedades.fulfilled, (state, action) => {
+        state.Enfermedades = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getEnfermedades.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.Enfermedades = initialState.Enfermedades
       })
       .addCase(createDetCitas.pending, (state) => {
         state.fetchingGeneralData = true

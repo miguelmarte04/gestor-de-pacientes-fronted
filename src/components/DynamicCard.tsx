@@ -82,32 +82,34 @@ const DynamicCard: React.FC<DynamicCardProps> = ({
   direction = 'horizontal',
 }): React.ReactElement => {
   return (
-    <CustomSpace direction={direction} width={'100%'} size={'large'}>
-      {dataSources?.map((item, index) => (
-        <CardContainer key={index}>
-          <CardHeader color={item.color}>{item.title}</CardHeader>
-          <StyledCard>
-            <CustomRow
-              justify={'space-between'}
-              align={'middle'}
-              style={{ padding: '10px' }}
-            >
-              <CustomCol xs={6}>
-                <Image
-                  preview={false}
-                  src={item.icon}
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                  }}
-                />
-              </CustomCol>
-              <span>{item.description}</span>
-            </CustomRow>
-          </StyledCard>
-        </CardContainer>
-      ))}
-    </CustomSpace>
+    <CustomRow justify="center">
+      <CustomSpace direction={direction} width={'100%'} size={'large'}>
+        {dataSources?.map((item, index) => (
+          <CardContainer key={index}>
+            <CardHeader color={item.color}>{item.title}</CardHeader>
+            <StyledCard>
+              <CustomRow
+                justify={'space-between'}
+                align={'middle'}
+                style={{ padding: '10px' }}
+              >
+                <CustomCol xs={6}>
+                  <Image
+                    preview={false}
+                    src={item.icon}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                    }}
+                  />
+                </CustomCol>
+                <span>{item.description}</span>
+              </CustomRow>
+            </StyledCard>
+          </CardContainer>
+        ))}
+      </CustomSpace>
+    </CustomRow>
   )
 }
 

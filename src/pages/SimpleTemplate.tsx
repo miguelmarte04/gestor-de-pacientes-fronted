@@ -53,6 +53,7 @@ import {
   getConsultas,
   getDetCitas,
   getDoctores,
+  getEnfermedades,
   getEspecialidades,
   getHorarios,
   getNacionalidades,
@@ -136,6 +137,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     Consultas,
     DetCitas,
     ColorLesion,
+    Enfermedades,
     TipoLesion,
     Administradores,
     fetchingGeneralData,
@@ -203,6 +205,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       )
       dispatch(getTipoLesion({}))
       dispatch(getColorLesion({}))
+      dispatch(getEnfermedades({}))
     } else if (State === 'HC') {
       dispatch(
         getConsultas({
@@ -213,6 +216,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       )
       dispatch(getTipoLesion({}))
       dispatch(getColorLesion({}))
+      dispatch(getEnfermedades({}))
     } else if (State === 'HP' && getSessionInfo().id) {
       dispatch(
         getConsultas({
@@ -233,6 +237,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       )
       dispatch(getTipoLesion({}))
       dispatch(getColorLesion({}))
+      dispatch(getEnfermedades({}))
     } else if (State === 'A' && getSessionInfo().id) {
       dispatch(getAdministradores({}))
     }
@@ -355,7 +360,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     }
   }
   const handleAddDetalles = (record: ConsultasType) => {
-    dispatch(getDetCitas({ condition: { id_cita: record.id } }))
+    dispatch(getDetCitas({ condition: { id_consulta: record.id } }))
     setVisibleDetalles(true)
     setEdit(record)
   }
@@ -2896,7 +2901,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         createDetCitas({
                           condition: {
                             ...data,
-                            id_cita: edit?.id,
+                            id_consulta: edit?.id,
                           },
                         })
                       )
@@ -2990,6 +2995,25 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         <CustomInput
                           placeholder="Tratamientos utilizados Anteriormente"
                           style={{ width: '112%' }}
+                          disabled={State === 'HD' || State === 'HC'}
+                        />
+                      </CustomFormItem>
+                    </CustomCol>
+                    <CustomCol {...defaultBreakpoints}>
+                      <CustomFormItem
+                        label={'Enfermedad'}
+                        name={'id_enfermedad'}
+                        rules={[{ required: true }]}
+                        labelCol={{ span: 6 }}
+                      >
+                        <CustomSelect
+                          placeholder={'Selecciona la enfermedad'}
+                          options={Enfermedades?.filter(
+                            (item) => item.estado === 'A'
+                          )?.map((item) => ({
+                            label: item.enfermedad,
+                            value: item.id,
+                          }))}
                           disabled={State === 'HD' || State === 'HC'}
                         />
                       </CustomFormItem>

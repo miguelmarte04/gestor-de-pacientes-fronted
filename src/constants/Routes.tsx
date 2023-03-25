@@ -29,6 +29,7 @@ export const WEB_SERVICE_API_GET_ADMINISTRADORES = `${WEB_SERVICE_API}/administr
 export const WEB_SERVICE_API_GET_DET_CITAS = `${WEB_SERVICE_API}/detcitas`
 export const WEB_SERVICE_API_GET_TIPO_LESION = `${WEB_SERVICE_API}/tipo_lesion`
 export const WEB_SERVICE_API_GET_COLOR_LESION = `${WEB_SERVICE_API}/color_lesion`
+export const WEB_SERVICE_API_GET_ENFERMEDADES = `${WEB_SERVICE_API}/enfermedades`
 export const WEB_SERVICE_API_GET_DOCTORES = `${WEB_SERVICE_API}/doctores`
 export const WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS = `${WEB_SERVICE_API}/consultas/consulta`
 export const WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES = `${WEB_SERVICE_API}/administradores/administrador`

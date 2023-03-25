@@ -6,6 +6,7 @@ import {
   WEB_SERVICE_API_GET_CONSULTAS,
   WEB_SERVICE_API_GET_DET_CITAS,
   WEB_SERVICE_API_GET_DOCTORES,
+  WEB_SERVICE_API_GET_ENFERMEDADES,
   WEB_SERVICE_API_GET_ESPECILIDADES,
   WEB_SERVICE_API_GET_HORARIOS,
   WEB_SERVICE_API_GET_NACIONALIDADES,
@@ -119,6 +120,9 @@ const getTipoLesion = (payload: GeneralType): Promise<AxiosResponse> => {
 const getColorLesion = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_COLOR_LESION}`, payload)
 }
+const getEnfermedades = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_ENFERMEDADES}`, payload)
+}
 const createDetCitas = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DET_CITAS}`, payload)
 }
@@ -197,5 +201,6 @@ export const userApiHelper = {
   createDetCitas,
   getTipoLesion,
   getColorLesion,
+  getEnfermedades,
   updateDetCitas,
 }

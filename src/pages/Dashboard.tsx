@@ -180,6 +180,16 @@ const Dashboard = (): React.ReactElement => {
         })
       )
     }
+    if (getSessionInfo().privilegios === 3) {
+      dispatch(
+        getConsultas({
+          condition: {
+            estado: 'T',
+            id_doctor: getSessionInfo().id,
+          },
+        })
+      )
+    }
   }, [])
 
   const CardDescription = (desc: string, label: string) => (
@@ -208,6 +218,24 @@ const Dashboard = (): React.ReactElement => {
       icon: './assets/especialidades.png',
       color: '#95de64',
     },
+    {
+      title: 'Consultas',
+      description: CardDescription('Total', `${Consultas?.length ?? 0}`),
+      icon: './assets/consultas.png',
+      color: '#87e8de',
+    },
+  ]
+  const dynamicCardDataSourcesDoc: DynamicCardType[] = [
+    {
+      title: 'Pacientes',
+      description: CardDescription(
+        'Total',
+        `${Consultas?.unique('id_paciente')?.length ?? 0}`
+      ),
+      icon: './assets/pacientes.png',
+      color: '#ffe58f',
+    },
+
     {
       title: 'Consultas',
       description: CardDescription('Total', `${Consultas?.length ?? 0}`),
@@ -729,6 +757,75 @@ const Dashboard = (): React.ReactElement => {
                   </CustomRow>
                 </ConditionalComponent>
               </CustomCol>
+
+              <ConditionalComponent
+                condition={getSessionInfo().privilegios === 3}
+              >
+                <CustomCol xs={24}>
+                  <CustomRow justify={'center'}>
+                    <DynamicCard dataSources={dynamicCardDataSourcesDoc} />
+                  </CustomRow>
+                </CustomCol>
+
+                <Separated />
+                <CustomCol xs={24} style={{ marginBottom: 10 }}>
+                  <CustomCard>
+                    <CustomRow justify={'end'} width={'100%'}>
+                      <CustomTooltip title={'Imprimir'}>
+                        <CustomButton
+                          onClick={async () => {
+                            setLoading(true)
+                            setCurrentRef('consultas')
+                            setChartTitle('Consumo')
+                            getChartIMG('bar-chart')
+                          }}
+                          type={'text'}
+                          icon={<PrinterFilled style={{ fontSize: '22px' }} />}
+                        >
+                          Imprimir
+                        </CustomButton>
+                      </CustomTooltip>
+                    </CustomRow>
+                    <CustomRow justify="space-between">
+                      <CustomCol xs={18}>
+                        <CustomDivider>
+                          <CustomTitle level={5}>
+                            Consultas por meses
+                          </CustomTitle>
+                        </CustomDivider>
+                      </CustomCol>
+                      <CustomCol xs={6}>
+                        <CustomSelect
+                          placeholder={'Seleccionar Año'}
+                          defaultValue={moment().year()}
+                          options={years}
+                          onChange={(value) => {
+                            SetYearSelected(value)
+                          }}
+                        />
+                      </CustomCol>
+                    </CustomRow>
+
+                    <BarChart
+                      title={'Consultas'}
+                      labels={labels}
+                      id={'bar-chart'}
+                      Bardata={buildDataSource(
+                        [
+                          ...(Consultas?.filter(
+                            (item) =>
+                              moment(
+                                item.fecha_insercion,
+                                'YYYY-MM-DD'
+                              ).year() === yearSelected
+                          ) ?? []),
+                        ],
+                        'fecha_insercion'
+                      )}
+                    />
+                  </CustomCard>
+                </CustomCol>
+              </ConditionalComponent>
             </CustomRow>
           </CustomRow>
         </CustomCol>

@@ -145,6 +145,11 @@ export type ColorLesionType = {
   color: string
   estado: string
 }
+export type EnfermedadesType = {
+  id: number
+  enfermedad: string
+  estado: string
+}
 
 export type PaymentType = {
   id: number
