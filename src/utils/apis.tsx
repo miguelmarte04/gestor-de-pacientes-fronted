@@ -11,6 +11,7 @@ import {
   WEB_SERVICE_API_GET_HORARIOS,
   WEB_SERVICE_API_GET_NACIONALIDADES,
   WEB_SERVICE_API_GET_PACIENTES,
+  WEB_SERVICE_API_GET_RECEPCIONISTAS,
   WEB_SERVICE_API_GET_SEGUROS,
   WEB_SERVICE_API_GET_TIPO_LESION,
   WEB_SERVICE_API_LOGIN,
@@ -21,6 +22,7 @@ import {
   WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD,
   WEB_SERVICE_API_UPDATE_CREATE_HORARIOS,
   WEB_SERVICE_API_UPDATE_CREATE_PACIENTES,
+  WEB_SERVICE_API_UPDATE_CREATE_RECEPCIONISTAS,
 } from '../constants/Routes'
 import { GeneralType } from '../constants/types'
 import { removeNullFields } from './general'
@@ -137,6 +139,9 @@ const getDoctores = (payload: GeneralType): Promise<AxiosResponse> => {
 const getPacientes = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_PACIENTES}`, payload)
 }
+const getRecepcionistas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_GET_RECEPCIONISTAS}`, payload)
+}
 const getNacionalidades = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_GET_NACIONALIDADES}`, payload)
 }
@@ -149,6 +154,12 @@ const createPacientes = (payload: GeneralType): Promise<AxiosResponse> => {
 }
 const updatePacientes = (payload: GeneralType): Promise<AxiosResponse> => {
   return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_PACIENTES}`, payload)
+}
+const createRecepcionistas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_RECEPCIONISTAS}`, payload)
+}
+const updateRecepcionistas = (payload: GeneralType): Promise<AxiosResponse> => {
+  return putRequest(`${WEB_SERVICE_API_UPDATE_CREATE_RECEPCIONISTAS}`, payload)
 }
 const createDoctor = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_DOCTORES}`, payload)
@@ -177,6 +188,7 @@ const updateHorarios = (payload: GeneralType): Promise<AxiosResponse> => {
 
 export const userApiHelper = {
   getPacientes,
+  getRecepcionistas,
   getHorarios,
   createHorarios,
   updateHorarios,
@@ -187,6 +199,8 @@ export const userApiHelper = {
   getSeguros,
   createPacientes,
   updatePacientes,
+  createRecepcionistas,
+  updateRecepcionistas,
   createDoctor,
   updateDoctor,
   authenticateUser,

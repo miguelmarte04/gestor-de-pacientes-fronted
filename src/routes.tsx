@@ -23,6 +23,7 @@ import {
   PATH_PACIENTES,
   PATH_PACIENTES_DOCTORES,
   PATH_PROFILE,
+  PATH_RECEPCIONISTAS,
 } from './constants/Routes'
 import MenuRoutesWrapper from './components/MenuRoutesWrapper'
 import { isLoggedIn } from './utils/session'
@@ -70,6 +71,10 @@ const Routes = (): React.ReactElement => {
             <Route
               path={PATH_PACIENTES}
               element={<SimpleTemplate State={'P'} />}
+            />
+            <Route
+              path={PATH_RECEPCIONISTAS}
+              element={<SimpleTemplate State={'R'} />}
             />
             <Route
               path={PATH_PACIENTES_DOCTORES}

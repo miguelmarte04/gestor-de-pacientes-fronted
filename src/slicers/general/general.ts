@@ -10,6 +10,7 @@ import {
   HorariosType,
   NacionalidadesType,
   PacientesType,
+  RecepcionistasType,
   SegurosType,
   TipoLesionType,
 } from './types'
@@ -29,6 +30,7 @@ export interface GeneralState {
   Enfermedades: EnfermedadesType[]
   doctores: DoctoresType[]
   pacientes: PacientesType[]
+  recepcionistas: RecepcionistasType[]
   nacionalidades: NacionalidadesType[]
   especialidades: EspecilidadesType[]
   seguros: SegurosType[]
@@ -39,6 +41,7 @@ export interface GeneralState {
   createDetCitasRequestStatus: RequestStatusType
   createAdministradoresRequestStatus: RequestStatusType
   createPacientesRequestStatus: RequestStatusType
+  createRecepcionistasRequestStatus: RequestStatusType
   createDoctorRequestStatus: RequestStatusType
   createEspecialidadRequestStatus: RequestStatusType
   createHorariosRequestStatus: RequestStatusType
@@ -55,6 +58,7 @@ const initialState: GeneralState = {
   DetCitas: {} as DetCitasType,
   doctores: [],
   pacientes: [] as PacientesType[],
+  recepcionistas: [] as RecepcionistasType[],
   nacionalidades: new Array<NacionalidadesType>(),
   especialidades: new Array<EspecilidadesType>(),
   seguros: new Array<SegurosType>(),
@@ -67,6 +71,7 @@ const initialState: GeneralState = {
   createEspecialidadRequestStatus: '',
   createHorariosRequestStatus: '',
   createPacientesRequestStatus: '',
+  createRecepcionistasRequestStatus: '',
   createDoctorRequestStatus: '',
   fileList: new Array<CustomUploadFileType>(),
   fetchingGeneralData: false,
@@ -284,6 +289,16 @@ export const getPacientes = createAsyncThunk(
     return data
   }
 )
+export const getRecepcionistas = createAsyncThunk(
+  'general/getRecepcionistas',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.getRecepcionistas(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
 export const getNacionalidades = createAsyncThunk(
   'general/getNacionalidades',
   async (payload: GeneralType) => {
@@ -337,6 +352,52 @@ export const updatePacientes = createAsyncThunk(
   'general/updatePacientes',
   async (payload: GeneralType) => {
     const response = await userApiHelper.updatePacientes(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha_insercion',
+        'key',
+        'index',
+        'nombre_paciente',
+        'apellido_paciente',
+        'nombre_doctor',
+        'apellido_doctor',
+        'fecha',
+        'clave',
+        'documento',
+        'seguro',
+        'nacionalidad',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const createRecepcionistas = createAsyncThunk(
+  'general/createRecepcionistas',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.createRecepcionistas(
+      removeField(payload.condition, [
+        'dias',
+        'SEARCH_EMPLOYEE',
+        'doc_identidad',
+        'fecha',
+        'seguro',
+        'nacionalidad',
+        'documento',
+      ])
+    )
+    const { data } = response.data
+
+    return data
+  }
+)
+export const updateRecepcionistas = createAsyncThunk(
+  'general/updateRecepcionistas',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.updateRecepcionistas(
       removeField(payload.condition, [
         'dias',
         'SEARCH_EMPLOYEE',
@@ -766,6 +827,17 @@ export const generalSlice = createSlice({
         state.fetchingGeneralData = false
         state.pacientes = initialState.pacientes
       })
+      .addCase(getRecepcionistas.pending, (state) => {
+        state.fetchingGeneralData = true
+      })
+      .addCase(getRecepcionistas.fulfilled, (state, action) => {
+        state.recepcionistas = action.payload
+        state.fetchingGeneralData = false
+      })
+      .addCase(getRecepcionistas.rejected, (state) => {
+        state.fetchingGeneralData = false
+        state.recepcionistas = initialState.recepcionistas
+      })
       .addCase(getNacionalidades.pending, (state) => {
         state.fetchingGeneralData = true
       })
@@ -818,6 +890,28 @@ export const generalSlice = createSlice({
         showNotification({
           title: 'Error',
           description: 'No se pudo Insertar el Paciente',
+          type: 'error',
+        })
+      })
+      .addCase(createRecepcionistas.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createRecepcionistasRequestStatus = 'pending'
+      })
+      .addCase(createRecepcionistas.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createRecepcionistasRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Recepcionista Insertado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(createRecepcionistas.rejected, (state) => {
+        state.createRecepcionistasRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo Insertar el Recepcionista',
           type: 'error',
         })
       })
@@ -884,6 +978,28 @@ export const generalSlice = createSlice({
         showNotification({
           title: 'Error',
           description: 'No se pudo actualizar el Paciente',
+          type: 'error',
+        })
+      })
+      .addCase(updateRecepcionistas.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.createRecepcionistasRequestStatus = 'pending'
+      })
+      .addCase(updateRecepcionistas.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.createRecepcionistasRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Recepcionista actualizado correctamente',
+          type: 'success',
+        })
+      })
+      .addCase(updateRecepcionistas.rejected, (state) => {
+        state.createRecepcionistasRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo actualizar el Recepcionista',
           type: 'error',
         })
       })

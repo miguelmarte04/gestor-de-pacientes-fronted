@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react'
 import { Affix, Avatar, Image, Layout } from 'antd'
 import {
@@ -8,7 +7,6 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   QuestionCircleOutlined,
-  UserOutlined,
 } from '@ant-design/icons'
 import CustomLayout from './CustomLayout'
 import CustomSider from './CustomSider'
@@ -19,24 +17,16 @@ import CustomButton from './CustomButton'
 import CustomTooltip from './CustomTooltip'
 import CustomDropdown from './CustomDropdown'
 import CustomMenuItem from './CustomMenuItem'
-import {
-  // getDataInfoEmpresa,
-  getSessionInfo,
-  isLoggedIn,
-  removeSession,
-} from '../utils/session'
+import { getSessionInfo, isLoggedIn, removeSession } from '../utils/session'
 import { CSSProperties } from 'styled-components'
 import { Outlet, useNavigate } from 'react-router-dom'
 import CustomDivider from './CustomDivider'
 import DrawerOptions from './DrawerOptions'
 import Darkreader from 'react-darkreader'
 import Cookies from 'js-cookie'
-
-// import { InfoEmpresaType } from '../slicers/general'
 import CustomCol from './CustomCol'
 import { defaultTheme } from '../themes'
 import CustomSpace from './CustomSpace'
-import { formatter } from '../utils/general'
 import CustomModal from './CustomModal'
 import CustomTitle from './CustomTitle'
 import CustomText from './CustomText'
@@ -55,25 +45,13 @@ const MenuRoutesWrapper = (): React.ReactElement => {
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const [fullScreen, setFullScreen] = useState<boolean>(false)
   const [modalVisible, SetModalVisible] = useState<boolean>(false)
-  // const [getDataEmpresa, setGetDataEmpresa] = useState<InfoEmpresaType>()
 
   if (!isLoggedIn()) {
     removeSession()
   }
 
-  // useEffect(() => {
-  //   setGetDataEmpresa(getDataInfoEmpresa())
-  // }, [])
-
   const PerfilMenu = (
     <CustomMenu key={1}>
-      {/* <CustomMenuItem
-        key="1"
-        icon={<UserOutlined />}
-        onClick={() => history('/account')}
-      >
-        Perfil
-      </CustomMenuItem> */}
       <CustomMenuItem onClick={removeSession} key="2" icon={<LoginOutlined />}>
         Cerrar Sesión
       </CustomMenuItem>
@@ -141,6 +119,8 @@ const MenuRoutesWrapper = (): React.ReactElement => {
               ? 'Administrador'
               : getSessionInfo()?.privilegios === 2
               ? 'Paciente'
+              : getSessionInfo()?.privilegios === 4
+              ? 'Recepcionista'
               : 'Doctor'}
           </h5>
         </CustomCol>
@@ -302,9 +282,6 @@ const MenuRoutesWrapper = (): React.ReactElement => {
             <CustomContainer>
               <Outlet />
             </CustomContainer>
-            {/* <CustomFooter>
-              <Copyright />
-            </CustomFooter> */}
           </Content>
         </CustomRow>
       </CustomLayout>

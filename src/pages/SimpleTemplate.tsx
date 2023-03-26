@@ -48,6 +48,7 @@ import {
   createEspecialidad,
   createHorarios,
   createPacientes,
+  createRecepcionistas,
   getAdministradores,
   getColorLesion,
   getConsultas,
@@ -58,6 +59,7 @@ import {
   getHorarios,
   getNacionalidades,
   getPacientes,
+  getRecepcionistas,
   getSeguros,
   getTipoLesion,
   updateAdministradores,
@@ -67,6 +69,7 @@ import {
   updateEspecialidad,
   updateHorarios,
   updatePacientes,
+  updateRecepcionistas,
 } from '../slicers/general/general'
 import { ConsultasType, setDetCitas } from '../slicers/general'
 import CustomTable from '../components/CustomTable'
@@ -84,6 +87,7 @@ import {
   EspecilidadesType,
   HorariosType,
   PacientesType,
+  RecepcionistasType,
 } from '../slicers/general/types'
 import ConditionalComponent from '../components/ConditionalComponent'
 import CustomDatePicker from '../components/CustomDatePicker'
@@ -143,6 +147,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     fetchingGeneralData,
     createConsultasRequestStatus,
     createDetCitasRequestStatus,
+    createRecepcionistasRequestStatus,
     createPacientesRequestStatus,
     createAdministradoresRequestStatus,
     createDoctorRequestStatus,
@@ -150,6 +155,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     createHorariosRequestStatus,
     doctores,
     pacientes,
+    recepcionistas,
     nacionalidades,
     seguros,
     horarios,
@@ -174,6 +180,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dispatch(getHorarios({}))
     } else if (State === 'P') {
       dispatch(getPacientes({}))
+      dispatch(getNacionalidades({}))
+      dispatch(getSeguros({}))
+    } else if (State === 'R') {
+      dispatch(getRecepcionistas({}))
       dispatch(getNacionalidades({}))
       dispatch(getSeguros({}))
     } else if (State === 'D') {
@@ -300,6 +310,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           },
         })
       )
+    } else if (State === 'R') {
+      dispatch(
+        updateRecepcionistas({
+          condition: {
+            ...record,
+            estado: record.estado === 'A' ? 'I' : 'A',
+          },
+        })
+      )
     } else if (State === 'D') {
       dispatch(
         updateDoctor({
@@ -385,6 +404,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
         imagen: record.imagen ? record.imagen : [],
         nacionalidad: record.id_nacionalidad,
         seguro: record.id_seguro,
+      })
+    } else if (State === 'R') {
+      form.setFieldsValue({
+        ...record,
+        fecha_nacimiento: moment(record.fecha_nacimiento),
+        nacionalidad: record.id_nacionalidad,
       })
     } else if (State === 'D') {
       form.setFieldsValue({
@@ -1310,6 +1335,163 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       },
     },
   ]
+  const columnsRecepcionistas: ColumnType<RecepcionistasType>[] = [
+    {
+      key: 'id',
+      title: 'Id',
+      dataIndex: 'id',
+    },
+    {
+      key: 'nombres',
+      title: 'Nombre',
+      dataIndex: 'nombres',
+      render: (_, record) => {
+        return `${record.nombres} ${record.apellidos}`
+      },
+    },
+    {
+      key: 'cedula',
+      title: 'Cédula',
+      width: '12%',
+      dataIndex: 'cedula',
+      render: (_, record) => {
+        return formatter({ value: record.cedula, type: 'identity_doc' })
+      },
+    },
+    {
+      key: 'fecha_nacimiento',
+      title: 'Fecha de nacimiento',
+      width: '10%',
+      dataIndex: 'fecha_nacimiento',
+      render: (_, record) => {
+        return moment(record.fecha_nacimiento).format('DD/MM/YYYY')
+      },
+    },
+    {
+      key: 'sexo',
+      title: 'Sexo',
+      width: '10%',
+      dataIndex: 'sexo',
+      render: (item) => {
+        return item === 'M' ? 'Masculino' : 'Femenino'
+      },
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.sexo === 'M' ? 'Masculino' : 'Femenino',
+                value: item.sexo,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.sexo === value
+      },
+    },
+
+    {
+      key: 'nacionalidad',
+      title: 'Nacionalidad',
+      dataIndex: 'nacionalidad',
+      filters:
+        Number(pacientes?.length) > 0
+          ? pacientes
+              ?.map((item) => ({
+                text: item.nacionalidad,
+                value: item.nacionalidad,
+              }))
+              ?.unique('text')
+          : [],
+
+      onFilter(value, record) {
+        return record.nacionalidad === value
+      },
+    },
+
+    {
+      key: 'acciones',
+      title: 'Acciones',
+      align: 'center',
+      width: '10%',
+      render: (_, item: AnyType) => {
+        return (
+          <CustomSpace>
+            <CustomTooltip
+              key={'edit'}
+              title={
+                item.estado === 'A' ? 'Editar' : 'Inactivo, no permite edición'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={() => handleEdit(item)}
+                type={'link'}
+                icon={<EditOutlined style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'print'}
+              title={
+                item.estado === 'A'
+                  ? 'Imprimir Datos'
+                  : 'Inactivo, no permite acción'
+              }
+            >
+              <CustomButton
+                disabled={item.estado === 'I'}
+                onClick={async () => {
+                  setDataPrint(item)
+                  setCurrentRef('printDatos')
+                  setLoading(true)
+                }}
+                type={'text'}
+                icon={<PrinterFilled style={{ fontSize: '18px' }} />}
+                className={'editPhoneButton'}
+              />
+            </CustomTooltip>
+
+            <CustomTooltip
+              key={'delete'}
+              title={item.estado === 'A' ? 'Inhabilitar' : 'Habilitar'}
+            >
+              <CustomButton
+                onClick={() => {
+                  CustomModalConfirmation({
+                    content:
+                      item.estado === 'A'
+                        ? '¿Está seguro que desea eliminar el registro?'
+                        : '¿Está seguro que desea habilitar el registro?',
+                    onOk: () => {
+                      handleDelete(item)
+                    },
+                  })
+                }}
+                type={'link'}
+                icon={
+                  item.estado === 'A' ? (
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: defaultTheme.dangerColor,
+                      }}
+                    />
+                  ) : (
+                    <RollbackOutlined
+                      className="disabledColor"
+                      style={{ fontSize: '18px' }}
+                    />
+                  )
+                }
+              />
+            </CustomTooltip>
+          </CustomSpace>
+        )
+      },
+    },
+  ]
   const columnsDoctores: ColumnType<DoctoresType>[] = [
     {
       key: 'id',
@@ -1716,6 +1898,33 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
               search
             )?.filter((item) => item.estado === stateFilter),
     },
+    R: {
+      title: 'Recepcionistas',
+      titleModal: 'Registrar Recepcionista',
+      titleModalEdit: 'Editar Recepcionista',
+      placeHolderSearch: 'Buscar por nombre Recepcionista o cedula',
+      columns: columnsRecepcionistas,
+      dataSource:
+        stateFilter === ''
+          ? searchInArray(
+              Array.isArray(recepcionistas)
+                ? recepcionistas?.filter(
+                    (item) => item.estado === 'A' || item.estado === 'I'
+                  )
+                : [],
+              ['nombres', 'apellidos', 'cedula'],
+              search
+            )
+          : searchInArray(
+              Array.isArray(recepcionistas)
+                ? recepcionistas?.filter(
+                    (item) => item.estado === 'A' || item.estado === 'I'
+                  )
+                : [],
+              ['nombres', 'apellidos', 'cedula'],
+              search
+            )?.filter((item) => item.estado === stateFilter),
+    },
 
     D: {
       title: 'Doctores',
@@ -1913,11 +2122,13 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       createDoctorRequestStatus === 'success' ||
       createEspecialidadRequestStatus === 'success' ||
       createHorariosRequestStatus === 'success' ||
-      createDetCitasRequestStatus === 'success'
+      createDetCitasRequestStatus === 'success' ||
+      createRecepcionistasRequestStatus === 'success'
     ) {
       State === 'C' && dispatch(getConsultas({}))
       State === 'HD' && dispatch(getConsultas({}))
       State === 'P' && dispatch(getPacientes({}))
+      State === 'R' && dispatch(getRecepcionistas({}))
       State === 'D' && dispatch(getDoctores({}))
       State === 'E' && dispatch(getEspecialidades({}))
       State === 'H' && dispatch(getHorarios({}))
@@ -1946,6 +2157,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     createHorariosRequestStatus,
     createAdministradoresRequestStatus,
     createDetCitasRequestStatus,
+    createRecepcionistasRequestStatus,
   ])
 
   const handleUpdate = async () => {
@@ -1955,6 +2167,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     } else if (State === 'P') {
       dispatch(
         updatePacientes({
+          condition: {
+            ...edit,
+            ...data,
+            cedula: replaceAll(data.cedula, '-', ''),
+            telefono: replaceAll(data.cedula, '-', ''),
+            id_nacionalidad: data.nacionalidad,
+          },
+        })
+      )
+    } else if (State === 'R') {
+      dispatch(
+        updateRecepcionistas({
           condition: {
             ...edit,
             ...data,
@@ -2022,6 +2246,18 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             cedula: replaceAll(data.cedula, '-', ''),
             telefono: replaceAll(data.cedula, '-', ''),
             id_seguro: data.seguro,
+            id_nacionalidad: data.nacionalidad,
+            clave: generatePassword(data.nombres, data.apellidos),
+          },
+        })
+      )
+    } else if (State === 'R') {
+      dispatch(
+        createRecepcionistas({
+          condition: {
+            ...data,
+            cedula: replaceAll(data.cedula, '-', ''),
+            telefono: replaceAll(data.cedula, '-', ''),
             id_nacionalidad: data.nacionalidad,
             clave: generatePassword(data.nombres, data.apellidos),
           },
@@ -2513,6 +2749,108 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                         labelCol={{ span: 6 }}
                       />
                     </CustomCol> */}
+                    </CustomRow>
+                  </ConditionalComponent>
+                  {/* Pacientes  */}
+                  <ConditionalComponent condition={State === 'R'}>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Nombre'}
+                          name={'nombres'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomInput placeholder="Nombre" />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Apellido'}
+                          name={'apellidos'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomInput placeholder="Apellido" />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </CustomRow>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints} pull={1}>
+                        <CustomFormItem
+                          label={'Nacionalidad'}
+                          name={'nacionalidad'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 8 }}
+                        >
+                          <CustomSelect
+                            placeholder={'Seleccione una nacionalidad'}
+                            width={'112%'}
+                            options={nacionalidades
+                              ?.filter((item) => item.estado === 'A')
+                              ?.map((item) => ({
+                                label: item.nombre,
+                                value: item.id,
+                              }))}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Cédula'}
+                          name={'cedula'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomMaskedInput
+                            mask={maskedInput.doc_identidad}
+                            placeholder="Cedula"
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </CustomRow>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints} pull={2}>
+                        <CustomFormItem
+                          label={'Fecha de Nac.'}
+                          name={'fecha_nacimiento'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 10 }}
+                        >
+                          <CustomDatePicker style={{ width: '128%' }} />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Sexo'}
+                          name={'sexo'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomSelect
+                            placeholder={'Seleccione el Sexo'}
+                            options={[
+                              { label: 'Masculino', value: 'M' },
+                              { label: 'Femenino', value: 'F' },
+                            ]}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </CustomRow>
+                    <CustomRow justify="space-between">
+                      <CustomCol {...defaultBreakpoints}>
+                        <CustomFormItem
+                          label={'Teléfono'}
+                          name={'telefono'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomMaskedInput
+                            mask={maskedInput.telefono}
+                            placeholder="Telefono"
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
                     </CustomRow>
                   </ConditionalComponent>
                   {/* Administradores  */}

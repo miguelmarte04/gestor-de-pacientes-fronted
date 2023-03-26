@@ -17,6 +17,19 @@ export type PacientesType = {
   sexo: string
   telefono: string
 }
+export type RecepcionistasType = {
+  apellidos: string
+  cedula: string
+  estado: string
+  fecha_insercion: string
+  fecha_nacimiento: string
+  id: number
+  id_nacionalidad: number
+  nacionalidad: string
+  nombres: string
+  sexo: string
+  telefono: string
+}
 export type NacionalidadesType = {
   id: number
   nombre: string
@@ -93,6 +106,7 @@ export type CountriesType = {
 export type ConsultasType = {
   apellido_doctor: string
   apellido_paciente: string
+  especialidad: string
   asunto: string
   cedula: string
   estado: string

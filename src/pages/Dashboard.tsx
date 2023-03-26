@@ -2,7 +2,7 @@
 import { PrinterFilled } from '@ant-design/icons'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
-import { Image } from 'antd'
+import { Image, Timeline } from 'antd'
 import styled from 'styled-components'
 import BarChart from '../components/BarChart'
 import ConditionalComponent from '../components/ConditionalComponent'
@@ -46,6 +46,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
+import CustomTimeLine from '../components/CustomTimeLine'
 
 const StyledLayout = styled(CustomLayout)`
   background-color: #fff;
@@ -142,7 +143,10 @@ const Dashboard = (): React.ReactElement => {
 
   useEffect(() => {
     const condition = {}
-    if (getSessionInfo().privilegios === 1) {
+    if (
+      getSessionInfo().privilegios === 1 ||
+      getSessionInfo().privilegios === 4
+    ) {
       dispatch(
         getConsultas({
           condition: {
@@ -167,6 +171,16 @@ const Dashboard = (): React.ReactElement => {
           condition: {
             estado: 'T',
             id_doctor: getSessionInfo().id,
+          },
+        })
+      )
+    }
+    if (getSessionInfo().privilegios === 2) {
+      dispatch(
+        getConsultas({
+          condition: {
+            estado: 'T',
+            id_paciente: getSessionInfo().id,
           },
         })
       )
@@ -349,7 +363,10 @@ const Dashboard = (): React.ReactElement => {
             <CustomRow justify={'space-between'}>
               <CustomCol xs={24}>
                 <ConditionalComponent
-                  condition={getSessionInfo().privilegios === 1}
+                  condition={
+                    getSessionInfo().privilegios === 1 ||
+                    getSessionInfo().privilegios === 4
+                  }
                 >
                   <DynamicCard dataSources={dynamicCardDataSources} />
 
@@ -726,11 +743,9 @@ const Dashboard = (): React.ReactElement => {
                   </CustomRow>
                 </ConditionalComponent>
               </CustomCol>
-              <ConditionalComponent
-                condition={
-                  getSessionInfo().privilegios === 2 ||
-                  getSessionInfo().privilegios === 4
-                }
+
+              {/* <ConditionalComponent
+                condition={getSessionInfo().privilegios === 4}
               >
                 <CustomCol xs={24} style={{ marginBottom: 10 }}>
                   <CustomRow justify={'center'}>
@@ -741,7 +756,7 @@ const Dashboard = (): React.ReactElement => {
                     />
                   </CustomRow>
                 </CustomCol>
-              </ConditionalComponent>
+              </ConditionalComponent> */}
               <ConditionalComponent
                 condition={getSessionInfo().privilegios === 3}
               >
@@ -813,6 +828,32 @@ const Dashboard = (): React.ReactElement => {
             </CustomRow>
           </CustomRow>
         </CustomCol>
+        <ConditionalComponent condition={getSessionInfo().privilegios === 2}>
+          <CustomRow justify="center">
+            <CustomCol xs={22} style={{ marginBottom: 10 }}>
+              <CustomCard>
+                <CustomRow justify={'start'}>
+                  <CustomTitle level={5}>Consultas</CustomTitle>
+                </CustomRow>
+                <Timeline mode={'left'}>
+                  {Consultas?.map((item, index) => {
+                    return (
+                      <Timeline.Item
+                        label={`Fecha: ${moment(
+                          item.fecha_insercion,
+                          'YYYY-MM-DD'
+                        ).format('DD/MM/YYYY')}`}
+                        key={index}
+                      >
+                        {`Dr. ${item.nombre_doctor} ${item.apellido_doctor} - Especialidad: ${item.especialidad} - Asunto: ${item.asunto}`}
+                      </Timeline.Item>
+                    )
+                  })}
+                </Timeline>
+              </CustomCard>
+            </CustomCol>
+          </CustomRow>
+        </ConditionalComponent>
       </StyledLayout>
       <PrintTemplate ref={ConsultasRef} className={'print-report'}>
         <CustomDivider>{`Gráfico de ${chartTitle}`}</CustomDivider>

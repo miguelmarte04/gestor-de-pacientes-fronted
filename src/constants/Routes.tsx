@@ -14,12 +14,14 @@ export const PATH_DOCTORES = '/doctores'
 export const PATH_ADMINISTRADORES = '/administradores'
 export const PATH_ESPECIALIDADES = '/especialidades'
 export const PATH_PACIENTES = '/pacientes'
+export const PATH_RECEPCIONISTAS = '/recepcionistas'
 export const PATH_PACIENTES_DOCTORES = '/pacientes_doctores'
 
 // external routes API
 export const WEB_SERVICE_API = process.env.REACT_APP_WEB_SERVICE_API
 export const WEB_SERVICE_API_LOGIN = `${WEB_SERVICE_API}/login`
 export const WEB_SERVICE_API_GET_PACIENTES = `${WEB_SERVICE_API}/pacientes`
+export const WEB_SERVICE_API_GET_RECEPCIONISTAS = `${WEB_SERVICE_API}/recepcionistas`
 export const WEB_SERVICE_API_GET_NACIONALIDADES = `${WEB_SERVICE_API}/nacionalidades`
 export const WEB_SERVICE_API_GET_ESPECILIDADES = `${WEB_SERVICE_API}/especialidades`
 export const WEB_SERVICE_API_GET_HORARIOS = `${WEB_SERVICE_API}/horarios`
@@ -35,6 +37,7 @@ export const WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS = `${WEB_SERVICE_API}/consu
 export const WEB_SERVICE_API_UPDATE_CREATE_ADMINISTRADORES = `${WEB_SERVICE_API}/administradores/administrador`
 export const WEB_SERVICE_API_UPDATE_CREATE_DET_CITAS = `${WEB_SERVICE_API}/detcitas/detcita`
 export const WEB_SERVICE_API_UPDATE_CREATE_PACIENTES = `${WEB_SERVICE_API}/pacientes/paciente`
+export const WEB_SERVICE_API_UPDATE_CREATE_RECEPCIONISTAS = `${WEB_SERVICE_API}/recepcionistas/recepcionista`
 export const WEB_SERVICE_API_UPDATE_CREATE_DOCTORES = `${WEB_SERVICE_API}/doctores/doctor`
 export const WEB_SERVICE_API_UPDATE_CREATE_ESPECIALIDAD = `${WEB_SERVICE_API}/especialidades/especialidad`
 export const WEB_SERVICE_API_UPDATE_CREATE_HORARIOS = `${WEB_SERVICE_API}/horarios/horario`
