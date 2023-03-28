@@ -471,6 +471,25 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Asunto',
       dataIndex: 'asunto',
     },
+    {
+      key: 'id_tanda',
+      title: 'Tanda',
+      width: '10%',
+      dataIndex: 'id_tanda',
+      render: (item: string) => {
+        return item === 'M' ? 'Mañana' : 'Tarde'
+      },
+      filters:
+        Number(Consultas?.length) > 0
+          ? Consultas?.map((item: AnyType) => ({
+              text: item.id_tanda === 'M' ? 'Mañana' : 'Tarde',
+              value: item.id_tanda,
+            }))?.unique('text')
+          : [],
+      onFilter(value, record) {
+        return record.id_tanda === value
+      },
+    },
 
     {
       key: 'fecha_insercion',
@@ -1018,69 +1037,33 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'asunto',
     },
     {
-      key: 'inicio',
-      title: 'Inicio',
+      key: 'id_tanda',
+      title: 'Tanda',
       width: '10%',
-      dataIndex: 'inicio',
+      dataIndex: 'id_tanda',
       render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
+        return item === 'M' ? 'Mañana' : 'Tarde'
       },
       filters:
         Number(Consultas?.length) > 0
           ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
+              text: item.id_tanda === 'M' ? 'Mañana' : 'Tarde',
+              value: item.id_tanda,
             }))?.unique('text')
           : [],
       onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
+        return record.id_tanda === value
       },
     },
-    // {
-    //   key: 'acciones',
-    //   title: 'Acciones',
-    //   align: 'center',
-    //   width: '10%',
-    //   render: (_, item: AnyType) => {
-    //     return (
-    //       <CustomSpace>
-    //         {/* <CustomTooltip key={'edit'} title={'Ver Historial del paciente'}>
-    //           <CustomButton
-    //             // onClick={() => handleEdit(item)}
-    //             type={'link'}
-    //             icon={<FieldTimeOutlined style={{ fontSize: '18px' }} />}
-    //             className={'editPhoneButton'}
-    //           />
-    //         </CustomTooltip> */}
-    //         <CustomTooltip key={'edit'} title={'Ver Detalles'}>
-    //           <CustomButton
-    //             onClick={() => handleAddDetalles(item)}
-    //             type={'link'}
-    //             icon={<UnorderedListOutlined style={{ fontSize: '18px' }} />}
-    //             className={'editPhoneButton'}
-    //           />
-    //         </CustomTooltip>
-    //         <CustomTooltip key={'addReceta'} title={'Ver Receta'}>
-    //           <CustomButton
-    //             onClick={() => handleAddReceta(item)}
-    //             type={'link'}
-    //             icon={<SolutionOutlined style={{ fontSize: '18px' }} />}
-    //             className={'editPhoneButton'}
-    //           />
-    //         </CustomTooltip>
-    //       </CustomSpace>
-    //     )
-    //   },
-    // },
+    {
+      key: 'fecha_insercion',
+      title: 'Fecha',
+      width: '10%',
+      dataIndex: 'fecha_insercion',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
+      },
+    },
   ]
   const columnsHistorialPacientes: ColumnType<ConsultasType>[] = [
     {

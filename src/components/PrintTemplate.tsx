@@ -49,10 +49,9 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
           </Text>
         </CustomRow>
         <Separated />
-
-        <CustomCol xs={24}>
-          <CustomRow justify={'center'}>{children} </CustomRow>
-        </CustomCol>
+        <CustomRow justify={'center'}>
+          <CustomCol xs={24}>{children}</CustomCol>
+        </CustomRow>
 
         <Separated />
         <CustomRow justify={'end'}>

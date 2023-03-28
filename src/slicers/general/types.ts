@@ -107,6 +107,7 @@ export type ConsultasType = {
   apellido_doctor: string
   apellido_paciente: string
   especialidad: string
+  tanda: string
   asunto: string
   cedula: string
   estado: string
