@@ -259,13 +259,22 @@ const Dashboard = (): React.ReactElement => {
   ]
   const dynamicCardDataSourcesPac: DynamicCardType[] = [
     {
-      title: 'Consultas',
+      title: 'Total de consultas',
       description: CardDescription(
         'Total',
         `${Consultas?.filter((item) => item.estado !== 'I')?.length ?? 0}`
       ),
       icon: './assets/consultas.png',
       color: '#87e8de',
+    },
+    {
+      title: 'Consultas pendientes',
+      description: CardDescription(
+        'Total',
+        `${Consultas?.filter((item) => item.estado === 'A')?.length ?? 0}`
+      ),
+      icon: './assets/consultas.png',
+      color: '#ffe58f',
     },
   ]
 
@@ -864,6 +873,17 @@ const Dashboard = (): React.ReactElement => {
         </CustomCol>
         <ConditionalComponent condition={getSessionInfo().privilegios === 2}>
           <CustomRow justify="space-between">
+            <CustomTitle
+              style={{
+                backgroundColor: '#87e8de',
+                padding: '5px 10px',
+                borderRadius: '5px',
+                textAlign: 'center',
+              }}
+              level={4}
+            >{`Bienvenido: ${getSessionInfo().nombres} ${
+              getSessionInfo().apellidos
+            }`}</CustomTitle>
             <CustomCol xs={22} style={{ marginBottom: 10 }}>
               <CustomRow justify="center">
                 <DynamicCard dataSources={dynamicCardDataSourcesPac} />
