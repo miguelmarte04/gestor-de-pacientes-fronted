@@ -589,32 +589,32 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'asunto',
     },
     {
-      key: 'inicio',
-      title: 'Inicio',
+      key: 'id_tanda',
+      title: 'Tanda',
       width: '10%',
-      dataIndex: 'inicio',
+      dataIndex: 'id_tanda',
       render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
-
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
+        return item === 'M' ? 'Mañana' : 'Tarde'
       },
       filters:
         Number(Consultas?.length) > 0
           ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
+              text: item.id_tanda === 'M' ? 'Mañana' : 'Tarde',
+              value: item.id_tanda,
             }))?.unique('text')
           : [],
       onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
+        return record.id_tanda === value
+      },
+    },
+
+    {
+      key: 'fecha_insercion',
+      title: 'Fecha',
+      width: '10%',
+      dataIndex: 'fecha_insercion',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
       },
     },
   ]
@@ -1091,31 +1091,32 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'asunto',
     },
     {
-      key: 'inicio',
-      title: 'Inicio',
+      key: 'id_tanda',
+      title: 'Tanda',
       width: '10%',
-      dataIndex: 'inicio',
+      dataIndex: 'id_tanda',
       render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
+        return item === 'M' ? 'Mañana' : 'Tarde'
       },
       filters:
         Number(Consultas?.length) > 0
           ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
+              text: item.id_tanda === 'M' ? 'Mañana' : 'Tarde',
+              value: item.id_tanda,
             }))?.unique('text')
           : [],
       onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
+        return record.id_tanda === value
+      },
+    },
+
+    {
+      key: 'fecha_insercion',
+      title: 'Fecha',
+      width: '10%',
+      dataIndex: 'fecha_insercion',
+      render: (item: string) => {
+        return moment(item).format('DD/MM/YYYY')
       },
     },
     {
@@ -1748,7 +1749,6 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
           : ''
       },
     },
-
     {
       key: 'nombre_doctor',
       title: 'Doctor',
@@ -2345,10 +2345,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
 
                   <CustomCol xs={24} style={{ marginBottom: '1%' }}>
                     <CustomRow justify={'space-between'}>
-                      {State === 'CD' ||
-                      State === 'HD' ||
-                      State === 'CP' ||
-                      State === 'HP' ? (
+                      {State === 'CD' || State === 'HD' || State === 'HP' ? (
                         <CustomFormItem label={'Filtrar por Fecha'}>
                           <CustomRangePicker
                             format={'DD/MM/YYYY'}
