@@ -197,25 +197,37 @@ const Dashboard = (): React.ReactElement => {
   const dynamicCardDataSources: DynamicCardType[] = [
     {
       title: 'Pacientes',
-      description: CardDescription('Total', `${pacientes?.length ?? 0}`),
+      description: CardDescription(
+        'Total',
+        `${pacientes?.filter((item) => item.estado === 'A')?.length ?? 0}`
+      ),
       icon: './assets/pacientes.png',
       color: '#ffe58f',
     },
     {
       title: 'Doctores',
-      description: CardDescription('Total', `${doctores?.length ?? 0}`),
+      description: CardDescription(
+        'Total',
+        `${doctores?.filter((item) => item.estado === 'A')?.length ?? 0}`
+      ),
       icon: './assets/doctor.png',
       color: '#f4ffb8',
     },
     {
       title: 'Especialidades',
-      description: CardDescription('Total', `${especialidades?.length ?? 0}`),
+      description: CardDescription(
+        'Total',
+        `${especialidades?.filter((item) => item.estado === 'A')?.length ?? 0}`
+      ),
       icon: './assets/especialidades.png',
       color: '#95de64',
     },
     {
       title: 'Consultas',
-      description: CardDescription('Total', `${Consultas?.length ?? 0}`),
+      description: CardDescription(
+        'Total',
+        `${Consultas?.filter((item) => item.estado !== 'I')?.length ?? 0}`
+      ),
       icon: './assets/consultas.png',
       color: '#87e8de',
     },
@@ -225,7 +237,11 @@ const Dashboard = (): React.ReactElement => {
       title: 'Pacientes',
       description: CardDescription(
         'Total',
-        `${Consultas?.unique('id_paciente')?.length ?? 0}`
+        `${
+          Consultas?.filter((item) => item.estado !== 'I')?.unique(
+            'id_paciente'
+          )?.length ?? 0
+        }`
       ),
       icon: './assets/pacientes.png',
       color: '#ffe58f',
@@ -233,7 +249,21 @@ const Dashboard = (): React.ReactElement => {
 
     {
       title: 'Consultas',
-      description: CardDescription('Total', `${Consultas?.length ?? 0}`),
+      description: CardDescription(
+        'Total',
+        `${Consultas?.filter((item) => item.estado !== 'I')?.length ?? 0}`
+      ),
+      icon: './assets/consultas.png',
+      color: '#87e8de',
+    },
+  ]
+  const dynamicCardDataSourcesPac: DynamicCardType[] = [
+    {
+      title: 'Consultas',
+      description: CardDescription(
+        'Total',
+        `${Consultas?.filter((item) => item.estado !== 'I')?.length ?? 0}`
+      ),
       icon: './assets/consultas.png',
       color: '#87e8de',
     },
@@ -547,12 +577,14 @@ const Dashboard = (): React.ReactElement => {
                           <CustomCol xs={6}>
                             <CustomSelect
                               placeholder={'Seleccionar Especialidad'}
-                              options={especialidades?.map((item) => {
-                                return {
-                                  label: item.nombre,
-                                  value: item.id,
-                                }
-                              })}
+                              options={especialidades
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => {
+                                  return {
+                                    label: item.nombre,
+                                    value: item.id,
+                                  }
+                                })}
                               onChange={(value) => {
                                 setEspecilidadSelected(value)
                               }}
@@ -636,12 +668,14 @@ const Dashboard = (): React.ReactElement => {
                           <CustomCol xs={6}>
                             <CustomSelect
                               placeholder={'Seleccionar Doctor'}
-                              options={doctores?.map((item) => {
-                                return {
-                                  label: item.nombre,
-                                  value: item.id,
-                                }
-                              })}
+                              options={doctores
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => {
+                                  return {
+                                    label: item.nombre,
+                                    value: item.id,
+                                  }
+                                })}
                               onChange={(value) => {
                                 setDoctorSelected(value)
                               }}
@@ -829,8 +863,70 @@ const Dashboard = (): React.ReactElement => {
           </CustomRow>
         </CustomCol>
         <ConditionalComponent condition={getSessionInfo().privilegios === 2}>
-          <CustomRow justify="center">
+          <CustomRow justify="space-between">
             <CustomCol xs={22} style={{ marginBottom: 10 }}>
+              <CustomRow justify="center">
+                <DynamicCard dataSources={dynamicCardDataSourcesPac} />
+              </CustomRow>
+            </CustomCol>
+            <CustomCol xs={11} style={{ marginBottom: 10 }}>
+              <CustomCol xs={24} style={{ marginBottom: 10 }}>
+                <CustomCard>
+                  <CustomRow justify={'end'} width={'100%'}>
+                    <CustomTooltip title={'Imprimir'}>
+                      <CustomButton
+                        onClick={async () => {
+                          setLoading(true)
+                          setCurrentRef('consultas')
+                          setChartTitle('Consumo')
+                          getChartIMG('bar-chart')
+                        }}
+                        type={'text'}
+                        icon={<PrinterFilled style={{ fontSize: '22px' }} />}
+                      >
+                        Imprimir
+                      </CustomButton>
+                    </CustomTooltip>
+                  </CustomRow>
+                  <CustomRow justify="space-between">
+                    <CustomCol xs={18}>
+                      <CustomDivider>
+                        <CustomTitle level={5}>Consultas por meses</CustomTitle>
+                      </CustomDivider>
+                    </CustomCol>
+                    <CustomCol xs={6}>
+                      <CustomSelect
+                        placeholder={'Seleccionar Año'}
+                        defaultValue={moment().year()}
+                        options={years}
+                        onChange={(value) => {
+                          SetYearSelected(value)
+                        }}
+                      />
+                    </CustomCol>
+                  </CustomRow>
+
+                  <BarChart
+                    title={'Consultas'}
+                    labels={labels}
+                    id={'bar-chart'}
+                    Bardata={buildDataSource(
+                      [
+                        ...(Consultas?.filter(
+                          (item) =>
+                            moment(
+                              item.fecha_insercion,
+                              'YYYY-MM-DD'
+                            ).year() === yearSelected
+                        ) ?? []),
+                      ],
+                      'fecha_insercion'
+                    )}
+                  />
+                </CustomCard>
+              </CustomCol>
+            </CustomCol>
+            <CustomCol xs={11} style={{ marginBottom: 10 }}>
               <CustomCard>
                 <CustomRow justify={'start'}>
                   <CustomTitle level={5}>Consultas</CustomTitle>
@@ -845,7 +941,11 @@ const Dashboard = (): React.ReactElement => {
                         ).format('DD/MM/YYYY')}`}
                         key={index}
                       >
-                        {`Dr. ${item.nombre_doctor} ${item.apellido_doctor} - Especialidad: ${item.especialidad} - Asunto: ${item.asunto}`}
+                        {`Dr. ${item.nombre_doctor} ${
+                          item.apellido_doctor
+                        } - Especialidad: ${item.especialidad} - Tanda: ${
+                          item.id_tanda === 'M' ? 'Mañana' : 'Tarde'
+                        }`}
                       </Timeline.Item>
                     )
                   })}
