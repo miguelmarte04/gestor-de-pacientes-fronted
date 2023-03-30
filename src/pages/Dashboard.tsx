@@ -892,22 +892,6 @@ const Dashboard = (): React.ReactElement => {
             <CustomCol xs={11} style={{ marginBottom: 10 }}>
               <CustomCol xs={24} style={{ marginBottom: 10 }}>
                 <CustomCard>
-                  <CustomRow justify={'end'} width={'100%'}>
-                    <CustomTooltip title={'Imprimir'}>
-                      <CustomButton
-                        onClick={async () => {
-                          setLoading(true)
-                          setCurrentRef('consultas')
-                          setChartTitle('Consumo')
-                          getChartIMG('bar-chart')
-                        }}
-                        type={'text'}
-                        icon={<PrinterFilled style={{ fontSize: '22px' }} />}
-                      >
-                        Imprimir
-                      </CustomButton>
-                    </CustomTooltip>
-                  </CustomRow>
                   <CustomRow justify="space-between">
                     <CustomCol xs={18}>
                       <CustomDivider>
@@ -951,7 +935,10 @@ const Dashboard = (): React.ReactElement => {
                 <CustomRow justify={'start'}>
                   <CustomTitle level={5}>Consultas</CustomTitle>
                 </CustomRow>
-                <Timeline mode={'left'}>
+                <Timeline
+                  mode={'left'}
+                  style={{ height: '235.22px', maxHeight: '235.22px' }}
+                >
                   {Consultas?.map((item, index) => {
                     return (
                       <Timeline.Item
