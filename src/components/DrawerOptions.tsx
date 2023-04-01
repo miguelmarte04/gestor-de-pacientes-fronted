@@ -142,7 +142,7 @@ const DrawerOptions = (): React.ReactElement => {
               icon={<ProfileOutlined />}
               onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
             >
-              CONSULTAS
+              AGREGAR CONSULTAS
             </CustomMenuItem>
             <CustomMenuItem
               key="1-2"
