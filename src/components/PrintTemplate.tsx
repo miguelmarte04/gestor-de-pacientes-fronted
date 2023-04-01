@@ -45,7 +45,7 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
 
         <CustomRow justify={'end'}>
           <Text type={'secondary'} style={{ fontSize: '20px' }}>
-            {moment().format('DD MMMM YYYY')}
+            {moment().format('DD MMMM YYYY hh:mm:ss a')}
           </Text>
         </CustomRow>
         <Separated />
