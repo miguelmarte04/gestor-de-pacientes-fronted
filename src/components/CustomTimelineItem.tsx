@@ -1,17 +1,11 @@
-import React from 'react'
-import Timeline, { TimelineItemProps } from 'antd/lib/timeline'
+import { Timeline, TimelineItemProps } from 'antd'
 
 const { Item } = Timeline
 
 const CustomTimelineItem: React.FC<TimelineItemProps> = ({
-  position = 'left',
   ...props
 }): React.ReactElement => {
-  return (
-    <Item position={position} {...props}>
-      {props.children}
-    </Item>
-  )
+  return <Item {...props}>{props.children}</Item>
 }
 
 export default CustomTimelineItem

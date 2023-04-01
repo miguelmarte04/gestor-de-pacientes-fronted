@@ -54,7 +54,12 @@ const PrintTemplate = React.forwardRef<HTMLDivElement, PrintTemplateProps>(
         </CustomRow>
 
         <Separated />
-        <CustomRow justify={'end'}>
+        <CustomRow justify={'center'}>
+          <Text type={'secondary'} style={{ fontSize: '20px' }}>
+            ___________________________________
+          </Text>
+          <Separated />
+
           <Text type={'secondary'} style={{ fontSize: '20px' }}>
             Usuario:
             <strong>{`${getSessionInfo().nombres} ${

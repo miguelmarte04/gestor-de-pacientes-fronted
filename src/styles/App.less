@@ -334,3 +334,21 @@ code {
 .ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-content{
   overflow-y: hidden;
 }
+.card-history {
+  margin-top: 2%;
+  max-height: 300px;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f2f5;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: @primary-color; /* color of the scroll thumb */
+    border-radius: 7px; /* roundness of the scroll thumb */
+  }
+}

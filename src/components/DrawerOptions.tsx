@@ -61,7 +61,7 @@ const DrawerOptions = (): React.ReactElement => {
         icon={<BarChartOutlined />}
         onClick={() => handleClick(PATH_MAIN, '01')}
       >
-        DASHBOARD
+        PANEL PRINCIPAL
       </CustomMenuItem>
       {getSessionInfo().privilegios === 1 && (
         <>
@@ -75,7 +75,7 @@ const DrawerOptions = (): React.ReactElement => {
               icon={<ProfileOutlined />}
               onClick={() => handleClick(PATH_CONSULTAS, '1-1')}
             >
-              CONSULTAS
+              AGREGAR CONSULTAS
             </CustomMenuItem>
             <CustomMenuItem
               key="1-2"

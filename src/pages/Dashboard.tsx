@@ -2,7 +2,7 @@
 import { PrinterFilled } from '@ant-design/icons'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
-import { Image, Timeline } from 'antd'
+import { Image } from 'antd'
 import styled from 'styled-components'
 import BarChart from '../components/BarChart'
 import ConditionalComponent from '../components/ConditionalComponent'
@@ -46,7 +46,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import CustomTimeLine from '../components/CustomTimeLine'
+import CustomHistory from '../components/CustomHistory'
 
 const StyledLayout = styled(CustomLayout)`
   background-color: #fff;
@@ -410,20 +410,7 @@ const Dashboard = (): React.ReactElement => {
                   <DynamicCard dataSources={dynamicCardDataSources} />
 
                   <Separated />
-                  {/* <CustomCol xs={24} style={{ marginBottom: 10 }}>
-                    <CustomCard>
-                      <CustomTimeLine />
-                      <Calendar
-                        dateCellRender={dateCellRender}
-                        monthCellRender={monthCellRender}
-                        style={{
-                          maxHeight: '50vh',
-                          overflow: 'auto',
-                          width: '50%',
-                        }}
-                      />
-                    </CustomCard>
-                  </CustomCol> */}
+
                   <CustomRow justify="space-between">
                     <CustomCol xs={11} style={{ marginBottom: 10 }}>
                       <CustomCard>
@@ -433,7 +420,7 @@ const Dashboard = (): React.ReactElement => {
                               onClick={async () => {
                                 setLoading(true)
                                 setCurrentRef('consultas')
-                                setChartTitle('Consumo')
+                                setChartTitle('Consultas por meses')
                                 getChartIMG('bar-chart')
                               }}
                               type={'text'}
@@ -492,7 +479,7 @@ const Dashboard = (): React.ReactElement => {
                               onClick={async () => {
                                 setLoading(true)
                                 setCurrentRef('consultas')
-                                setChartTitle('Consumo')
+                                setChartTitle('Consultas por tanda')
                                 getChartIMG('pie-chart')
                               }}
                               type={'text'}
@@ -563,7 +550,7 @@ const Dashboard = (): React.ReactElement => {
                               onClick={async () => {
                                 setLoading(true)
                                 setCurrentRef('consultas')
-                                setChartTitle('Consumo')
+                                setChartTitle('Consultas por especialidad')
                                 getChartIMG('line-chart')
                               }}
                               type={'text'}
@@ -654,7 +641,7 @@ const Dashboard = (): React.ReactElement => {
                               onClick={async () => {
                                 setLoading(true)
                                 setCurrentRef('consultas')
-                                setChartTitle('Consumo')
+                                setChartTitle('Consultas por Doctor')
                                 getChartIMG('line-doc-chart')
                               }}
                               type={'text'}
@@ -744,7 +731,7 @@ const Dashboard = (): React.ReactElement => {
                               onClick={async () => {
                                 setLoading(true)
                                 setCurrentRef('consultas')
-                                setChartTitle('Consumo')
+                                setChartTitle('Consultas por enfermedad')
                                 getChartIMG('pie-enfermedad-chart')
                               }}
                               type={'text'}
@@ -931,33 +918,24 @@ const Dashboard = (): React.ReactElement => {
               </CustomCol>
             </CustomCol>
             <CustomCol xs={11} style={{ marginBottom: 10 }}>
-              <CustomCard>
-                <CustomRow justify={'start'}>
-                  <CustomTitle level={5}>Consultas</CustomTitle>
-                </CustomRow>
-                <Timeline
-                  mode={'left'}
-                  style={{ height: '235.22px', maxHeight: '235.22px' }}
-                >
-                  {Consultas?.map((item, index) => {
-                    return (
-                      <Timeline.Item
-                        label={`Fecha: ${moment(
-                          item.fecha_insercion,
-                          'YYYY-MM-DD'
-                        ).format('DD/MM/YYYY')}`}
-                        key={index}
-                      >
-                        {`Dr. ${item.nombre_doctor} ${
-                          item.apellido_doctor
-                        } - Especialidad: ${item.especialidad} - Tanda: ${
-                          item.id_tanda === 'M' ? 'Mañana' : 'Tarde'
-                        }`}
-                      </Timeline.Item>
-                    )
-                  })}
-                </Timeline>
-              </CustomCard>
+              <CustomHistory
+                title={'Consultas'}
+                dataSource={Consultas?.map((item) => ({
+                  key: String(item.id),
+                  date: moment(item.fecha_insercion, 'YYYY-MM-DD').format(
+                    'DD MMMM YYYY'
+                  ),
+                  description: (
+                    <span>
+                      {`Dr. ${item.nombre_doctor} ${
+                        item.apellido_doctor
+                      } - Especialidad: ${item.especialidad} - Tanda: ${
+                        item.id_tanda === 'M' ? 'Mañana' : 'Tarde'
+                      }`}
+                    </span>
+                  ),
+                }))}
+              />
             </CustomCol>
           </CustomRow>
         </ConditionalComponent>

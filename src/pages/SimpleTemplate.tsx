@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { defaultBreakpoints, defaultTheme } from '../themes'
 import {
   filterByArray,
-  filterByDates,
+  filterByStartDate,
   formatter,
   generatePassword,
   getKeyValue,
@@ -643,20 +643,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       title: 'Asunto',
       dataIndex: 'asunto',
     },
+
     {
-      key: 'inicio',
-      title: 'Inicio',
+      key: 'fecha_insercion',
+      title: 'Fecha',
       width: '10%',
-      dataIndex: 'inicio',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-    },
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
+      dataIndex: 'fecha_insercion',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
@@ -928,33 +920,15 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
       dataIndex: 'asunto',
     },
     {
-      key: 'inicio',
-      title: 'Inicio',
+      key: 'fecha_insercion',
+      title: 'Fecha',
       width: '10%',
-      dataIndex: 'inicio',
+      dataIndex: 'fecha_insercion',
       render: (item: string) => {
         return moment(item).format('DD/MM/YYYY')
       },
     },
-    {
-      key: 'fin',
-      title: 'Fin',
-      width: '10%',
-      dataIndex: 'fin',
-      render: (item: string) => {
-        return moment(item).format('DD/MM/YYYY')
-      },
-      filters:
-        Number(Consultas?.length) > 0
-          ? Consultas?.map((item: AnyType) => ({
-              text: moment(item.fin).format('DD/MM/YYYY'),
-              value: moment(item.fin).format('DD/MM/YYYY'),
-            }))?.unique('text')
-          : [],
-      onFilter(value, record) {
-        return moment(record.fin).format('DD/MM/YYYY') === value
-      },
-    },
+
     {
       key: 'acciones',
       title: 'Acciones',
@@ -2389,11 +2363,11 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   columns={title[`${State}`]?.columns}
                   dataSource={
                     fechaSelected !== null
-                      ? filterByDates(
+                      ? filterByStartDate(
                           title[`${State}`]?.dataSource,
-                          'inicio',
-                          'fin',
-                          fechaSelected
+                          'fecha_insercion',
+                          fechaSelected[0],
+                          fechaSelected[1]
                         )
                       : title[`${State}`]?.dataSource
                   }
@@ -3405,11 +3379,11 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
               )}
               dataSource={searchInArrayMultiple(
                 fechaSelected !== null
-                  ? filterByDates(
+                  ? filterByStartDate(
                       title[`${State}`]?.dataSource,
-                      'inicio',
-                      'fin',
-                      fechaSelected
+                      'fecha_insercion',
+                      fechaSelected[0],
+                      fechaSelected[1]
                     )
                   : title[`${State}`]?.dataSource,
                 [...(filters?.map((item) => item.key) ?? [])],
@@ -3426,9 +3400,12 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
             />
           </PrintTemplate>
           <PrintTemplate ref={printRefDatos} className={'print-report'}>
-            <CustomTitle style={{ textAlign: 'center' }}>{`Datos de ${
-              getSessionInfo().nombres
-            } ${getSessionInfo().apellidos}`}</CustomTitle>
+            <CustomRow justify="center">
+              <Text
+                strong
+                style={{ fontSize: '25px' }}
+              >{`Datos de ${dataPrint?.nombres} ${dataPrint?.apellidos}`}</Text>
+            </CustomRow>
 
             <CustomRow justify="space-between">
               <CustomCol {...defaultBreakpoints}>

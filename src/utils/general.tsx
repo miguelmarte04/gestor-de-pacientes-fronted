@@ -582,23 +582,23 @@ export const removeFilters = (columns: AnyType[]): AnyType[] => {
 }
 
 // filtrar array por fecha inicial
-export const filterByDates = (
-  array: AnyType[],
-  keyInicio: string,
-  keyFin: string,
-  date: [moment.Moment, moment.Moment]
-): AnyType[] => {
+export function filterByStartDate<T, K extends keyof T>(
+  array: T[],
+  key: K,
+  startDate: moment.Moment,
+  endDate: moment.Moment
+): T[] {
   const newArray = [...array]
   return newArray?.filter((item) => {
-    const dateItemInicio = new Date(item[keyInicio])
-    const dateItemFin = new Date(item[keyFin])
+    const date = new Date(item[key as string])
     return (
-      moment(dateItemInicio).isSameOrAfter(date?.[0]) &&
-      moment(dateItemFin).isSameOrBefore(date?.[1])
+      (moment(date).isSameOrAfter(startDate) &&
+        moment(date).isSameOrBefore(endDate)) ||
+      moment(date)?.format('DD/MM/YYYY') === startDate?.format('DD/MM/YYYY') ||
+      moment(date)?.format('DD/MM/YYYY') === endDate?.format('DD/MM/YYYY')
     )
   })
 }
-
 // [s: string] obtener el key y value de un objeto y retornarlos en un array
 export const getKeyValue = (obj: AnyType): AnyType[] => {
   const newObj = { ...obj }
@@ -694,4 +694,10 @@ export function createBarDatasets<T>(arr: T[], type: string): AnyType {
     labels: Array.from(new Set(labels)),
     datasets, // datos de cada articulo
   }
+}
+export function getArray<T>(array: T[], size: number): T[] {
+  if (array.length <= size) {
+    return array
+  }
+  return array.slice(0, size)
 }
