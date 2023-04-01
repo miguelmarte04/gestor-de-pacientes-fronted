@@ -39,6 +39,7 @@ export interface GeneralState {
   pacientesRequestStatus: RequestStatusType
   createConsultasRequestStatus: RequestStatusType
   copiaDbRequestStatus: RequestStatusType
+  existIdRequestStatus: RequestStatusType
   createDetCitasRequestStatus: RequestStatusType
   createAdministradoresRequestStatus: RequestStatusType
   createPacientesRequestStatus: RequestStatusType
@@ -48,6 +49,7 @@ export interface GeneralState {
   createHorariosRequestStatus: RequestStatusType
   fileList: CustomUploadFileType[]
   fetchingGeneralData: boolean
+  fetchingexistId: boolean
 }
 
 const initialState: GeneralState = {
@@ -68,6 +70,7 @@ const initialState: GeneralState = {
   pacientesRequestStatus: '',
   createConsultasRequestStatus: '',
   copiaDbRequestStatus: '',
+  existIdRequestStatus: '',
   createAdministradoresRequestStatus: '',
   createDetCitasRequestStatus: '',
   createEspecialidadRequestStatus: '',
@@ -77,6 +80,7 @@ const initialState: GeneralState = {
   createDoctorRequestStatus: '',
   fileList: new Array<CustomUploadFileType>(),
   fetchingGeneralData: false,
+  fetchingexistId: false,
 }
 
 export const resetAction = createAction<boolean>('general/resetStore')
@@ -106,6 +110,16 @@ export const copiaDb = createAsyncThunk(
   'general/copiaDb',
   async (payload: GeneralType) => {
     const response = await userApiHelper.copiaDb(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const existId = createAsyncThunk(
+  'general/existId',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.existId(payload)
 
     const { data } = response.data
 
@@ -685,6 +699,18 @@ export const generalSlice = createSlice({
           description: 'No se pudo realizar la copia de seguridad',
           type: 'error',
         })
+      })
+      .addCase(existId.pending, (state) => {
+        state.fetchingexistId = true
+        state.existIdRequestStatus = 'pending'
+      })
+      .addCase(existId.fulfilled, (state) => {
+        state.fetchingexistId = false
+        state.existIdRequestStatus = 'success'
+      })
+      .addCase(existId.rejected, (state) => {
+        state.existIdRequestStatus = 'error'
+        state.fetchingexistId = false
       })
       .addCase(updateConsultas.pending, (state) => {
         state.fetchingGeneralData = true

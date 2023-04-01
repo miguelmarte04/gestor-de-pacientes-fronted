@@ -49,6 +49,7 @@ import {
   createHorarios,
   createPacientes,
   createRecepcionistas,
+  existId,
   getAdministradores,
   getColorLesion,
   getConsultas,
@@ -160,6 +161,8 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
     seguros,
     horarios,
     especialidades,
+    existIdRequestStatus,
+    fetchingexistId,
   } = useAppSelector((state) => state.general)
 
   const handleUsePrint = useCallback(() => {
@@ -169,6 +172,17 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
   }, [currentRef])
 
   useEffect(handleUsePrint, [handleUsePrint])
+
+  useEffect(() => {
+    if (existIdRequestStatus === 'error') {
+      form.setFields([
+        {
+          name: 'cedula',
+          errors: ['La cedula ya existe'],
+        },
+      ])
+    }
+  }, [existIdRequestStatus])
 
   useEffect(() => {
     setFechaSelected(null)
@@ -2414,7 +2428,10 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   width={'55%'}
                   visible={visible}
                   cancelText={view ? 'Salir' : 'Cancelar'}
-                  okButtonProps={{ hidden: view }}
+                  okButtonProps={{
+                    hidden: view,
+                    disabled: existIdRequestStatus === 'error',
+                  }}
                   onCancel={() => {
                     CustomModalConfirmation({
                       content:
@@ -2431,585 +2448,53 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                     edit?.id ? handleUpdate() : handleCreate()
                   }}
                 >
-                  {/* consultas  */}
-                  <ConditionalComponent condition={State === 'C'}>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Paciente'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
+                  <CustomSpin spinning={fetchingexistId}>
+                    {/* consultas  */}
+                    <ConditionalComponent condition={State === 'C'}>
+                      <CustomCol xs={24}>
                         <CustomFormItem
-                          label={'Nombre'}
-                          noStyle
-                          name={'nombres'}
+                          label={'Paciente'}
                           rules={[{ required: true }]}
+                          labelCol={{ span: 4 }}
                         >
-                          {edit?.nombre_paciente ? (
-                            <CustomInput disabled placeholder="paciente" />
-                          ) : (
-                            <CustomSelect
-                              placeholder={'Seleccione un Paciente'}
-                              options={pacientes
-                                ?.filter((item) => item.estado === 'A')
-                                ?.map((item) => ({
-                                  label: `${formatter({
-                                    value: item.cedula,
-                                    type: 'identity_doc',
-                                  })} - ${item.nombres} ${item.apellidos}`,
-                                  value: item.id,
-                                }))}
-                              onSelect={(_, item) => {
-                                setpacienteSelected(
-                                  pacientes?.find(
-                                    (paciente) => paciente.id === item.value
+                          <CustomFormItem
+                            label={'Nombre'}
+                            noStyle
+                            name={'nombres'}
+                            rules={[{ required: true }]}
+                          >
+                            {edit?.nombre_paciente ? (
+                              <CustomInput disabled placeholder="paciente" />
+                            ) : (
+                              <CustomSelect
+                                placeholder={'Seleccione un Paciente'}
+                                options={pacientes
+                                  ?.filter((item) => item.estado === 'A')
+                                  ?.map((item) => ({
+                                    label: `${formatter({
+                                      value: item.cedula,
+                                      type: 'identity_doc',
+                                    })} - ${item.nombres} ${item.apellidos}`,
+                                    value: item.id,
+                                  }))}
+                                onSelect={(_, item) => {
+                                  setpacienteSelected(
+                                    pacientes?.find(
+                                      (paciente) => paciente.id === item.value
+                                    )
                                   )
-                                )
-                              }}
-                            />
-                          )}
-                        </CustomFormItem>
-                      </CustomFormItem>
-                    </CustomCol>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Doctor'}
-                        name={'id_doctor'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
-                        <CustomSelect
-                          placeholder={'Seleccione un doctor'}
-                          options={doctores
-                            ?.filter((item) => item.estado === 'A')
-                            ?.map((item) => ({
-                              label: item.nombre,
-                              value: item.id,
-                            }))}
-                        />
-                      </CustomFormItem>
-                    </CustomCol>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Asunto'}
-                        name={'asunto'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
-                        <CustomTextArea placeholder="Asunto" />
-                      </CustomFormItem>
-                    </CustomCol>
-                    <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
-                      <CustomFormItem
-                        label={'Tanda'}
-                        name={'id_tanda'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
-                        <CustomSelect
-                          placeholder={'Seleccione la tanda'}
-                          options={[
-                            horarios?.find(async (item) => {
-                              item.id_doctor ===
-                                (await form.getFieldValue('id_doctor'))
-                            })?.tanda_manana !== ''
-                              ? {
-                                  label: 'Mañana',
-                                  value: 'M',
-                                }
-                              : null,
-                            horarios?.find(async (item) => {
-                              item.id_doctor ===
-                                (await form.getFieldValue('id_doctor'))
-                            })?.tanda_tarde !== ''
-                              ? {
-                                  label: 'Tarde',
-                                  value: 'T',
-                                }
-                              : null,
-                          ]?.filter((item) => item !== null)}
-                          onSelect={async (value) => {
-                            setTandaSelected(value)
-                          }}
-                        />
-                      </CustomFormItem>
-                    </CustomCol>
-                    <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
-                      <CustomFormItem
-                        label={'Dia'}
-                        name={'dia'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 4 }}
-                      >
-                        <CustomSelect
-                          placeholder={'Seleccione el dia'}
-                          options={filterByArray(
-                            diasDeLaSemana,
-                            tandaSelected === 'M'
-                              ? horarios
-                                  ?.find(async (item) => {
-                                    item.id_doctor ===
-                                      (await form.getFieldValue('id_doctor'))
-                                  })
-                                  ?.tanda_manana?.split(',')
-                              : horarios
-                                  ?.find(async (item2) => {
-                                    item2.id_doctor ===
-                                      (await form.getFieldValue('id_doctor'))
-                                  })
-                                  ?.tanda_tarde?.split(',')
-                          )}
-                        />
-                      </CustomFormItem>
-                    </CustomCol>
-                  </ConditionalComponent>
-                  {/* Pacientes  */}
-                  <ConditionalComponent condition={State === 'P'}>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Nombre'}
-                          name={'nombres'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Nombre" />
+                                }}
+                              />
+                            )}
+                          </CustomFormItem>
                         </CustomFormItem>
                       </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Apellido'}
-                          name={'apellidos'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Apellido" />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints} pull={1}>
-                        <CustomFormItem
-                          label={'Nacionalidad'}
-                          name={'nacionalidad'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 8 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione una nacionalidad'}
-                            width={'112%'}
-                            options={nacionalidades
-                              ?.filter((item) => item.estado === 'A')
-                              ?.map((item) => ({
-                                label: item.nombre,
-                                value: item.id,
-                              }))}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Cédula'}
-                          name={'cedula'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.doc_identidad}
-                            placeholder="Cedula"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints} pull={2}>
-                        <CustomFormItem
-                          label={'Fecha de Nac.'}
-                          name={'fecha_nacimiento'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 10 }}
-                        >
-                          <CustomDatePicker style={{ width: '128%' }} />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Sexo'}
-                          name={'sexo'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione el Sexo'}
-                            options={[
-                              { label: 'Masculino', value: 'M' },
-                              { label: 'Femenino', value: 'F' },
-                            ]}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Seguro'}
-                          name={'seguro'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione el Seguro'}
-                            options={seguros
-                              ?.filter((item) => item.estado === 'A')
-                              ?.map((item) => ({
-                                label: item.nombre,
-                                value: item.id,
-                              }))}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Teléfono'}
-                          name={'telefono'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.telefono}
-                            placeholder="Telefono"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Email'}
-                          name={'email'}
-                          rules={[{ type: 'email' }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput
-                            placeholder={'Correo Electrónico'}
-                            type={'email'}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      {/* <CustomCol {...defaultBreakpoints}>
-                      <CustomUpload
-                        form={form}
-                        previewTitle={'Imagen'}
-                        label={'Foto'}
-                        name={'imagen'}
-                        labelCol={{ span: 6 }}
-                      />
-                    </CustomCol> */}
-                    </CustomRow>
-                  </ConditionalComponent>
-                  {/* Pacientes  */}
-                  <ConditionalComponent condition={State === 'R'}>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Nombre'}
-                          name={'nombres'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Nombre" />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Apellido'}
-                          name={'apellidos'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Apellido" />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints} pull={1}>
-                        <CustomFormItem
-                          label={'Nacionalidad'}
-                          name={'nacionalidad'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 8 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione una nacionalidad'}
-                            width={'112%'}
-                            options={nacionalidades
-                              ?.filter((item) => item.estado === 'A')
-                              ?.map((item) => ({
-                                label: item.nombre,
-                                value: item.id,
-                              }))}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Cédula'}
-                          name={'cedula'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.doc_identidad}
-                            placeholder="Cedula"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints} pull={2}>
-                        <CustomFormItem
-                          label={'Fecha de Nac.'}
-                          name={'fecha_nacimiento'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 10 }}
-                        >
-                          <CustomDatePicker style={{ width: '128%' }} />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Sexo'}
-                          name={'sexo'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione el Sexo'}
-                            options={[
-                              { label: 'Masculino', value: 'M' },
-                              { label: 'Femenino', value: 'F' },
-                            ]}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Teléfono'}
-                          name={'telefono'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.telefono}
-                            placeholder="Telefono"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                  </ConditionalComponent>
-                  {/* Administradores  */}
-                  <ConditionalComponent condition={State === 'A'}>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Nombre'}
-                          name={'nombres'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Nombre" />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Apellido'}
-                          name={'apellidos'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Apellido" />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Cédula'}
-                          name={'cedula'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.doc_identidad}
-                            placeholder="Cedula"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                  </ConditionalComponent>
-                  {/* Doctor  */}
-                  <ConditionalComponent condition={State === 'D'}>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Nombre'}
-                          name={'nombre'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Nombre" />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Apellido'}
-                          name={'apellido'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder="Apellido" />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints} pull={1}>
-                        <CustomFormItem
-                          label={'Nacionalidad'}
-                          name={'nacionalidad'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 8 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione una nacionalidad'}
-                            width={'112%'}
-                            options={nacionalidades
-                              ?.filter((item) => item.estado === 'A')
-                              ?.map((item) => ({
-                                label: item.nombre,
-                                value: item.id,
-                              }))}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Cédula'}
-                          name={'cedula'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.doc_identidad}
-                            placeholder="Cedula"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints} pull={2}>
-                        <CustomFormItem
-                          label={'Fecha de Nac.'}
-                          name={'fecha_nacimiento'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 10 }}
-                        >
-                          <CustomDatePicker style={{ width: '128%' }} />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Sexo'}
-                          name={'sexo'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccione el Sexo'}
-                            options={[
-                              { label: 'Masculino', value: 'M' },
-                              { label: 'Femenino', value: 'F' },
-                            ]}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Especialidad'}
-                          name={'especialidad'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomSelect
-                            placeholder={'Seleccionar Especialidad'}
-                            options={especialidades
-                              ?.filter((item) => item.estado === 'A')
-                              ?.map((item) => ({
-                                label: item.nombre,
-                                value: item.id,
-                              }))}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Exequatur'}
-                          name={'exequatur'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput placeholder={'Exequatur'} />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Teléfono'}
-                          name={'telefono'}
-                          rules={[{ required: true }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomMaskedInput
-                            mask={maskedInput.telefono}
-                            placeholder="Telefono"
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
-                        <CustomFormItem
-                          label={'Email'}
-                          name={'correo'}
-                          rules={[{ type: 'email' }]}
-                          labelCol={{ span: 6 }}
-                        >
-                          <CustomInput
-                            placeholder={'Correo Electrónico'}
-                            type={'email'}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                  </ConditionalComponent>
-                  <ConditionalComponent condition={State === 'E'}>
-                    <CustomCol xs={24}>
-                      <CustomFormItem
-                        label={'Especialidad'}
-                        name={'nombre'}
-                        rules={[{ required: true }]}
-                        labelCol={{ span: 6 }}
-                      >
-                        <CustomInput placeholder="Especialidad" />
-                      </CustomFormItem>
-                    </CustomCol>
-                  </ConditionalComponent>
-                  {/* Horarios  */}
-                  <ConditionalComponent condition={State === 'H'}>
-                    <CustomRow justify="space-between">
-                      <CustomCol {...defaultBreakpoints}>
+                      <CustomCol xs={24}>
                         <CustomFormItem
                           label={'Doctor'}
                           name={'id_doctor'}
                           rules={[{ required: true }]}
+                          labelCol={{ span: 4 }}
                         >
                           <CustomSelect
                             placeholder={'Seleccione un doctor'}
@@ -3022,71 +2507,665 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           />
                         </CustomFormItem>
                       </CustomCol>
-                      <CustomCol {...defaultBreakpoints}>
+                      <CustomCol xs={24}>
                         <CustomFormItem
-                          label={'Oficina'}
-                          name={'oficina'}
+                          label={'Asunto'}
+                          name={'asunto'}
                           rules={[{ required: true }]}
+                          labelCol={{ span: 4 }}
                         >
-                          <CustomInput placeholder="Oficina" />
+                          <CustomTextArea placeholder="Asunto" />
                         </CustomFormItem>
                       </CustomCol>
+                      <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
+                        <CustomFormItem
+                          label={'Tanda'}
+                          name={'id_tanda'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 4 }}
+                        >
+                          <CustomSelect
+                            placeholder={'Seleccione la tanda'}
+                            options={[
+                              horarios?.find(async (item) => {
+                                item.id_doctor ===
+                                  (await form.getFieldValue('id_doctor'))
+                              })?.tanda_manana !== ''
+                                ? {
+                                    label: 'Mañana',
+                                    value: 'M',
+                                  }
+                                : null,
+                              horarios?.find(async (item) => {
+                                item.id_doctor ===
+                                  (await form.getFieldValue('id_doctor'))
+                              })?.tanda_tarde !== ''
+                                ? {
+                                    label: 'Tarde',
+                                    value: 'T',
+                                  }
+                                : null,
+                            ]?.filter((item) => item !== null)}
+                            onSelect={async (value) => {
+                              setTandaSelected(value)
+                            }}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                      <CustomCol xs={24} style={{ marginTop: '0.5%' }}>
+                        <CustomFormItem
+                          label={'Dia'}
+                          name={'dia'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 4 }}
+                        >
+                          <CustomSelect
+                            placeholder={'Seleccione el dia'}
+                            options={filterByArray(
+                              diasDeLaSemana,
+                              tandaSelected === 'M'
+                                ? horarios
+                                    ?.find(async (item) => {
+                                      item.id_doctor ===
+                                        (await form.getFieldValue('id_doctor'))
+                                    })
+                                    ?.tanda_manana?.split(',')
+                                : horarios
+                                    ?.find(async (item2) => {
+                                      item2.id_doctor ===
+                                        (await form.getFieldValue('id_doctor'))
+                                    })
+                                    ?.tanda_tarde?.split(',')
+                            )}
+                          />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </ConditionalComponent>
+                    {/* Pacientes  */}
+                    <ConditionalComponent condition={State === 'P'}>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Nombre'}
+                            name={'nombres'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Nombre" />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Apellido'}
+                            name={'apellidos'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Apellido" />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints} pull={1}>
+                          <CustomFormItem
+                            label={'Nacionalidad'}
+                            name={'nacionalidad'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 8 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione una nacionalidad'}
+                              width={'112%'}
+                              options={nacionalidades
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: item.nombre,
+                                  value: item.id,
+                                }))}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Cédula'}
+                            name={'cedula'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.doc_identidad}
+                              placeholder="Cedula"
+                              onBlur={(e) => {
+                                !edit?.id &&
+                                  e.target.value.length > 0 &&
+                                  dispatch(
+                                    existId({
+                                      condition: {
+                                        cedula: replaceAll(
+                                          e.target.value,
+                                          '-',
+                                          ''
+                                        ),
+                                      },
+                                    })
+                                  )
+                              }}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints} pull={2}>
+                          <CustomFormItem
+                            label={'Fecha de Nac.'}
+                            name={'fecha_nacimiento'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 10 }}
+                          >
+                            <CustomDatePicker style={{ width: '128%' }} />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Sexo'}
+                            name={'sexo'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione el Sexo'}
+                              options={[
+                                { label: 'Masculino', value: 'M' },
+                                { label: 'Femenino', value: 'F' },
+                              ]}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Seguro'}
+                            name={'seguro'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione el Seguro'}
+                              options={seguros
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: item.nombre,
+                                  value: item.id,
+                                }))}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Teléfono'}
+                            name={'telefono'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.telefono}
+                              placeholder="Telefono"
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Email'}
+                            name={'email'}
+                            rules={[{ type: 'email' }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput
+                              placeholder={'Correo Electrónico'}
+                              type={'email'}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        {/* <CustomCol {...defaultBreakpoints}>
+                      <CustomUpload
+                        form={form}
+                        previewTitle={'Imagen'}
+                        label={'Foto'}
+                        name={'imagen'}
+                        labelCol={{ span: 6 }}
+                      />
+                    </CustomCol> */}
+                      </CustomRow>
+                    </ConditionalComponent>
+                    {/* Recepcionistas  */}
+                    <ConditionalComponent condition={State === 'R'}>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Nombre'}
+                            name={'nombres'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Nombre" />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Apellido'}
+                            name={'apellidos'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Apellido" />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints} pull={1}>
+                          <CustomFormItem
+                            label={'Nacionalidad'}
+                            name={'nacionalidad'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 8 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione una nacionalidad'}
+                              width={'112%'}
+                              options={nacionalidades
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: item.nombre,
+                                  value: item.id,
+                                }))}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Cédula'}
+                            name={'cedula'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.doc_identidad}
+                              placeholder="Cedula"
+                              onBlur={(e) => {
+                                !edit?.id &&
+                                  e.target.value.length > 0 &&
+                                  dispatch(
+                                    existId({
+                                      condition: {
+                                        cedula: replaceAll(
+                                          e.target.value,
+                                          '-',
+                                          ''
+                                        ),
+                                      },
+                                    })
+                                  )
+                              }}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints} pull={2}>
+                          <CustomFormItem
+                            label={'Fecha de Nac.'}
+                            name={'fecha_nacimiento'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 10 }}
+                          >
+                            <CustomDatePicker style={{ width: '128%' }} />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Sexo'}
+                            name={'sexo'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione el Sexo'}
+                              options={[
+                                { label: 'Masculino', value: 'M' },
+                                { label: 'Femenino', value: 'F' },
+                              ]}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Teléfono'}
+                            name={'telefono'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.telefono}
+                              placeholder="Telefono"
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                    </ConditionalComponent>
+                    {/* Administradores  */}
+                    <ConditionalComponent condition={State === 'A'}>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Nombre'}
+                            name={'nombres'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Nombre" />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Apellido'}
+                            name={'apellidos'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Apellido" />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Cédula'}
+                            name={'cedula'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.doc_identidad}
+                              placeholder="Cedula"
+                              onBlur={(e) => {
+                                !edit?.id &&
+                                  e.target.value.length > 0 &&
+                                  dispatch(
+                                    existId({
+                                      condition: {
+                                        cedula: replaceAll(
+                                          e.target.value,
+                                          '-',
+                                          ''
+                                        ),
+                                      },
+                                    })
+                                  )
+                              }}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                    </ConditionalComponent>
+                    {/* Doctor  */}
+                    <ConditionalComponent condition={State === 'D'}>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Nombre'}
+                            name={'nombre'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Nombre" />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Apellido'}
+                            name={'apellido'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder="Apellido" />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints} pull={1}>
+                          <CustomFormItem
+                            label={'Nacionalidad'}
+                            name={'nacionalidad'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 8 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione una nacionalidad'}
+                              width={'112%'}
+                              options={nacionalidades
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: item.nombre,
+                                  value: item.id,
+                                }))}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Cédula'}
+                            name={'cedula'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.doc_identidad}
+                              placeholder="Cedula"
+                              onBlur={(e) => {
+                                !edit?.id &&
+                                  e.target.value.length > 0 &&
+                                  dispatch(
+                                    existId({
+                                      condition: {
+                                        cedula: replaceAll(
+                                          e.target.value,
+                                          '-',
+                                          ''
+                                        ),
+                                      },
+                                    })
+                                  )
+                              }}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints} pull={2}>
+                          <CustomFormItem
+                            label={'Fecha de Nac.'}
+                            name={'fecha_nacimiento'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 10 }}
+                          >
+                            <CustomDatePicker style={{ width: '128%' }} />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Sexo'}
+                            name={'sexo'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione el Sexo'}
+                              options={[
+                                { label: 'Masculino', value: 'M' },
+                                { label: 'Femenino', value: 'F' },
+                              ]}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Especialidad'}
+                            name={'especialidad'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccionar Especialidad'}
+                              options={especialidades
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: item.nombre,
+                                  value: item.id,
+                                }))}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Exequatur'}
+                            name={'exequatur'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput placeholder={'Exequatur'} />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Teléfono'}
+                            name={'telefono'}
+                            rules={[{ required: true }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomMaskedInput
+                              mask={maskedInput.telefono}
+                              placeholder="Telefono"
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Email'}
+                            name={'correo'}
+                            rules={[{ type: 'email' }]}
+                            labelCol={{ span: 6 }}
+                          >
+                            <CustomInput
+                              placeholder={'Correo Electrónico'}
+                              type={'email'}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                    </ConditionalComponent>
+                    <ConditionalComponent condition={State === 'E'}>
+                      <CustomCol xs={24}>
+                        <CustomFormItem
+                          label={'Especialidad'}
+                          name={'nombre'}
+                          rules={[{ required: true }]}
+                          labelCol={{ span: 6 }}
+                        >
+                          <CustomInput placeholder="Especialidad" />
+                        </CustomFormItem>
+                      </CustomCol>
+                    </ConditionalComponent>
+                    {/* Horarios  */}
+                    <ConditionalComponent condition={State === 'H'}>
+                      <CustomRow justify="space-between">
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Doctor'}
+                            name={'id_doctor'}
+                            rules={[{ required: true }]}
+                          >
+                            <CustomSelect
+                              placeholder={'Seleccione un doctor'}
+                              options={doctores
+                                ?.filter((item) => item.estado === 'A')
+                                ?.map((item) => ({
+                                  label: item.nombre,
+                                  value: item.id,
+                                }))}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints}>
+                          <CustomFormItem
+                            label={'Oficina'}
+                            name={'oficina'}
+                            rules={[{ required: true }]}
+                          >
+                            <CustomInput placeholder="Oficina" />
+                          </CustomFormItem>
+                        </CustomCol>
 
-                      <CustomCol
-                        {...defaultBreakpoints}
-                        style={{ marginTop: '2%' }}
-                      >
-                        <CustomTitle style={{ textAlign: 'center' }}>
-                          Tanda de la Mañana
-                        </CustomTitle>
-                      </CustomCol>
-                      <CustomCol
-                        {...defaultBreakpoints}
-                        style={{ marginTop: '2%' }}
-                      >
-                        <CustomTitle style={{ textAlign: 'center' }}>
-                          Tanda de la Tarde
-                        </CustomTitle>
-                      </CustomCol>
-                      {/* <CustomCol {...defaultBreakpoints} /> */}
-                      <CustomCol {...defaultBreakpoints} push={1}>
-                        <CustomFormItem
-                          label={'Días de la tanda de la mañana'}
-                          name={'tanda_manana'}
-                          // rules={[{ required: true }]}
-                          noStyle
+                        <CustomCol
+                          {...defaultBreakpoints}
+                          style={{ marginTop: '2%' }}
                         >
-                          <CustomSelect
-                            mode="multiple"
-                            onChange={(value: string[]) => {
-                              setSelectedDiasManana(value)
-                            }}
-                            placeholder={'Seleccione los dias'}
-                            options={diasDeLaSemana}
-                            width={'80%'}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                      <CustomCol {...defaultBreakpoints} push={1}>
-                        <CustomFormItem
-                          label={'Días de la tanda de la tarde'}
-                          name={'tanda_tarde'}
-                          // rules={[{ required: true }]}
-                          noStyle
+                          <CustomTitle style={{ textAlign: 'center' }}>
+                            Tanda de la Mañana
+                          </CustomTitle>
+                        </CustomCol>
+                        <CustomCol
+                          {...defaultBreakpoints}
+                          style={{ marginTop: '2%' }}
                         >
-                          <CustomSelect
-                            mode="multiple"
-                            onChange={(value: string[]) => {
-                              setSelectedDiasTarde(value)
-                            }}
-                            placeholder={'Seleccione los dias'}
-                            options={diasDeLaSemana}
-                            width={'80%'}
-                          />
-                        </CustomFormItem>
-                      </CustomCol>
-                    </CustomRow>
-                  </ConditionalComponent>
+                          <CustomTitle style={{ textAlign: 'center' }}>
+                            Tanda de la Tarde
+                          </CustomTitle>
+                        </CustomCol>
+                        {/* <CustomCol {...defaultBreakpoints} /> */}
+                        <CustomCol {...defaultBreakpoints} push={1}>
+                          <CustomFormItem
+                            label={'Días de la tanda de la mañana'}
+                            name={'tanda_manana'}
+                            // rules={[{ required: true }]}
+                            noStyle
+                          >
+                            <CustomSelect
+                              mode="multiple"
+                              onChange={(value: string[]) => {
+                                setSelectedDiasManana(value)
+                              }}
+                              placeholder={'Seleccione los dias'}
+                              options={diasDeLaSemana}
+                              width={'80%'}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                        <CustomCol {...defaultBreakpoints} push={1}>
+                          <CustomFormItem
+                            label={'Días de la tanda de la tarde'}
+                            name={'tanda_tarde'}
+                            // rules={[{ required: true }]}
+                            noStyle
+                          >
+                            <CustomSelect
+                              mode="multiple"
+                              onChange={(value: string[]) => {
+                                setSelectedDiasTarde(value)
+                              }}
+                              placeholder={'Seleccione los dias'}
+                              options={diasDeLaSemana}
+                              width={'80%'}
+                            />
+                          </CustomFormItem>
+                        </CustomCol>
+                      </CustomRow>
+                    </ConditionalComponent>
+                  </CustomSpin>
                 </CustomModal>
                 <CustomModal
                   title={<CustomTitle>Receta</CustomTitle>}

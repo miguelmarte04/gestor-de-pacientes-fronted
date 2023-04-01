@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 import { getSessionToken } from './session'
 import {
   WEB_SERVICE_API_COPIA_DB,
+  WEB_SERVICE_API_EXIST_ID,
   WEB_SERVICE_API_GET_ADMINISTRADORES,
   WEB_SERVICE_API_GET_COLOR_LESION,
   WEB_SERVICE_API_GET_CONSULTAS,
@@ -94,6 +95,9 @@ const getConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
 }
 const copiaDb = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_COPIA_DB}`, payload)
+}
+const existId = (payload: GeneralType): Promise<AxiosResponse> => {
+  return postRequest(`${WEB_SERVICE_API_EXIST_ID}`, payload)
 }
 const createConsultas = (payload: GeneralType): Promise<AxiosResponse> => {
   return postRequest(`${WEB_SERVICE_API_UPDATE_CREATE_CONSULTAS}`, payload)
@@ -210,6 +214,7 @@ export const userApiHelper = {
   authenticateUser,
   getConsultas,
   copiaDb,
+  existId,
   createConsultas,
   updateConsultas,
   getDoctores,
