@@ -27,6 +27,7 @@ export const WEB_SERVICE_API_GET_ESPECILIDADES = `${WEB_SERVICE_API}/especialida
 export const WEB_SERVICE_API_GET_HORARIOS = `${WEB_SERVICE_API}/horarios`
 export const WEB_SERVICE_API_GET_SEGUROS = `${WEB_SERVICE_API}/seguros`
 export const WEB_SERVICE_API_GET_CONSULTAS = `${WEB_SERVICE_API}/consultas`
+export const WEB_SERVICE_API_COPIA_DB = `${WEB_SERVICE_API}/copia_db`
 export const WEB_SERVICE_API_GET_ADMINISTRADORES = `${WEB_SERVICE_API}/administradores`
 export const WEB_SERVICE_API_GET_DET_CITAS = `${WEB_SERVICE_API}/detcitas`
 export const WEB_SERVICE_API_GET_TIPO_LESION = `${WEB_SERVICE_API}/tipo_lesion`

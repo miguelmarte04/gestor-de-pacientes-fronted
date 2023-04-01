@@ -38,6 +38,7 @@ export interface GeneralState {
   fetchingFromPacientes: boolean
   pacientesRequestStatus: RequestStatusType
   createConsultasRequestStatus: RequestStatusType
+  copiaDbRequestStatus: RequestStatusType
   createDetCitasRequestStatus: RequestStatusType
   createAdministradoresRequestStatus: RequestStatusType
   createPacientesRequestStatus: RequestStatusType
@@ -66,6 +67,7 @@ const initialState: GeneralState = {
   fetchingFromPacientes: false,
   pacientesRequestStatus: '',
   createConsultasRequestStatus: '',
+  copiaDbRequestStatus: '',
   createAdministradoresRequestStatus: '',
   createDetCitasRequestStatus: '',
   createEspecialidadRequestStatus: '',
@@ -94,6 +96,16 @@ export const getConsultas = createAsyncThunk(
   'general/getConsultas',
   async (payload: GeneralType) => {
     const response = await userApiHelper.getConsultas(payload)
+
+    const { data } = response.data
+
+    return data
+  }
+)
+export const copiaDb = createAsyncThunk(
+  'general/copiaDb',
+  async (payload: GeneralType) => {
+    const response = await userApiHelper.copiaDb(payload)
 
     const { data } = response.data
 
@@ -629,6 +641,7 @@ export const generalSlice = createSlice({
         state.fetchingGeneralData = false
         state.Consultas = initialState.Consultas
       })
+
       .addCase(createConsultas.pending, (state) => {
         state.fetchingGeneralData = true
         state.createConsultasRequestStatus = 'pending'
@@ -648,6 +661,28 @@ export const generalSlice = createSlice({
         showNotification({
           title: 'Error',
           description: 'No se pudo Insertar el Consulta',
+          type: 'error',
+        })
+      })
+      .addCase(copiaDb.pending, (state) => {
+        state.fetchingGeneralData = true
+        state.copiaDbRequestStatus = 'pending'
+      })
+      .addCase(copiaDb.fulfilled, (state) => {
+        state.fetchingGeneralData = false
+        state.copiaDbRequestStatus = 'success'
+        showNotification({
+          title: 'Exitoso',
+          description: 'Copia de seguridad realizada',
+          type: 'success',
+        })
+      })
+      .addCase(copiaDb.rejected, (state) => {
+        state.copiaDbRequestStatus = 'error'
+        state.fetchingGeneralData = false
+        showNotification({
+          title: 'Error',
+          description: 'No se pudo realizar la copia de seguridad',
           type: 'error',
         })
       })

@@ -7,6 +7,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   QuestionCircleOutlined,
+  SaveOutlined,
 } from '@ant-design/icons'
 import CustomLayout from './CustomLayout'
 import CustomSider from './CustomSider'
@@ -30,6 +31,10 @@ import CustomSpace from './CustomSpace'
 import CustomModal from './CustomModal'
 import CustomTitle from './CustomTitle'
 import CustomText from './CustomText'
+import ConditionalComponent from './ConditionalComponent'
+import { CustomModalConfirmation } from './ConfirmModalMethod'
+import { useAppDispatch } from '../hooks'
+import { copiaDb } from '../slicers/general/general'
 
 const { Header, Content } = Layout
 
@@ -45,6 +50,7 @@ const MenuRoutesWrapper = (): React.ReactElement => {
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const [fullScreen, setFullScreen] = useState<boolean>(false)
   const [modalVisible, SetModalVisible] = useState<boolean>(false)
+  const dispatch = useAppDispatch()
 
   if (!isLoggedIn()) {
     removeSession()
@@ -77,6 +83,15 @@ const MenuRoutesWrapper = (): React.ReactElement => {
       setFullScreen(false)
       exitFullscreen()
     }
+  }
+  const HandleSaveData = () => {
+    CustomModalConfirmation({
+      content: '¿Está seguro que desea realizar una copia de seguridad?',
+
+      onOk: () => {
+        dispatch(copiaDb({}))
+      },
+    })
   }
 
   return (
@@ -196,6 +211,30 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                     </CustomButton>
                   </CustomDropdown>
                 </CustomCol>
+                <ConditionalComponent
+                  condition={getSessionInfo().privilegios === 1}
+                >
+                  <CustomCol xs={5}>
+                    <CustomTooltip title={'Copia de seguridad'}>
+                      <CustomButton
+                        size={'large'}
+                        type={'link'}
+                        style={iconButtonStyle}
+                        onClick={() => HandleSaveData()}
+                      >
+                        <Avatar
+                          style={{
+                            backgroundColor: 'transparent',
+                            color: 'black',
+                          }}
+                          size={'large'}
+                          icon={<SaveOutlined />}
+                        />
+                      </CustomButton>
+                    </CustomTooltip>
+                  </CustomCol>
+                </ConditionalComponent>
+
                 <CustomCol xs={12}>
                   <CustomTooltip
                     title={
@@ -227,7 +266,6 @@ const MenuRoutesWrapper = (): React.ReactElement => {
                     </CustomButton>
                   </CustomTooltip>
                 </CustomCol>
-
                 <Affix
                   style={{
                     position: 'fixed',
