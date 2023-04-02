@@ -344,13 +344,13 @@ const MenuRoutesWrapper = (): React.ReactElement => {
         <CustomCol xs={24}>
           <CustomRow justify={'center'}>
             <CustomCol xs={24}>
-              <CustomText>Telefono: 829-855-5622</CustomText>
+              <CustomText>Telefono: 809-573-2379</CustomText>
             </CustomCol>
             <CustomCol xs={24}>
-              <CustomText>Email: 829-855-5622</CustomText>
+              <CustomText>Email: soporte@idi.com</CustomText>
             </CustomCol>
             <CustomCol xs={24}>
-              <CustomText>Direccion: 829-855-5622</CustomText>
+              <CustomText>Direccion: La Vega</CustomText>
             </CustomCol>
           </CustomRow>
         </CustomCol>

@@ -2293,7 +2293,7 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                   <CustomCol xs={24} md={12} />
                   <CustomCol xs={24} md={12}>
                     <CustomRow justify={'space-between'} gutter={[10, 0]}>
-                      <CustomCol xs={20}>
+                      <CustomCol xs={19} lg={17} xl={19}>
                         <CustomFormItem noStyle name={'SEARCH'}>
                           <CustomSearch
                             className={'search'}
@@ -2314,17 +2314,19 @@ const SimpleTemplate: React.FC<TemplateProps> = ({
                           State !== 'HC'
                         }
                       >
-                        <CustomCol xs={4} md={2} lg={3} xl={2}>
-                          <CustomTooltip title={'Nuevo'}>
+                        <CustomCol xs={5} md={5} lg={7} xl={5}>
+                          <CustomTooltip title={'Agregar'}>
                             <CustomButton
                               icon={<PlusOutlined />}
-                              shape={'circle'}
+                              // shape={'circle'}
                               size={'middle'}
                               type={'primary'}
                               onClick={() => {
                                 setVisible(true)
                               }}
-                            />
+                            >
+                              Agregar
+                            </CustomButton>
                           </CustomTooltip>
                         </CustomCol>
                       </ConditionalComponent>
